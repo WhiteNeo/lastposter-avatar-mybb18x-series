@@ -54,7 +54,7 @@ function avatarep_info()
 		"author"		=> "Dark Neo",
 		"authorsite"	=> "http://forosmybb.es",
 		"version"		=> "2.8.2",
-		"guid" 			=> "c4f9c28c311a919b6bcf8914f61e6133",
+		"codename" 		=> "last_poster_avatar",
 		"compatibility" => "18*"
 	);
 } 
@@ -219,6 +219,7 @@ function avatarep_activate() {
 					{$lang->postbit_status} {$online_status}<br />					
 					{$lang->registration_date} {$memregdate}<br />
 					{$lang->reputation} {$memprofile[\'reputation\']}<br />
+					{$lang->total_threads} {$memprofile[\'threadnum\']}<br />					
 					{$lang->total_posts} {$memprofile[\'postnum\']}<br />
 					{$lang->lastvisit} {$memlastvisitdate} {$memlastvisittime}<br />	
 					{$lang->warning_level} <a href="{$warning_link}">{$warning_level} %</a><br /><hr>
@@ -592,6 +593,29 @@ function forumlist_avatar(&$_f)
 
 			if($forum['fid'])
 			{
+			
+				if($private_forums[$forum['fid']]['lastpost'])
+				{
+					$forum['lastpost'] = $private_forums[$forum['fid']]['lastpost'];
+					$lastpost_data = array(
+						"lastpost" => $private_forums[$forum['fid']]['lastpost'],
+						"lastpostsubject" => $private_forums[$forum['fid']]['subject'],
+						"lastposter" => $private_forums[$forum['fid']]['lastposter'],
+						"lastposttid" => $private_forums[$forum['fid']]['tid'],
+						"lastposteruid" => $private_forums[$forum['fid']]['lastposteruid']
+					);
+				}
+				else
+				{
+					$lastpost_data = array(
+						"lastpost" => $forum['lastpost'],
+						"lastpostsubject" => $forum['lastpostsubject'],
+						"lastposter" => $forum['lastposter'],
+						"lastposttid" => $forum['lastposttid'],
+						"lastposteruid" => $forum['lastposteruid']
+					);
+				}
+
 				$forum = iterator_to_array($forum);
 				$avatarep_cache[$forum['fid']] = $forum;
 
