@@ -574,9 +574,9 @@ function forumlist_avatar(&$_f)
     $lang->load("avatarep", false, true);
     
     //Revisar que la opcion este activa
-    if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && !$mybb->settings['avatarep_foros'] == 1)
+    if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_foros'] == 0)
     {
-     return false;	
+		return false;	
 	}
 	
 	if(!isset($cache->cache['avatarep_cache']))
@@ -593,32 +593,9 @@ function forumlist_avatar(&$_f)
 
 			if($forum['fid'])
 			{
-			
-				if($private_forums[$forum['fid']]['lastpost'])
-				{
-					$forum['lastpost'] = $private_forums[$forum['fid']]['lastpost'];
-					$lastpost_data = array(
-						"lastpost" => $private_forums[$forum['fid']]['lastpost'],
-						"lastpostsubject" => $private_forums[$forum['fid']]['subject'],
-						"lastposter" => $private_forums[$forum['fid']]['lastposter'],
-						"lastposttid" => $private_forums[$forum['fid']]['tid'],
-						"lastposteruid" => $private_forums[$forum['fid']]['lastposteruid']
-					);
-				}
-				else
-				{
-					$lastpost_data = array(
-						"lastpost" => $forum['lastpost'],
-						"lastpostsubject" => $forum['lastpostsubject'],
-						"lastposter" => $forum['lastposter'],
-						"lastposttid" => $forum['lastposttid'],
-						"lastposteruid" => $forum['lastposteruid']
-					);
-				}
-
 				$forum = iterator_to_array($forum);
 				$avatarep_cache[$forum['fid']] = $forum;
-
+				
 				if($forum['parentlist'])
 				{
 					$avatarep_cache[$forum['fid']] = $forum;
@@ -629,7 +606,7 @@ function forumlist_avatar(&$_f)
 					foreach($exp as $parent)
 					{
 						if($parent == $forum['fid']) continue;
-						if(isset($avatarep_cache[$parent]) && $forum['lastpost'] > $avatarep_cache[$parent]['lastpost'])
+						if(isset($avatarep_cache[$parent]) && $forum['lastpost'] < $avatarep_cache[$parent]['lastpost'])
 						{
 							$avatarep_cache[$parent]['lastpost'] = $lastpost_data['lastpost'];
 							$avatarep_cache[$parent]['avataruid'] = $lastpost_data['lastposteruid']; // Se reemplaza la info de un subforo, por la original...
@@ -688,7 +665,6 @@ function forumlist_avatar(&$_f)
 	}
 	
 	$username = format_name($_f['avatarep_lastpost']['username'], $_f['avatarep_lastpost']['usergroup'], $_f['avatarep_lastpost']['displaygroup']);	
-    //$profilelink = build_profile_link($username, $_f['uid']);	
 	//$_f['lastposter'] = $username;
 	$_f['lastposter'] = "<span class=\"avatarep_fs\"><br />{$lang->by} " . $username . "</span></a></span><span class=\"avatarep_fd\">" . $_f['avatarep'];  	
 }
