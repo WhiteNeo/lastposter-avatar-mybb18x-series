@@ -595,6 +595,28 @@ function forumlist_avatar(&$_f)
 			{
 				$forum = iterator_to_array($forum);
 				$avatarep_cache[$forum['fid']] = $forum;
+
+				if($private_forums[$forum['fid']]['lastpost'])
+				{
+					$forum['lastpost'] = $private_forums[$forum['fid']]['lastpost'];
+					$lastpost_data = array(
+						"lastpost" => $private_forums[$forum['fid']]['lastpost'],
+						"lastpostsubject" => $private_forums[$forum['fid']]['subject'],
+						"lastposter" => $private_forums[$forum['fid']]['lastposter'],
+						"lastposttid" => $private_forums[$forum['fid']]['tid'],
+						"lastposteruid" => $private_forums[$forum['fid']]['lastposteruid']
+					);
+				}
+				else
+				{
+					$lastpost_data = array(
+						"lastpost" => $forum['lastpost'],
+						"lastpostsubject" => $forum['lastpostsubject'],
+						"lastposter" => $forum['lastposter'],
+						"lastposttid" => $forum['lastposttid'],
+						"lastposteruid" => $forum['lastposteruid']
+					);
+				}
 				
 				if($forum['parentlist'])
 				{
