@@ -309,15 +309,16 @@ function avatarep_activate() {
 }
 
 .avatarep_fs{
-	margin-top: 18px;
-	margin-left: 63px; 
-	position: absolute; 
+	position: relative; 
 	font-size: 12px;
 }
 
 .avatarep_fd{
-	float: right;
-	padding: 5px;
+	margin-left: -5px;
+	margin-top: -40px;
+	position: relative;
+	float: left;
+	padding: 0 5px;
 }';
 
 	$stylesheet = array(
