@@ -28,6 +28,8 @@ $plugins->add_hook('search_results_post', 'avatarep_search');
 }
 $plugins->add_hook('global_start', 'avatarep_popup');
 $plugins->add_hook('usercp_do_avatar_end', 'avatarep_avatar_update');
+$plugins->add_hook('global_end', 'avatarep_style_guser');
+$plugins->add_hook('pre_output_page', 'avatarep_style_output');
 if(THIS_SCRIPT == 'modcp.php' && in_array($mybb->input['action'], array('do_new_announcement', 'do_edit_announcement'))){
 $plugins->add_hook('redirect', 'avatarep_announcement_update');
 }
@@ -48,13 +50,13 @@ function avatarep_info()
 	}
 
 	return array(
-        "name"			=> $db->escape_string($lang->avatarep_name),
-    	"description"	=> $db->escape_string($lang->avatarep_descrip) . " " . $avatarep_config_link,
-		"website"		=> "http://forosmybb.es",
-		"author"		=> "Dark Neo",
+        	"name"		=> $db->escape_string($lang->avatarep_name),
+    		"description"	=> $db->escape_string($lang->avatarep_descrip) . " " . $avatarep_config_link,
+		"website"	=> "http://forosmybb.es",
+		"author"	=> "Dark Neo",
 		"authorsite"	=> "http://forosmybb.es",
-		"version"		=> "2.8.2",
-		"codename" 		=> "last_poster_avatar",
+		"version"	=> "2.8.2",
+		"codename" 	=> "last_poster_avatar",
 		"compatibility" => "18*"
 	);
 } 
@@ -187,9 +189,6 @@ function avatarep_activate() {
 		$cache->update('anno_cache', $inline_avatars);
 	}
 	
-	//Reconstruimos las opciones del archivo settings
-	rebuild_settings();
-
 	//Adding new templates
 	$templatearray = array(
 		'title' => 'avatarep_popup',
@@ -364,112 +363,20 @@ function avatarep_activate() {
 		*/
 		
     //Archivo requerido para reemplazo de templates
-   	require MYBB_ROOT.'inc/adminfunctions_templates.php';
+    require_once MYBB_ROOT.'inc/adminfunctions_templates.php';
     // Reemplazos que vamos a hacer en las plantillas 1.- Platilla 2.- Contenido a Reemplazar 3.- Contenido que reemplaza lo anterior
-	/*find_replace_templatesets("headerinclude", '#'.preg_quote('{$stylesheets}').'#', '{$stylesheets}
-<script type="text/javascript" src="{$mybb->settings[\'bburl\']}/images/avatarep/avatarep.js"></script>');*/
-    find_replace_templatesets("forumdisplay_thread", '#^(.*)$#s', '<tr class="inline_row">
-	<td align="center" class="{$bgcolor}{$thread_type_class}" width="2%"><span class="thread_status {$folder}" title="{$folder_label}">&nbsp;</span>{$icon}</td>
-	<td align="center" class="{$bgcolor}{$thread_type_class}" width="2%">{$avatarep_avatar[\'avatarep\']}</td>
-	<td class="{$bgcolor}{$thread_type_class}">
-		{$attachment_count}
-		<div>
-			<span>{$prefix} {$gotounread}{$thread[\'threadprefix\']}<span class="{$inline_edit_class} {$new_class}" id="tid_{$inline_edit_tid}"><a href="{$thread[\'threadlink\']}">{$thread[\'subject\']}</a></span>{$thread[\'multipage\']}</span>
-			<div class="author smalltext">{$thread[\'profilelink\']}</div>
-		</div>
-	</td>
-	<td align="center" class="{$bgcolor}{$thread_type_class}"><a href="javascript:MyBB.whoPosted({$thread[\'tid\']});">{$thread[\'replies\']}</a>{$unapproved_posts}</td>
-	<td align="center" class="{$bgcolor}{$thread_type_class}">{$thread[\'views\']}</td>
-	{$rating}
-	<td class="{$bgcolor}{$thread_type_class}" style="white-space: nowrap; text-align: left;">
-        <table border="0">
-         <tr>
-         <td>{$avatarep_lastpost[\'avatarep\']}</td>
-         <td>
-		<span class="lastpost smalltext">{$lastpostdate} {$lastposttime}<br />
-		<a href="{$thread[\'lastpostlink\']}">{$lang->lastpost}</a>: {$lastposterlink}</span>
-        </td>
-        </tr>
-        </table>
-	</td>
-{$modbit}
-</tr>');
-	find_replace_templatesets("forumbit_depth2_forum_lastpost", '#^(.*)$#s', '<table border="0">
-  <tr>
-    <td width="2%"><span class="smalltext">{$lastpost_profilelink}</span></td>
-    <td align="left" valign="top">
-<span class="smalltext">
-<a href="{$lastpost_link}" title="{$full_lastpost_subject}"><strong>{$lastpost_subject}</strong></a>
-<br />{$lastpost_date} {$lastpost_time}</span>
-   </td>
-  </tr>
-</table>');
-	find_replace_templatesets("forumdisplay_announcements_announcement", '#^(.*)$#s', '<tr>
-<td align="center" class="{$bgcolor}" width="2%"><span class="thread_status {$folder}">&nbsp;</span></td>
-<td align="center" class="{$bgcolor}" width="2%">{$anno_avatar[\'avatarep\']}</td>
-<td class="{$bgcolor} forumdisplay_announcement">
-	<a href="{$announcement[\'announcementlink\']}"{$new_class}>{$announcement[\'subject\']}</a>
-	<div class="author smalltext">{$announcement[\'profilelink\']}</div>
-</td>
-<td align="center" class="{$bgcolor} forumdisplay_announcement">-</td>
-<td align="center" class="{$bgcolor} forumdisplay_announcement">-</td>
-{$rating}
-<td class="{$bgcolor} forumdisplay_announcement" style="white-space: nowrap; text-align: right"><span class="smalltext">{$postdate}</span></td>
-{$modann}
-</tr>');	
-	find_replace_templatesets("search_results_posts_post", '#^(.*)$#s', '<tr class="inline_row">
-	<td align="center" class="{$bgcolor}" width="2%"><span class="thread_status {$folder}">&nbsp;</span>{$icon}&nbsp;</td>
-	<td align="center" class="{$bgcolor}" width="2%">{$avatarep_avatar[\'avatarep\']}</td>
-	<td class="{$bgcolor}">
-		<span class="smalltext">
-			{$lang->post_thread} <a href="{$thread_url}{$highlight}">{$post[\'thread_subject\']}</a><br />
-			{$lang->post_subject} <a href="{$post_url}{$highlight}#pid{$post[\'pid\']}">{$post[\'subject\']}</a>
-		</span><br />
-		<table width="100%"><tr><td><span class="smalltext"><em>{$prev}</em></span></td></tr></table>
-	</td>
-	<td align="center" class="{$bgcolor}">{$post[\'profilelink\']}</td>
-	<td class="{$bgcolor}" >{$post[\'forumlink\']}</td>
-	<td align="center" class="{$bgcolor}"><a href="javascript:MyBB.whoPosted({$post[\'tid\']});">{$post[\'thread_replies\']}</a></td>
-	<td align="center" class="{$bgcolor}">{$post[\'thread_views\']}</td>
-	<td class="{$bgcolor}" style="white-space: nowrap; text-align: center;"><span class="smalltext">{$posted}</span></td>
-	{$inline_mod_checkbox}
-</tr>');
-	find_replace_templatesets("search_results_threads_thread", '#^(.*)$#s', '<tr class="inline_row">
-	<td align="center" class="{$bgcolor}" width="2%"><span class="thread_status {$folder}" title="{$folder_label}">&nbsp;</span>{$icon}&nbsp;</td>
-	<td align="center" class="{$bgcolor}" width="2%">{$avatarep_avatar[\'avatarep\']}</td>
-	<td class="{$bgcolor}">
-		{$attachment_count}
-		<div>
-			<span>{$prefix} {$gotounread}{$thread[\'threadprefix\']}<a href="{$thread_link}{$highlight}" class="{$inline_edit_class} {$new_class}" id="tid_{$inline_edit_tid}">{$thread[\'subject\']}</a>{$thread[\'multipage\']}</span>
-			<div class="author smalltext">{$thread[\'profilelink\']}</div>
-		</div>
-	</td>
-	<td class="{$bgcolor}">{$thread[\'forumlink\']}</td>
-	<td align="center" class="{$bgcolor}"><a href="javascript:MyBB.whoPosted({$thread[\'tid\']});">{$thread[\'replies\']}</a></td>
-	<td align="center" class="{$bgcolor}">{$thread[\'views\']}</td>
-	<td class="{$bgcolor}" style="white-space: nowrap">
-            <table border"0">
-                <tr>
-					<td width="2%">
-						{$avatarep_lastpost[\'avatarep\']}
-					</td>
-					<td>
-						<span class="smalltext">
-							{$lastpostdate}<br />
-							<a href="{$thread[\'lastpostlink\']}">{$lang->lastpost}</a>: {$lastposterlink}
-						</span>
-					</td>
-				</tr>
-			</table>
-	</td>
-	{$inline_mod_checkbox}
-</tr>');
-
-    //Se actualiza la info de las plantillas
-   	$cache->update_forums();
-
-    return true;
-
+    find_replace_templatesets("postbit", '#'.preg_quote('{$post[\'profilelink\']}').'#', '{$post[\'dntstyle\']}');
+    find_replace_templatesets("postbit_classic", '#'.preg_quote('{$post[\'profilelink\']}').'#', '{$post[\'dntstyle\']}');	
+    find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$thread[\'profilelink\']}').'#', '{$avatarep_avatar[\'avatarep\']}{$thread[\'profilelink\']}');
+    find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$lastposterlink}').'#', '{$avatarep_lastpost[\'avatarep\']}{$lastposterlink}');
+	find_replace_templatesets("forumdisplay_announcements_announcement", '#'.preg_quote('{$announcement[\'profilelink\']}').'#', '{$anno_avatar[\'avatarep\']}{$announcement[\'profilelink\']}');	
+    find_replace_templatesets("search_results_threads_thread", '#'.preg_quote('{$thread[\'profilelink\']}').'#', '{$avatarep_avatar[\'avatarep\']}{$thread[\'profilelink\']}');
+    find_replace_templatesets("search_results_threads_thread", '#'.preg_quote('{$lastposterlink}').'#', '{$avatarep_lastpost[\'avatarep\']}{$lastposterlink}');
+    find_replace_templatesets("search_results_posts_post", '#'.preg_quote('{$post[\'profilelink\']}').'#', '{$avatarep_avatar[\'avatarep\']}{$post[\'profilelink\']}',0);	
+	
+   //Se actualiza la info de las plantillas
+   $cache->update_forums();
+   rebuild_settings();
 }
 
 function avatarep_deactivate() {
@@ -488,8 +395,6 @@ function avatarep_deactivate() {
 	$db->delete_query('datacache', "title = 'anno_cache'");
 	}
 	
-    rebuild_settings();
-
     //Eliminamos la hoja de estilo creada...
    	$db->delete_query('themestylesheets', "name='avatarep.css'");
 	$query = $db->simple_select('themes', 'tid');
@@ -500,7 +405,7 @@ function avatarep_deactivate() {
 	}
 
     //Archivo requerido para reemplazo de templates
- 	require MYBB_ROOT.'inc/adminfunctions_templates.php';
+ 	require_once MYBB_ROOT.'inc/adminfunctions_templates.php';
 	
     //Reemplazos que vamos a hacer en las plantillas 1.- Platilla 2.- Contenido a Reemplazar 3.- Contenido que reemplaza lo anterior
 	find_replace_templatesets("headerinclude", '#'.preg_quote('<script type="text/javascript" src="{$mybb->settings[\'bburl\']}/images/avatarep/avatarep.js"></script>').'#', '', 0);	
@@ -518,10 +423,8 @@ function avatarep_deactivate() {
 	$db->delete_query("templates", "title='avatarep_popup'");
 	
     //Se actualiza la info de las plantillas
-  	$cache->update_forums();
-
-    return true;
-
+    $cache->update_forums();
+    rebuild_settings();
 }
 
 // Creamos el formato que llevara el avatar al ser llamado...
@@ -1026,6 +929,118 @@ function avatarep_search()
 	}
 }
 
+function avatarep_style_guser(){
+   global $mybb, $cache, $db;
+
+   	if($mybb->settings['avatarep_active'] == 0)
+    {
+        return false;
+    }
+	
+    if (empty($cache->cache['moderators']))
+    {
+        $cache->cache['moderators'] = $cache->read("moderators");
+    }
+
+    foreach ($cache->cache['moderators'] as $fid => $fdata)
+    {
+        if (isset($fdata['usergroups']))
+        {
+            foreach ($fdata['usergroups'] as $gid => $gdata)
+            {
+                $cache->cache['moderators'][$fid]['usergroups'][$gid]['title'] = "#{$gdata['title']}{$gid}#";
+		$cache->cache['usergroups'][$gid]['title'] = $gdata['title'];
+                $cache->cache['groups'][] = $gid;
+            }
+        }
+        if (isset($fdata['users']))
+        {
+            foreach ($fdata['users'] as $uid => $udata)
+            {
+                $cache->cache['moderators'][$fid]['users'][$uid]['username'] = "#{$udata['username']}{$uid}#";				
+		$cache->cache['users'][$uid] = $udata['username'];
+                $cache->cache['mods'][] = $uid;
+            }
+        }
+    }
+}
+
+function avatarep_style_output(&$content){
+	global $mybb, $db, $cache;
+
+	if($mybb->settings['avatarep_active'] == 0)
+    {
+        return false;
+    }
+	if($cache->cache['users']){
+    $cache->cache['users'] = array_unique($cache->cache['users']);
+	}
+	if($cache->cache['guests']){
+    $cache->cache['guests'] = array_unique($cache->cache['guests']);
+	}
+	if($cache->cache['mods']){
+    $cache->cache['mods'] = array_unique($cache->cache['mods']);
+	}
+	if($cache->cache['groups']){
+    $cache->cache['groups'] = array_unique($cache->cache['groups']);
+	}
+	
+    if (sizeof($cache->cache['users']))
+    {	
+        $result = $db->simple_select('users', 'uid, username, usergroup, displaygroup', 'uid IN (' . implode(',', array_keys($cache->cache['users'])) . ')');
+        while ($avatarep = $db->fetch_array($result))
+        {
+			$username = format_name($avatarep['username'], $avatarep['usergroup'], $avatarep['displaygroup']);
+			$format = "#{$avatarep['username']}{$avatarep['uid']}#";
+			if(in_array($avatarep['uid'], $cache->cache['mods']))
+                {
+                    $old_username = str_replace('{username}', $format, $cache->cache['usergroups'][$avatarep['usergroup']]['namestyle']);
+                    if ($old_username != '')
+                    {
+                        $content = str_replace($old_username, $format, $content);
+                    }
+                }
+
+            $content = str_replace($format, $username, $content);			
+			unset($cache->cache['users'][$avatarep['uid']]);
+		}
+
+		if (isset($fdata['users']))
+		{
+			foreach ($fdata['users'] as $uid => $udata)
+			{
+				$cache->cache['moderators'][$fid]['users'][$uid]['username'] = "#{$udata['username']}{$uid}#";				
+				$cache->cache['users'][$uid] = $udata['username'];
+				$cache->cache['mods'][] = $uid;
+			}
+		}
+	}
+	
+	if (sizeof($cache->cache['guests']))
+    {
+        foreach ($cache->cache['guests'] as $username)
+        {
+            $format = "#{$username}#";
+            $username = format_name($username, 1, 1);
+            $content = str_replace($format, $username, $content);
+        }
+    }
+        
+    if (sizeof($cache->cache['groups']))
+    {
+        foreach ($cache->cache['usergroups'] as $gid => $gdata)
+        {
+            if (!in_array($gid, $cache->cache['groups']))
+            {
+                continue;
+            }
+            $title = format_name($gdata['title'], $gid);
+            $format = "#{$gdata['title']}{$gid}#";
+            $content = str_replace($format, $title, $content);
+        }
+    }	
+}
+
 function avatarep_popup(){
     global $lang, $mybb, $templates, $avatarep_popup, $db;
 
@@ -1042,7 +1057,7 @@ function avatarep_popup(){
 	
     if($mybb->usergroup['canviewprofiles'] == 0)
     {
-		error("You must login to see this content !!!");
+	echo "<div class=\"modal\"><div class=\"thead\"><img src=\"images/error.png\" alt=\"Avatarep Error\" />&nbsp;Error</div><div class=\"trow\"><br />&nbsp;&nbsp;&nbsp;You must login to see this content !!!<br />&nbsp;</div></div>";
     }
 	else{
 		// User is currently online and this user has permissions to view the user on the WOL
