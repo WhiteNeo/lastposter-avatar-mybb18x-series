@@ -366,8 +366,6 @@ function avatarep_activate() {
     //Archivo requerido para reemplazo de templates
     require_once MYBB_ROOT.'inc/adminfunctions_templates.php';
     // Reemplazos que vamos a hacer en las plantillas 1.- Platilla 2.- Contenido a Reemplazar 3.- Contenido que reemplaza lo anterior
-    find_replace_templatesets("postbit", '#'.preg_quote('{$post[\'profilelink\']}').'#', '{$post[\'dntstyle\']}');
-    find_replace_templatesets("postbit_classic", '#'.preg_quote('{$post[\'profilelink\']}').'#', '{$post[\'dntstyle\']}');	
     find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$thread[\'profilelink\']}').'#', '{$avatarep_avatar[\'avatarep\']}{$thread[\'profilelink\']}');
     find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$lastposterlink}').'#', '{$avatarep_lastpost[\'avatarep\']}{$lastposterlink}');
 	find_replace_templatesets("forumdisplay_announcements_announcement", '#'.preg_quote('{$announcement[\'profilelink\']}').'#', '{$anno_avatar[\'avatarep\']}{$announcement[\'profilelink\']}');	
