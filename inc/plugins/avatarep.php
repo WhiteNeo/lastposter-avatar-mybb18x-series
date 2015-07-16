@@ -576,18 +576,18 @@ function forumlist_avatar(&$_f)
 	
 	if($mybb->settings['avatarep_menu'] == 1){
 		if(function_exists("google_seo_url_profile")){
-			$_f['avatarep'] = "<a href=\"javascript:void(0)\" id =\"forum_member{$_f['fid']}\" onclick=\"MyBB.popupWindow('". $_f['avatarep_lastpost']['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$_f['avatarep_lastpost']['avatarep'];
+			$_f['avatarep'] = "</a><a href=\"javascript:void(0)\" id =\"forum_member{$_f['fid']}\" onclick=\"MyBB.popupWindow('". $_f['avatarep_lastpost']['profilelink'] . "?action=avatarep_popup', null, true); return false;\"><span class=\"avatarep_fd\">".$_f['avatarep_lastpost']['avatarep'] . "</span>";
 		}
 		else{
-			$_f['avatarep'] = "<a href=\"javascript:void(0)\" id =\"forum_member{$_f['fid']}\" onclick=\"MyBB.popupWindow('member.php?uid={$_f['uid']}&amp;action=avatarep_popup', null, true); return false;\">".$_f['avatarep_lastpost']['avatarep'];
+			$_f['avatarep'] = "</a><a href=\"javascript:void(0)\" id =\"forum_member{$_f['fid']}\" onclick=\"MyBB.popupWindow('member.php?uid={$_f['uid']}&amp;action=avatarep_popup', null, true); return false;\"><span class=\"avatarep_fd\">".$_f['avatarep_lastpost']['avatarep'] . "</span>";
 		}
 	}else{
-		$_f['avatarep'] = "<a href=\"". $_f['avatarep_lastpost']['profilelink'] . "\" id =\"forum_member{$_f['fid']}\">".$_f['avatarep_lastpost']['avatarep'];
+		$_f['avatarep'] = "</a><a href=\"". $_f['avatarep_lastpost']['profilelink'] . "\" id =\"forum_member{$_f['fid']}\"><span class=\"avatarep_fd\">".$_f['avatarep_lastpost']['avatarep'] . "</span>";
 	}
 	
 	$username = format_name($_f['avatarep_lastpost']['username'], $_f['avatarep_lastpost']['usergroup'], $_f['avatarep_lastpost']['displaygroup']);	
-	//$_f['lastposter'] = $username;
-	$_f['lastposter'] = "<span class=\"avatarep_fs\"><br />{$lang->by} " . $username . "</span></a></span><span class=\"avatarep_fd\">" . $_f['avatarep'];  	
+	$_f['lastposter'] = $username;
+	$_f['lastposter'] .= $_f['avatarep'];
 }
 
 // Avatar en temas
@@ -1076,8 +1076,11 @@ function avatarep_popup(){
 		}
 
 		$memprofile = get_user($uid);
-		$memprofile['avatar'] = "<img src=" . htmlspecialchars_uni($memprofile['avatar']) . " alt=\"avatarep\" />";
-		if(strlen(trim($memprofile['avatar'])) == 0) {$memprofile['avatar'] = '<img src="images/default_avatar.png" alt="avatarep" />';}
+		if($memprofile['avatar'] == "" || empty($memprofile['avatar'])) {
+			$memprofile['avatar'] = '<img src="images/default_avatar.png" alt="avatarep" />';
+		}else{
+			$memprofile['avatar'] = "<img src=" . htmlspecialchars_uni($memprofile['avatar']) . " alt=\"avatarep\" />";
+		}
 		$memprofile['avatar'] = $status_start . $memprofile['avatar'] . $status_end;
 		$formattedname = format_name($memprofile['username'], $memprofile['usergroup'], $memprofile['displaygroup']);
 		$usertitle = "";
