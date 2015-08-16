@@ -50,13 +50,13 @@ function avatarep_info()
 	}
 
 	return array(
-        	"name"		=> $db->escape_string($lang->avatarep_name),
-    		"description"	=> $db->escape_string($lang->avatarep_descrip) . " " . $avatarep_config_link,
-		"website"	=> "http://forosmybb.es",
-		"author"	=> "Dark Neo",
+        "name"			=> $db->escape_string($lang->avatarep_name),
+    	"description"	=> $db->escape_string($lang->avatarep_descrip) . " " . $avatarep_config_link,
+		"website"		=> "http://forosmybb.es",
+		"author"		=> "Dark Neo",
 		"authorsite"	=> "http://forosmybb.es",
-		"version"	=> "2.8.2",
-		"codename" 	=> "last_poster_avatar",
+		"version"		=> "2.8.3",
+		"codename" 		=> "last_poster_avatar",
 		"compatibility" => "18*"
 	);
 } 
@@ -569,9 +569,6 @@ function forumlist_avatar(&$_f)
 	}
 	
 	$_f['avatarep_lastpost'] = $cache->cache['avatarep_cache'][$_f['fid']]['avatarep_avatar'];	
-	
-	$menuh = $mybb->settings['avatarep_menu_heigh'];
-	$menuw = $mybb->settings['avatarep_menu_width'];
 	$_f['uid'] = $_f['avatarep_lastpost']['uid'];
 	
 	if($mybb->settings['avatarep_menu'] == 1){
@@ -582,10 +579,10 @@ function forumlist_avatar(&$_f)
 			$_f['avatarep'] = "</a><a href=\"javascript:void(0)\" id =\"forum_member{$_f['fid']}\" onclick=\"MyBB.popupWindow('member.php?uid={$_f['uid']}&amp;action=avatarep_popup', null, true); return false;\"><span class=\"avatarep_fd\">".$_f['avatarep_lastpost']['avatarep'] . "</span>";
 		}
 	}else{
-		$_f['avatarep'] = "</a><a href=\"". $_f['avatarep_lastpost']['profilelink'] . "\" id =\"forum_member{$_f['fid']}\"><span class=\"avatarep_fd\">".$_f['avatarep_lastpost']['avatarep'] . "</span>";
+		$_f['avatarep'] = "</a><a href=\"". $_f['avatarep_lastpost']['profilelink'] . "\" id =\"forum_member{$_f['fid']}\"><div class=\"avatarep_fd\">".$_f['avatarep_lastpost']['avatarep'] . "</div>";
 	}
 	
-	$username = format_name($_f['avatarep_lastpost']['username'], $_f['avatarep_lastpost']['usergroup'], $_f['avatarep_lastpost']['displaygroup']);	
+	$username = '<span class="avatarep_fs">' . format_name($_f['avatarep_lastpost']['username'], $_f['avatarep_lastpost']['usergroup'], $_f['avatarep_lastpost']['displaygroup']) . '</span>';	
 	$_f['lastposter'] = $username;
 	$_f['lastposter'] .= $_f['avatarep'];
 }
