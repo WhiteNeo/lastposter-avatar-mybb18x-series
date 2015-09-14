@@ -313,6 +313,11 @@ function avatarep_activate() {
 	font-size: 12px;
 }
 
+/* Fix avatar margin for Chrome and Safari */
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+.avatarep_fs{ margin-left: 62px !important; }
+}
+
 .avatarep_fd{
 	margin-left: -5px;
 	margin-top: -40px;
