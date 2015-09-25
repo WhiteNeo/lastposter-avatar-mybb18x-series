@@ -10,7 +10,7 @@ Steps to follow:
 	
 We don't have avatarep.css, then go to styles and create a new stylesheet called avatarep.css, inside this go to advanced mode and paste this content.
 
-[code]
+´´´CSS
 /* POPUP MENU*/
 .tavatar {
                 padding: 0px 10px;
@@ -96,7 +96,7 @@ We don't have avatarep.css, then go to styles and create a new stylesheet called
                 padding: 0 5px;
 }
 
-[/code] 
+´´´CSS
 
 Save and refresh cache on your explorer.
 
@@ -106,7 +106,7 @@ forumbit_depth2_forum_lastpost:
  
 Change all content to this:
  
-[code]
+´´´HTML
 <table border="0">
   <tr>
     <td width="20%" align="left" valign="middle"><span class="smalltext">{$lastpost_profilelink}</span></td>
@@ -117,7 +117,7 @@ Change all content to this:
    </td>
   </tr>
 </table>
-[/code]
+´´´
 
 
 forumbit_depth2_forum:
