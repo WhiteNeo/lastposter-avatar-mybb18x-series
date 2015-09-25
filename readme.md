@@ -10,7 +10,7 @@ Steps to follow:
 	
 We don't have avatarep.css, then go to styles and create a new stylesheet called avatarep.css, inside this go to advanced mode and paste this content.
 
-´´´CSS
+```CSS
 /* POPUP MENU*/
 .tavatar {
                 padding: 0px 10px;
@@ -96,7 +96,7 @@ We don't have avatarep.css, then go to styles and create a new stylesheet called
                 padding: 0 5px;
 }
 
-´´´CSS
+```
 
 Save and refresh cache on your explorer.
 
@@ -106,7 +106,7 @@ forumbit_depth2_forum_lastpost:
  
 Change all content to this:
  
-´´´HTML
+```HTML
 <table border="0">
   <tr>
     <td width="20%" align="left" valign="middle"><span class="smalltext">{$lastpost_profilelink}</span></td>
@@ -117,14 +117,14 @@ Change all content to this:
    </td>
   </tr>
 </table>
-´´´
+```
 
 
 forumbit_depth2_forum:
  
 Change all content to this:
 
-[code]
+```HTML
 <tr>
 <td class="{$bgcolor}" align="center" width="5%"><span class="forum_status forum_{$lightbulb['folder']} ajax_mark_read" title="{$lightbulb['altonoff']}" id="mark_read_{$forum['fid']}"></span></td>
 <td class="{$bgcolor}" width="50%">
@@ -134,14 +134,13 @@ Change all content to this:
 <td width="10%" class="{$bgcolor}" align="center" style="white-space: nowrap">{$posts}{$unapproved['unapproved_posts']}</td>
 <td width="25%" class="{$bgcolor}" align="left" style="white-space: nowrap">{$lastpost}</td>
 </tr>
-[/code]
-
+```
 
 forumdisplay_showthread
  
 Change all content to this:
  
-[code]
+```HTML
 <tr class="inline_row">
             <td align="center" class="{$bgcolor}{$thread_type_class}" width="2%"><span class="thread_status {$folder}" title="{$folder_label}">&nbsp;</span></td>
             <td align="center" class="{$bgcolor}{$thread_type_class}" width="2%">{$avatarep_avatar['avatarep']}</td>
@@ -168,14 +167,13 @@ Change all content to this:
             </td>
 {$modbit}
 </tr>
-[/code]
-
+```
 
 forumdisplay_announcements_announcement
  
 Change all content to this:
 
-[code] 
+```HTML
 <tr>
 <td align="center" class="{$bgcolor}" width="2%"><span class="thread_status {$folder}">&nbsp;</span></td>
 <td align="center" class="{$bgcolor}" width="2%">{$anno_avatar['avatarep']}</td>
@@ -189,13 +187,12 @@ Change all content to this:
 <td class="{$bgcolor} forumdisplay_announcement" style="white-space: nowrap; text-align: right"><span class="smalltext">{$postdate}</span></td>
 {$modann}
 </tr>
-[/code]
- 
- 
+```
+
 search_results_posts_post
 Change all content to this:
 
-[code]
+```HTML
 <tr class="inline_row">
             <td align="center" class="{$bgcolor}" width="2%"><span class="thread_status {$folder}">&nbsp;</span>{$icon}&nbsp;</td>
             <td align="center" class="{$bgcolor}" width="2%">{$avatarep_avatar['avatarep']}</td>
@@ -213,13 +210,13 @@ Change all content to this:
             <td class="{$bgcolor}" style="white-space: nowrap; text-align: center;"><span class="smalltext">{$posted}</span></td>
             {$inline_mod_checkbox}
 </tr>
-[/code]
+```
  
 
 search_results_threads_thread cambiar todo por
 Change all content to this:
 
-[code] 
+```HTML
 <tr class="inline_row">
             <td align="center" class="{$bgcolor}" width="2%"><span class="thread_status {$folder}" title="{$folder_label}">&nbsp;</span></td>
             <td align="center" class="{$bgcolor}" width="2%">{$avatarep_avatar['avatarep']}</td>
@@ -250,13 +247,9 @@ Change all content to this:
             </td>
             {$inline_mod_checkbox}
 </tr>
-[/code]
-
+```
 
 And done it !!!!
-
-don't copy [code] tags tht's only to reference purposes you can copy and paste this guide on your forum and see contents to do more easy the steps on this usersguide...
-
 
 Sample of this guide on spanish only
 
