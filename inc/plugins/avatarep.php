@@ -594,11 +594,11 @@ function forumlist_avatar(&$_f)
 	}else{
 		$_f['avatarep'] = "</a><a href=\"". $_f['avatarep_lastpost']['profilelink'] . "\" id =\"forum_member{$_f['fid']}\"><div class=\"avatarep_fd\">".$_f['avatarep_lastpost']['avatarep'] . "</div>";
 	}
-	if($_f['avatarep_lastpost']['username'] && $mybb->user['uid']){
+	if($_f['avatarep_lastpost']['username'] && $_f['avatarep_lastpost']['uid'] > 0){
 		$username = '<span class="avatarep_fs">' . format_name($_f['avatarep_lastpost']['username'], $_f['avatarep_lastpost']['usergroup'], $_f['avatarep_lastpost']['displaygroup']) . '</span>';	
 		$_f['lastposter'] = $username;
 		$_f['lastposter'] .= $_f['avatarep'];
-	}else{
+	}else if($_f['lastposteruid'] == 0){
 		$_f['avatarep'] = "<div class=\"avatarep_fd\"><img src='images/default_avatar.png' class='avatarep_img' alt='{$_f['lastposter']} Avatar' /></div>";
 		$_f['lastposter'] .= $_f['avatarep'];		
 	}
