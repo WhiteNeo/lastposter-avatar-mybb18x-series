@@ -57,9 +57,9 @@ function avatarep_info()
 	return array(
         "name"			=> $db->escape_string($lang->avatarep_name),
     	"description"	=> $db->escape_string($lang->avatarep_descrip) . " " . $avatarep_config_link,
-		"website"		=> "http://forosmybb.es",
+		"website"		=> "http://www.mybb.com",
 		"author"		=> "Dark Neo",
-		"authorsite"	=> "http://forosmybb.es",
+		"authorsite"	=> "http://soportemybb.es",
 		"version"		=> "2.8.4",
 		"codename" 		=> "last_poster_avatar",
 		"compatibility" => "18*"
