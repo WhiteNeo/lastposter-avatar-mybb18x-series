@@ -2,7 +2,7 @@
 /**
 *@ Autor: Dark Neo
 *@ Fecha: 2013-12-12
-*@ Version: 2.8.4
+*@ Version: 2.8.5
 *@ Contacto: neogeoman@gmail.com
 */
 
@@ -60,7 +60,7 @@ function avatarep_info()
 		"website"		=> "http://www.mybb.com",
 		"author"		=> "Dark Neo",
 		"authorsite"	=> "http://soportemybb.es",
-		"version"		=> "2.8.4",
+		"version"		=> "2.8.5",
 		"codename" 		=> "last_poster_avatar",
 		"compatibility" => "18*"
 	);
@@ -240,6 +240,19 @@ function avatarep_activate() {
 		);
 	$db->insert_query("templates", $templatearray);
 
+	$templatearray = array(
+		'title' => 'avatarep_popup_error',
+		'template' => $db->escape_string('<div class="modal">
+	<div class="thead">
+		<img src="images/error.png" alt="Avatarep Error" />&nbsp;Error</div>
+	<div class="trow"><br />&nbsp;&nbsp;&nbsp;You must login to see this content !!!<br />&nbsp;</div>
+</div>'),
+		'sid' => '-1',
+		'version' => '1803',
+		'dateline' => TIME_NOW
+		);
+	$db->insert_query("templates", $templatearray);
+
 	// Añadir el css para la tipsy
 	$avatarep_css = '/* POPUP MENU*/
 .tavatar {
@@ -349,7 +362,11 @@ function avatarep_activate() {
 	update_theme_stylesheet_list(1, false, true);
 	
 		/* Variables de imágen válidas, las normales son las que traen ya todo el código preformateado con la imágen y todo incluido...
-		
+
+		Lista de los foros:
+		$forum['avatar'] - Ruta de la imagen
+		$forum['avatarep'] - Código preformateado
+			
 		Anuncios:
 		$anno_avatar['avatar'] - Ruta de la imagen
 		$anno_avatar['avatarep'] - Código preformateado
@@ -377,6 +394,7 @@ function avatarep_activate() {
     //Archivo requerido para reemplazo de templates
     require_once MYBB_ROOT.'inc/adminfunctions_templates.php';
     // Reemplazos que vamos a hacer en las plantillas 1.- Platilla 2.- Contenido a Reemplazar 3.- Contenido que reemplaza lo anterior
+    find_replace_templatesets("forumbit_depth2_forum_lastpost", '#'.preg_quote('{$lastpost_profilelink}').'#', '{$forum[\'avatarep\']}{$lastpost_profilelink}');
     find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$thread[\'profilelink\']}').'#', '{$avatarep_avatar[\'avatarep\']}{$thread[\'profilelink\']}');
     find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$lastposterlink}').'#', '{$avatarep_lastpost[\'avatarep\']}{$lastposterlink}');
     find_replace_templatesets("forumdisplay_announcements_announcement", '#'.preg_quote('{$announcement[\'profilelink\']}').'#', '{$anno_avatar[\'avatarep\']}{$announcement[\'profilelink\']}');	
@@ -421,7 +439,8 @@ function avatarep_deactivate() {
  	require_once MYBB_ROOT.'inc/adminfunctions_templates.php';
 	
     //Reemplazos que vamos a hacer en las plantillas 1.- Platilla 2.- Contenido a Reemplazar 3.- Contenido que reemplaza lo anterior
-	find_replace_templatesets("headerinclude", '#'.preg_quote('<script type="text/javascript" src="{$mybb->settings[\'bburl\']}/images/avatarep/avatarep.js"></script>').'#', '', 0);	
+	find_replace_templatesets("headerinclude", '#'.preg_quote('<script type="text/javascript" src="{$mybb->settings[\'bburl\']}/images/avatarep/avatarep.js"></script>').'#', '', 0);
+    find_replace_templatesets("forumbit_depth2_forum_lastpost", '#'.preg_quote('{$forum[\'avatarep\']}').'#', '', 0);	
     find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$avatarep_avatar[\'avatarep\']}').'#', '',0);
     find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$avatarep_lastpost[\'avatarep\']}').'#', '',0);
     find_replace_templatesets("forumdisplay_announcements_announcement", '#'.preg_quote('{$anno_avatar[\'avatarep\']}').'#', '',0);
@@ -482,9 +501,10 @@ function avatarep_format_avatar($user)
 	return format_avatar($user);
 }		
 
+// Avatar en foros
 function forumlist_avatar(&$_f)
 {
-	global $cache, $db, $fcache, $mybb, $lang, $forum;
+	global $cache, $db, $fcache, $mybb, $lang;
 
     // Cargamos idioma
     $lang->load("avatarep", false, true);
@@ -511,7 +531,6 @@ function forumlist_avatar(&$_f)
 			{
 				$forum = iterator_to_array($forum);
 				$avatarep_cache[$forum['fid']] = $forum;
-
 				if($private_forums[$forum['fid']]['lastpost'])
 				{
 					$forum['lastpost'] = $private_forums[$forum['fid']]['lastpost'];
@@ -523,29 +542,37 @@ function forumlist_avatar(&$_f)
 						"lastposteruid" => $private_forums[$forum['fid']]['lastposteruid']
 					);
 				}
-				if($forum['parentlist'])
+				else
 				{
-					$avatarep_cache[$forum['fid']] = $forum;
-					$avatarep_cache[$forum['fid']]['avataruid'] = $forum['lastposteruid'];
-					
-					$exp = explode(',', $forum['parentlist']);
-
-					foreach($exp as $parent)
+					$lastpost_data = array(
+						"lastpost" => $forum['lastpost'],
+						"lastpostsubject" => $forum['lastpostsubject'],
+						"lastposter" => $forum['lastposter'],
+						"lastposttid" => $forum['lastposttid'],
+						"lastposteruid" => $forum['lastposteruid']
+					);
+				}			
+				// Fetch subforums of this forum
+				if(isset($fcache[$forum['fid']]))
+				{
+					$forum_info = build_forumbits($forum['fid'], $depth+1);
+					// If the child forums' lastpost is greater than the one for this forum, set it as the child forums greatest.
+					if($forum_info['lastpost']['lastpost'] > $lastpost_data['lastpost'])
 					{
-						if($parent == $forum['fid']) continue;
-						if(isset($avatarep_cache[$parent]) && $forum['lastpost'] > $avatarep_cache[$parent]['lastpost'])
-						{
-							$lastpost_data = array(
-								"lastpost" => $forum['lastpost'],
-								"lastpostsubject" => $forum['lastpostsubject'],
-								"lastposter" => $forum['lastposter'],
-								"lastposttid" => $forum['lastposttid'],
-								"lastposteruid" => $forum['lastposteruid']
-							);
-							$avatarep_cache[$parent]['lastpost'] = $lastpost_data['lastpost'];
-							$avatarep_cache[$parent]['avataruid'] = $lastpost_data['lastposteruid']; // Se reemplaza la info de un subforo, por la original...
-						}
+						$lastpost_data = $forum_info['lastpost'];
 					}
+
+					$sub_forums = $forum_info['forum_list'];
+				}
+				// If the current forums lastpost is greater than other child forums of the current parent, overwrite it
+				if(!isset($parent_lastpost) || $lastpost_data['lastpost'] > $parent_lastpost['lastpost'])
+				{
+					$parent_lastpost = $lastpost_data;
+				}			
+				if(isset($avatarep_cache) && $lastpost_data['lastposteruid'] > 0){	
+					$avatarep_cache[$forum['fid']]['avataruid'] = $lastpost_data['lastposteruid'];							
+					$avatarep_cache[$forum['fid']]['lastpost'] = $lastpost_data['lastpost'];
+					$avatarep_cache[$forum['fid']]['lastposter'] = $lastpost_data['lastposter'];	
 				}
 			}
 		}
@@ -570,9 +597,9 @@ function forumlist_avatar(&$_f)
 			{
 				// Finalmente, se le asigna el avatar a cada uno de ellos, los traidos en la sentencia.
 				$avatar = avatarep_format_avatar($user); 				
-				foreach($users[$user['uid']] as $fid)
+				foreach($users[$user['uid']] as $aid)
 				{
-					$avatarep_cache[$fid]['avatarep_avatar'] = $avatar;
+					$avatarep_cache[$aid]['avatarep_avatar'] = $avatar;
 				}	
 			}
 		}
@@ -582,26 +609,25 @@ function forumlist_avatar(&$_f)
 	}
 	
 	$_f['avatarep_lastpost'] = $cache->cache['avatarep_cache'][$_f['fid']]['avatarep_avatar'];	
-	$_f['uid'] = $_f['avatarep_lastpost']['uid'];
-	
+
 	if($mybb->settings['avatarep_menu'] == 1){
 		if(function_exists("google_seo_url_profile")){
-			$_f['avatarep'] = "</a><a href=\"javascript:void(0)\" id =\"forum_member{$_f['fid']}\" onclick=\"MyBB.popupWindow('". $_f['avatarep_lastpost']['profilelink'] . "?action=avatarep_popup', null, true); return false;\"><span class=\"avatarep_fd\">".$_f['avatarep_lastpost']['avatarep'] . "</span>";
+			$_f['avatarep'] = "<a href=\"javascript:void(0)\" id =\"forum_member{$_f['fid']}\" onclick=\"MyBB.popupWindow('". $_f['avatarep_lastpost']['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$_f['avatarep_lastpost']['avatarep'];
 		}
 		else{
-			$_f['avatarep'] = "</a><a href=\"javascript:void(0)\" id =\"forum_member{$_f['fid']}\" onclick=\"MyBB.popupWindow('member.php?uid={$_f['uid']}&amp;action=avatarep_popup', null, true); return false;\"><span class=\"avatarep_fd\">".$_f['avatarep_lastpost']['avatarep'] . "</span>";
+			$_f['avatarep'] = "<a href=\"javascript:void(0)\" id =\"forum_member{$_f['fid']}\" onclick=\"MyBB.popupWindow('member.php?uid={$_f['uid']}&amp;action=avatarep_popup', null, true); return false;\">".$_f['avatarep_lastpost']['avatarep'];
 		}
 	}else{
-		$_f['avatarep'] = "</a><a href=\"". $_f['avatarep_lastpost']['profilelink'] . "\" id =\"forum_member{$_f['fid']}\"><div class=\"avatarep_fd\">".$_f['avatarep_lastpost']['avatarep'] . "</div>";
+		$_f['avatarep'] = "<a href=\"". $_f['avatarep_lastpost']['profilelink'] . "\" id =\"forum_member{$_f['fid']}\">".$_f['avatarep_lastpost']['avatarep'];
+	}	
+	if($_f['avatarep_lastpost']['uid'] === NULL){
+		$no_avatar = htmlspecialchars_uni($_f['lastposter']);
+	$_f['avatarep'] = '<img class="avatarep_img" src="images/default_avatar.png" alt="{$no_avatar}\'s avatar" />';
 	}
-	if($_f['avatarep_lastpost']['username'] && $_f['avatarep_lastpost']['uid'] > 0){
-		$username = '<span class="avatarep_fs">' . format_name($_f['avatarep_lastpost']['username'], $_f['avatarep_lastpost']['usergroup'], $_f['avatarep_lastpost']['displaygroup']) . '</span>';	
-		$_f['lastposter'] = $username;
-		$_f['lastposter'] .= $_f['avatarep'];
-	}else if($_f['lastposteruid'] == 0){
-		$_f['avatarep'] = "<div class=\"avatarep_fd\"><img src='images/default_avatar.png' class='avatarep_img' alt='{$_f['lastposter']} Avatar' /></div>";
-		$_f['lastposter'] .= $_f['avatarep'];		
-	}
+
+	$username = format_name($_f['lastposter'], $_f['avatarep_lastpost']['usergroup'], $_f['avatarep_lastpost']['displaygroup']);	
+	$_f['lastposter'] = $username;
+	$_f['avatarep'] = '<div class="avatarep_fd">' . $_f['avatarep'] . '</div>';
 }
 
 // Avatar en temas
@@ -1142,7 +1168,8 @@ function avatarep_popup(){
 	
     if($mybb->usergroup['canviewprofiles'] == 0)
     {
-	echo "<div class=\"modal\"><div class=\"thead\"><img src=\"images/error.png\" alt=\"Avatarep Error\" />&nbsp;Error</div><div class=\"trow\"><br />&nbsp;&nbsp;&nbsp;You must login to see this content !!!<br />&nbsp;</div></div>";
+	eval("\$avatarep_popup = \"".$templates->get("avatarep_popup_error", 1, 0)."\";");
+	echo $avatarep_popup;
     }
 	else{
 		// User is currently online and this user has permissions to view the user on the WOL
