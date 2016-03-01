@@ -813,7 +813,7 @@ function avatarep_announcement()
 		);
 		
 	}
-	$announcement['profilelink'] = format_name($anno_avatar['username'], $anno_avatar['usergroup'], $anno_avatar['displaygroup']);
+	$announcement['profilelink'] = format_name($announcement['username'], $anno_avatar['usergroup'], $anno_avatar['displaygroup']);
 	$uid = $anno_avatar['uid'];
 	if($uid == 0)
 	{
