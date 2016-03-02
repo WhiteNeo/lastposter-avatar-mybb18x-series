@@ -615,6 +615,7 @@ function forumlist_avatar(&$_f)
 			$_f['avatarep'] = "<a href=\"javascript:void(0)\" id =\"forum_member{$_f['fid']}\" onclick=\"MyBB.popupWindow('". $_f['avatarep_lastpost']['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$_f['avatarep_lastpost']['avatarep']."</a>";
 		}
 		else{
+			$_f['uid'] = (int)$_f['avatarep_lastpost']['uid'];
 			$_f['avatarep'] = "<a href=\"javascript:void(0)\" id =\"forum_member{$_f['fid']}\" onclick=\"MyBB.popupWindow('member.php?uid={$_f['uid']}&amp;action=avatarep_popup', null, true); return false;\">".$_f['avatarep_lastpost']['avatarep']."</a>";
 		}
 	}else{
