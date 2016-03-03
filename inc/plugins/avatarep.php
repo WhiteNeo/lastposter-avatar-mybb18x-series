@@ -244,8 +244,8 @@ function avatarep_activate() {
 		'title' => 'avatarep_popup_error',
 		'template' => $db->escape_string('<div class="modal">
 	<div class="thead">
-		<img src="images/error.png" alt="Avatarep Error" />&nbsp;Error</div>
-	<div class="trow"><br />&nbsp;&nbsp;&nbsp;You must login to see this content !!!<br />&nbsp;</div>
+		<img src="images/error.png" alt="Avatarep Error" />{$lang->avatarep_user_error}</div>
+	<div class="trow"><br />{$lang->avatarep_user_error_text}<br />&nbsp;</div>
 </div>'),
 		'sid' => '-1',
 		'version' => '1803',
@@ -1000,6 +1000,8 @@ function avatarep_search()
 	$uid2 = intval($avatarep_lastpost['uid']);	
 	if($mybb->settings['avatarep_menu'] == '1')
 	{
+		$lang->avatarep_user_no_avatar = htmlspecialchars_uni($lang->avatarep_user_no_avatar);
+		
 		if(function_exists("google_seo_url_profile"))
 		{
 			$avatarep_avatar['avatarep'] = "<a href=\"javascript:void(0)\" id =\"tal_member{$thread['tid']}\" onclick=\"MyBB.popupWindow('". $avatarep_avatar['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$avatarep_avatar['avatarep']."</a>";  			
@@ -1012,15 +1014,17 @@ function avatarep_search()
 		}
 		if($uid == 0)
 		{
+			$lang->avatarep_user_alt = $lang->sprintf($lang->avatarep_user_alt, htmlspecialchars_uni($thread['threadusername']));			
 			if($thread['threadusername'] == "")
 			{
 				$thread['threadusername'] = $post['username'];
 			}
-			$avatarep_avatar['avatarep'] = "<img src='images/default_avatar.png' class='avatarep_img' alt='{$thread['threadusername']} Avatar' />";
+			$avatarep_avatar['avatarep'] = "<img src='images/default_avatar.png' class='avatarep_img' alt='{$lang->avatarep_user_alt}' />";
 		}
 		if($uid2 == 0)
 		{
-			$avatarep_lastpost['avatarep'] = "<img src='images/default_avatar.png' class='avatarep_img' alt='{$thread['lastposter']} Avatar' />";
+			$lang->avatarep_user_alt = $lang->sprintf($lang->avatarep_user_alt, htmlspecialchars_uni($thread['lastposter']));			
+			$avatarep_lastpost['avatarep'] = "<img src='images/default_avatar.png' class='avatarep_img' alt='{$lang->avatarep_user_alt}' />";
 		}		
 	}
 	else
@@ -1172,7 +1176,7 @@ function avatarep_private_end()
 	if(!empty($users))
 	{
 	$sql = implode(',', $users);
-	$query = $db->simple_select('users', 'uid, username, username AS userusername, avatar, usergroup, displaygroup AN', "uid IN ({$sql})");
+	$query = $db->simple_select('users', 'uid, username, username AS userusername, avatar, usergroup, displaygroup', "uid IN ({$sql})");
 		$find = $replace = array();
 		while($user = $db->fetch_array($query))
 		{
@@ -1189,16 +1193,16 @@ function avatarep_private_end()
 			{
 				if(function_exists("google_seo_url_profile"))
 				{
-					$user['avatar'] = "<a href=\"javascript:void(0)\" id =\"pm_member{$pm['pmid']}\" onclick=\"MyBB.popupWindow('". $user['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
+					$user['avatar'] = "<a href=\"javascript:void(0)\" id =\"pm_member{$uid}\" onclick=\"MyBB.popupWindow('". $user['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
 				}
 				else
 				{
-					$user['avatar'] = "<a href=\"javascript:void(0)\" id =\"pm_member{$pm['pmid']}\" onclick=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
+					$user['avatar'] = "<a href=\"javascript:void(0)\" id =\"pm_member{$uid}\" onclick=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
 				}			
 			}
 			else
 			{
-				$user['avatar'] = 	"<a href=\"". $user['profilelink'] . "\" id =\"pm_member{$pm['pmid']}\">".$user['avatar']."</a>";
+				$user['avatar'] = 	"<a href=\"". $user['profilelink'] . "\" id =\"pm_member{$uid}\">".$user['avatar']."</a>";
 			}			
 			$replace[] = $user['avatar'];
 		}
@@ -1224,8 +1228,8 @@ function avatarep_popup(){
 	
     if($mybb->usergroup['canviewprofiles'] == 0)
     {
-	eval("\$avatarep_popup = \"".$templates->get("avatarep_popup_error", 1, 0)."\";");
-	echo $avatarep_popup;
+		eval("\$avatarep_popup = \"".$templates->get("avatarep_popup_error", 1, 0)."\";");
+		echo $avatarep_popup;
     }
 	else{
 		// User is currently online and this user has permissions to view the user on the WOL
@@ -1248,15 +1252,20 @@ function avatarep_popup(){
 		}
 
 		$memprofile = get_user($uid);
-		if($memprofile['avatar'] == "" || empty($memprofile['avatar'])) {
-			$memprofile['avatar'] = '<img src="images/default_avatar.png" alt="avatarep" />';
-		}else{
-			$memprofile['avatar'] = "<img src=" . htmlspecialchars_uni($memprofile['avatar']) . " alt=\"avatarep\" />";
+		$lang->avatarep_user_alt = $lang->sprintf($lang->avatarep_user_alt, htmlspecialchars_uni($memprofile['username']));
+		$lang->avatarep_user_no_avatar = htmlspecialchars_uni($lang->avatarep_user_no_avatar);
+		if($memprofile['avatar'] == "" || empty($memprofile['avatar'])) 
+		{
+		$memprofile['avatar'] = '<img src="images/default_avatar.png" alt="'.$lang->avatarep_user_no_avatar.'" />';
+		}
+		else
+		{
+			$memprofile['avatar'] = "<img src=" . htmlspecialchars_uni($memprofile['avatar']) . " alt=\"".$lang->avatarep_user_alt."\" />";
 		}
 		$memprofile['avatar'] = $status_start . $memprofile['avatar'] . $status_end;
 		$formattedname = format_name($memprofile['username'], $memprofile['usergroup'], $memprofile['displaygroup']);
 		$usertitle = "";
-		if (!empty($memprofile['usertitle'])) { $usertitle = $memprofile['usertitle']; $usertitle = "($usertitle)";}
+		if(!empty($memprofile['usertitle'])) { $usertitle = $memprofile['usertitle']; $usertitle = "($usertitle)";}
 		$memregdate = my_date($mybb->settings['dateformat'], $memprofile['regdate']);
 		$memprofile['postnum'] = my_number_format($memprofile['postnum']);
 		$warning_link = "warnings.php?uid={$memprofile['uid']}";
