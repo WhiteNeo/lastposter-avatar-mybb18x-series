@@ -82,19 +82,6 @@ We don't have avatarep.css, then go to styles and create a new stylesheet called
                 border-radius: 50%;
                 opacity: 0.9;
 }
- 
-.avatarep_fs{
-                position: relative; 
-                font-size: 12px;
-}
- 
-.avatarep_fd{
-                margin-left: -5px;
-                margin-top: -40px;
-                position: relative;
-                float: left;
-                padding: 0 5px;
-}
 
 ```
 
@@ -109,11 +96,11 @@ Change all content to this:
 ```HTML
 <table border="0">
   <tr>
-    <td width="20%" align="left" valign="middle"><span class="smalltext">{$lastpost_profilelink}</span></td>
+    <td width="20%" align="left" valign="middle">{$forum['avatarep']}<span class="smalltext"></span></td>
     <td width="80%" align="left" valign="top">
 <span class="smalltext">
 <a href="{$lastpost_link}" title="{$full_lastpost_subject}"><strong>{$lastpost_subject}</strong></a>
-<br />{$lastpost_date} {$lastpost_time}</span>
+<br />{$lastpost_date} {$lastpost_time}<br />{$lastpost_profilelink}</span>
    </td>
   </tr>
 </table>
@@ -136,7 +123,7 @@ Change all content to this:
 </tr>
 ```
 
-forumdisplay_showthread
+forumdisplay_thread
  
 Change all content to this:
  
@@ -213,7 +200,7 @@ Change all content to this:
 ```
  
 
-search_results_threads_thread cambiar todo por
+search_results_threads_thread 
 Change all content to this:
 
 ```HTML
