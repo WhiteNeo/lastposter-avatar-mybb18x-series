@@ -1206,7 +1206,7 @@ function avatarep_private_end()
 			}			
 			$replace[] = $user['avatar'];
 			$find[] = $user['username'];
-			$replace[] = format_name($user['username'],$user['usergroup'],$user['displaygroup']);
+			$replace[] = format_name($user['userusername'],$user['usergroup'],$user['displaygroup']);
 		}
 		if(isset($messagelist)) $messagelist = str_replace($find, $replace, $messagelist);
 		if(isset($readmessages)) $readmessages = str_replace($find, $replace, $readmessages);
