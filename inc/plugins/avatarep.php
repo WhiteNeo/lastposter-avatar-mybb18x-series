@@ -2,7 +2,7 @@
 /**
 *@ Autor: Dark Neo
 *@ Fecha: 2013-12-12
-*@ Version: 2.8.5
+*@ Version: 2.8.6
 *@ Contacto: neogeoman@gmail.com
 */
 
@@ -60,7 +60,7 @@ function avatarep_info()
 		"website"		=> "http://www.mybb.com",
 		"author"		=> "Dark Neo",
 		"authorsite"	=> "http://soportemybb.es",
-		"version"		=> "2.8.5",
+		"version"		=> "2.8.6",
 		"codename" 		=> "last_poster_avatar",
 		"compatibility" => "18*"
 	);
@@ -1205,6 +1205,8 @@ function avatarep_private_end()
 				$user['avatar'] = 	"<a href=\"". $user['profilelink'] . "\" id =\"pm_member{$uid}\">".$user['avatar']."</a>";
 			}			
 			$replace[] = $user['avatar'];
+			$find[] = $user['username'];
+			$replace[] = format_name($user['username'],$user['usergroup'],$user['displaygroup']);
 		}
 		if(isset($messagelist)) $messagelist = str_replace($find, $replace, $messagelist);
 		if(isset($readmessages)) $readmessages = str_replace($find, $replace, $readmessages);
