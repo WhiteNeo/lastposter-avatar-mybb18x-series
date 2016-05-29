@@ -2,7 +2,7 @@
 /**
 *@ Autor: Dark Neo
 *@ Fecha: 2013-12-12
-*@ Version: 2.8.5
+*@ Version: 2.8.6
 *@ Contacto: neogeoman@gmail.com
 */
 
@@ -60,7 +60,7 @@ function avatarep_info()
 		"website"		=> "http://www.mybb.com",
 		"author"		=> "Dark Neo",
 		"authorsite"	=> "http://soportemybb.es",
-		"version"		=> "2.8.5",
+		"version"		=> "2.8.6",
 		"codename" 		=> "last_poster_avatar",
 		"compatibility" => "18*"
 	);
