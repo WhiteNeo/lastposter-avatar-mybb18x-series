@@ -2,7 +2,7 @@
 /**
 *@ Autor: Dark Neo
 *@ Fecha: 2013-12-12
-*@ Version: 2.8.6
+*@ Version: 2.8.5
 *@ Contacto: neogeoman@gmail.com
 */
 
@@ -60,7 +60,7 @@ function avatarep_info()
 		"website"		=> "http://www.mybb.com",
 		"author"		=> "Dark Neo",
 		"authorsite"	=> "http://soportemybb.es",
-		"version"		=> "2.8.6",
+		"version"		=> "2.8.5",
 		"codename" 		=> "last_poster_avatar",
 		"compatibility" => "18*"
 	);
@@ -402,8 +402,8 @@ function avatarep_activate() {
     find_replace_templatesets("search_results_threads_thread", '#'.preg_quote('{$lastposterlink}').'#', '{$avatarep_lastpost[\'avatarep\']}{$lastposterlink}');
     find_replace_templatesets("search_results_posts_post", '#'.preg_quote('{$post[\'profilelink\']}').'#', '{$avatarep_avatar[\'avatarep\']}{$post[\'profilelink\']}');	
     find_replace_templatesets("private_messagebit", '#'.preg_quote('{$tofromusername}').'#', '<avatarep[{$tofromuid}][\'avatar\']> {$tofromusername}');
-    find_replace_templatesets("private_tracking_readmessage", '#'.preg_quote('{$readmessage[\'profilelink\']}').'#', '<avatarep[{$readmessage[\'toid\']}][\'avatar\']> {$readmessage[\'profilelink\']}');
-    find_replace_templatesets("private_tracking_unreadmessage", '#'.preg_quote('{$unreadmessage[\'profilelink\']}').'#', '<avatarep[{$unreadmessage[\'toid\']}][\'avatar\']> {$unreadmessage[\'profilelink\']}');
+    find_replace_templatesets("private_tracking_readmessage", '#'.preg_quote('{$readmessage[\'profilelink\']}').'#', '<avatarep[{$readmessage[\'toid\']}][\'avatar\']> #pmuid_{$readmessage[\'profilelink\']}#');
+    find_replace_templatesets("private_tracking_unreadmessage", '#'.preg_quote('{$unreadmessage[\'profilelink\']}').'#', '<avatarep[{$unreadmessage[\'toid\']}][\'avatar\']> #pmuid_{$unreadmessage[\'profilelink\']}#');
  	
    //Se actualiza la info de las plantillas
    $cache->update_forums();
@@ -450,6 +450,9 @@ function avatarep_deactivate() {
     find_replace_templatesets("private_messagebit", '#'.preg_quote('<avatarep[{$tofromuid}][\'avatar\']>').'#', '',0);
     find_replace_templatesets("private_tracking_readmessage", '#'.preg_quote('<avatarep[{$readmessage[\'toid\']}][\'avatar\']>').'#', '',0);
     find_replace_templatesets("private_tracking_unreadmessage", '#'.preg_quote('<avatarep[{$unreadmessage[\'toid\']}][\'avatar\']>').'#', '',0);
+    find_replace_templatesets("private_tracking_readmessage", '#'.preg_quote('#pmuid_{$readmessage[\'profilelink\']}#').'#', '{$readmessage[\'profilelink\']}');
+    find_replace_templatesets("private_tracking_unreadmessage", '#'.preg_quote('#pmuid_{$unreadmessage[\'profilelink\']}#').'#', '{$unreadmessage[\'profilelink\']}');	
+	
 	
 	//Delete templates
 	$db->delete_query("templates", "title='avatarep_popup'");
@@ -887,6 +890,9 @@ function avatarep_threads()
 			$user = $db->fetch_array($query);			
 			$avatarep = avatarep_format_avatar($user);
 		}
+        $search = "/uploads";
+		$replace = "./uploads";
+        $avatarep = str_replace($replace, $search, $avatarep);		
 	}	
 }
 
@@ -1177,9 +1183,11 @@ function avatarep_private_end()
 	{
 	$sql = implode(',', $users);
 	$query = $db->simple_select('users', 'uid, username, username AS userusername, avatar, usergroup, displaygroup', "uid IN ({$sql})");
-		$find = $replace = array();
+	$find = $replace = array();
 		while($user = $db->fetch_array($query))
 		{
+			$find[] = "#pmuid_".$user['userusername']."#";
+			$replace[] = format_name($user['userusername'],$user['usergroup'],$user['displaygroup']);		
 			$find[] = "<avatarep[{$user['uid']}]['avatar']>";
 			if(empty($user['avatar'])){
 				$user['avatar'] = "images/default_avatar.png";
@@ -1188,7 +1196,7 @@ function avatarep_private_end()
 			}
 			$user['profilelink'] = get_profile_link($user['uid']);
 			$uid = (int)$user['uid'];
-			$user['avatar'] = "<img class=\"avatarep_img\" src=\"{$user['avatar']}\">";			
+			$user['avatar'] = "<img class=\"avatarep_img\" src=\"{$user['avatar']}\" style=\"display: block;\">";			
 			if($mybb->settings['avatarep_menu'] == 1)
 			{
 				if(function_exists("google_seo_url_profile"))
@@ -1205,8 +1213,6 @@ function avatarep_private_end()
 				$user['avatar'] = 	"<a href=\"". $user['profilelink'] . "\" id =\"pm_member{$uid}\">".$user['avatar']."</a>";
 			}			
 			$replace[] = $user['avatar'];
-			$find[] = $user['username'];
-			$replace[] = format_name($user['userusername'],$user['usergroup'],$user['displaygroup']);
 		}
 		if(isset($messagelist)) $messagelist = str_replace($find, $replace, $messagelist);
 		if(isset($readmessages)) $readmessages = str_replace($find, $replace, $readmessages);
