@@ -1182,16 +1182,16 @@ function avatarep_private_end()
 	$find = $replace = array();
 		while($user = $db->fetch_array($query))
 		{
-			$find[] = $user['userusername'];
-			$replace[] = format_name($user['userusername'],$user['usergroup'],$user['displaygroup']);		
+			$user['profilelink'] = get_profile_link($user['uid']);
+			$uid = (int)$user['uid'];			
+			$find[] = ">".$user['userusername']."<";
+			$replace[] = ">".format_name($user['userusername'],$user['usergroup'],$user['displaygroup'])."<";		
 			$find[] = "<avatarep[{$user['uid']}]['avatar']>";
 			if(empty($user['avatar'])){
 				$user['avatar'] = "images/default_avatar.png";
 			}else{
 				$user['avatar'] = htmlspecialchars_uni($user['avatar']);
 			}
-			$user['profilelink'] = get_profile_link($user['uid']);
-			$uid = (int)$user['uid'];
 			$user['avatar'] = "<img class=\"avatarep_img\" src=\"{$user['avatar']}\" style=\"display: block;\">";			
 			if($mybb->settings['avatarep_menu'] == 1)
 			{
