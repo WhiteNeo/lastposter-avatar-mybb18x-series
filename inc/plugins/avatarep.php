@@ -42,14 +42,12 @@ $plugins->add_hook('redirect', 'avatarep_announcement_update');
 // Informacion del plugin
 function avatarep_info()
 {
-	global $mybb, $cache, $db, $lang;
+	global $db, $mybb, $lang;
 
     $lang->load("avatarep", false, true);
 	$avatarep_config_link = '';
 
-	$query = $db->simple_select('settinggroups', '*', "name='avatarep'");
-
-	if (count($db->fetch_array($query)))
+	if($mybb->settigs['avatarep_active'] == 1)
 	{
 		$avatarep_config_link = '<div style="float: right;"><a href="index.php?module=config&amp;action=change&amp;search=avatarep" style="color:#035488; background: url(../images/usercp/options.gif) no-repeat 0px 18px; padding: 18px; text-decoration: none;"> '.$db->escape_string($lang->avatarep_config).'</a></div>';
 	}
@@ -188,7 +186,7 @@ function avatarep_activate() {
 		$inline_avatars = array();
 		while($user = $db->fetch_array($query))
 		{
-			$inline_avatars[$user['uid']] = format_avatar($user);
+			$inline_avatars[$user['uid']] = avatarep_format_avatar($user);
 		}
 
 		$cache->update('anno_cache', $inline_avatars);
@@ -351,7 +349,7 @@ function avatarep_activate() {
 		"attachedto"	=> '',		
 		"stylesheet"	=> $db->escape_string($avatarep_css),
 		"cachefile"		=> "avatarep.css",
-		"lastmodified"	=> TIME_NOW,
+		"lastmodified"	=> TIME_NOW
 	);
 	
 	$sid = $db->insert_query("themestylesheets", $stylesheet);
@@ -392,7 +390,8 @@ function avatarep_activate() {
 		*/
 		
     //Archivo requerido para reemplazo de templates
-    require_once MYBB_ROOT.'inc/adminfunctions_templates.php';
+    require_once '../inc/adminfunctions_templates.php';
+	
     // Reemplazos que vamos a hacer en las plantillas 1.- Platilla 2.- Contenido a Reemplazar 3.- Contenido que reemplaza lo anterior
     find_replace_templatesets("forumbit_depth2_forum_lastpost", '#'.preg_quote('{$lastpost_profilelink}').'#', '{$forum[\'avatarep\']}{$lastpost_profilelink}');
     find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$thread[\'profilelink\']}').'#', '{$avatarep_avatar[\'avatarep\']}{$thread[\'profilelink\']}');
@@ -402,8 +401,8 @@ function avatarep_activate() {
     find_replace_templatesets("search_results_threads_thread", '#'.preg_quote('{$lastposterlink}').'#', '{$avatarep_lastpost[\'avatarep\']}{$lastposterlink}');
     find_replace_templatesets("search_results_posts_post", '#'.preg_quote('{$post[\'profilelink\']}').'#', '{$avatarep_avatar[\'avatarep\']}{$post[\'profilelink\']}');	
     find_replace_templatesets("private_messagebit", '#'.preg_quote('{$tofromusername}').'#', '<avatarep[{$tofromuid}][\'avatar\']> {$tofromusername}');
-    find_replace_templatesets("private_tracking_readmessage", '#'.preg_quote('{$readmessage[\'profilelink\']}').'#', '<avatarep[{$readmessage[\'toid\']}][\'avatar\']> #pmuid_{$readmessage[\'profilelink\']}#');
-    find_replace_templatesets("private_tracking_unreadmessage", '#'.preg_quote('{$unreadmessage[\'profilelink\']}').'#', '<avatarep[{$unreadmessage[\'toid\']}][\'avatar\']> #pmuid_{$unreadmessage[\'profilelink\']}#');
+    find_replace_templatesets("private_tracking_readmessage", '#'.preg_quote('{$readmessage[\'profilelink\']}').'#', '<avatarep[{$readmessage[\'toid\']}][\'avatar\']> {$readmessage[\'profilelink\']}');
+    find_replace_templatesets("private_tracking_unreadmessage", '#'.preg_quote('{$unreadmessage[\'profilelink\']}').'#', '<avatarep[{$unreadmessage[\'toid\']}][\'avatar\']> {$unreadmessage[\'profilelink\']}');
  	
    //Se actualiza la info de las plantillas
    $cache->update_forums();
@@ -436,7 +435,7 @@ function avatarep_deactivate() {
 	}
 
     //Archivo requerido para reemplazo de templates
- 	require_once MYBB_ROOT.'inc/adminfunctions_templates.php';
+ 	require_once '../inc/adminfunctions_templates.php';
 	
     //Reemplazos que vamos a hacer en las plantillas 1.- Platilla 2.- Contenido a Reemplazar 3.- Contenido que reemplaza lo anterior
 	find_replace_templatesets("headerinclude", '#'.preg_quote('<script type="text/javascript" src="{$mybb->settings[\'bburl\']}/images/avatarep/avatarep.js"></script>').'#', '', 0);
@@ -449,10 +448,7 @@ function avatarep_deactivate() {
     find_replace_templatesets("search_results_posts_post", '#'.preg_quote('{$avatarep_avatar[\'avatarep\']}').'#', '',0);	
     find_replace_templatesets("private_messagebit", '#'.preg_quote('<avatarep[{$tofromuid}][\'avatar\']>').'#', '',0);
     find_replace_templatesets("private_tracking_readmessage", '#'.preg_quote('<avatarep[{$readmessage[\'toid\']}][\'avatar\']>').'#', '',0);
-    find_replace_templatesets("private_tracking_unreadmessage", '#'.preg_quote('<avatarep[{$unreadmessage[\'toid\']}][\'avatar\']>').'#', '',0);
-    find_replace_templatesets("private_tracking_readmessage", '#'.preg_quote('#pmuid_{$readmessage[\'profilelink\']}#').'#', '{$readmessage[\'profilelink\']}');
-    find_replace_templatesets("private_tracking_unreadmessage", '#'.preg_quote('#pmuid_{$unreadmessage[\'profilelink\']}#').'#', '{$unreadmessage[\'profilelink\']}');	
-	
+    find_replace_templatesets("private_tracking_unreadmessage", '#'.preg_quote('<avatarep[{$unreadmessage[\'toid\']}][\'avatar\']>').'#', '',0);	
 	
 	//Delete templates
 	$db->delete_query("templates", "title='avatarep_popup'");
@@ -1186,7 +1182,7 @@ function avatarep_private_end()
 	$find = $replace = array();
 		while($user = $db->fetch_array($query))
 		{
-			$find[] = "#pmuid_".$user['userusername']."#";
+			$find[] = $user['userusername'];
 			$replace[] = format_name($user['userusername'],$user['usergroup'],$user['displaygroup']);		
 			$find[] = "<avatarep[{$user['uid']}]['avatar']>";
 			if(empty($user['avatar'])){
