@@ -1,7 +1,7 @@
 <?php
 /**
 *  Idioma Español
-*  Avatar en Temas y Foros v 2.8.2
+*  Avatar en Temas y Foros v 2.8.6
 *
 *  Sitio Web: http://forosmybb.es
 *  Autor: Dark Neo - neogeoman@gmail.com
@@ -31,10 +31,16 @@ $l['avatarep_thread_lastposter_descrip'] = "Muestra el avatar del ultimo que con
 $l['avatarep_thread_announcements'] = "Mostrar Avatar en Anuncios";
 $l['avatarep_thread_announcements_descrip'] = "Muestra el avatar del usuario que creo los anuncios";
 
+$l['avatarep_portal'] = "Mostrar avatar en el portal";
+$l['avatarep_portal_descrip'] = "Mostrar el avatar en el portal, últimos mensajes y anuncios del portal";
+
 $l['avatarep_search'] = "Mostrar avatar en búsquedas";
 $l['avatarep_search_descrip'] = "Mostrar el avatar en los resultados encontrados de mensajes y temas";
 
 $l['avatarep_menu'] = "Menú Popup";
 $l['avatarep_menu_descrip'] = "Muestra un menú con datos del usuario al hacer clic en su avatar";
+
+$l['avatarep_menu_events'] = "Evento de la ventana";
+$l['avatarep_menu_events_descrip'] = "Elige el modo en que se mostrará la ventana (Evento del ratón).";
 
 ?>
