@@ -1,6 +1,6 @@
 Steps to follow:
 
-    1.- Downloaad this repo from github on 2.8.3 version only, on other versions may change due to core changes.
+    1.- Download this repo from github on 2.8.3 or better versions only (actually 2.8.6), on other versions may change due to core changes on MyBB (Tested since 1.7 series until 1.8.7 the most recent version.).
     2.- Enable plugin.
     3.- Go to styles and templates and verify avatarep.css exists and got content.
     4.- Make changes on style and templates to set visual customization.
@@ -8,7 +8,9 @@ Steps to follow:
     6.- Edit annother things like modal or contents.
     7.- Enjoy !!!
 	
-We don't have avatarep.css, then go to styles and create a new stylesheet called avatarep.css, inside this go to advanced mode and paste this content.
+KNOWN ISSUES:
+
+1.- We don't have avatarep.css, then go to styles and create a new stylesheet called avatarep.css, inside this go to advanced mode and paste this content.
 
 ```CSS
 /* POPUP MENU*/
@@ -86,6 +88,8 @@ We don't have avatarep.css, then go to styles and create a new stylesheet called
 ```
 
 Save and refresh cache on your explorer.
+
+2.- Avatar is not present on some areas: (Review this templates and his changes only on default theme and default based themes).
 
 Template changes:
 
@@ -235,6 +239,35 @@ Change all content to this:
             {$inline_mod_checkbox}
 </tr>
 ```
+
+Only 2.8.6 or better...
+
+portal_latestthreads_thread 
+Change all content to this:
+
+```HTML
+<tr>
+<td class="{$altbg}">
+<strong><a href="{$mybb->settings['bburl']}/{$thread['threadlink']}">{$thread['subject']}</a></strong>
+<span class="smalltext"><br />
+{$lang->forum} <a href="{$thread['forumlink']}">{$thread['forumname']}</a><br />
+<a href="{$thread['lastpostlink']}"><img src="images/jump.png" alt="{$lang->latest_threads_lastpost}" /></a> {$lastpostdate}
+<table border="0">
+<tr>
+<td align="left" valign="middle" width="100">
+{$lang->latest_threads_replies} {$thread['replies']}<br />
+{$lang->latest_threads_views} {$thread['views']}
+</td>
+<td align="right" valign="middle" width="100">
+<avatarep[{$thread['lastposteruid']}]['avatar']>  {$lastposterlink}
+</td>
+</tr>
+</table>
+</span>
+</td>
+</tr>
+```
+
 
 And done it !!!!
 
