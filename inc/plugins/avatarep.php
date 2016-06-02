@@ -46,16 +46,20 @@ $plugins->add_hook('redirect', 'avatarep_announcement_update');
 // Informacion del plugin
 function avatarep_info()
 {
-	global $db, $mybb, $lang;
+	global $db, $mybb, $lang, $avatarep_config_link;
 
     $lang->load("avatarep", false, true);
 	$avatarep_config_link = '';
 
-	if($mybb->settigs['avatarep_active'] == 1)
+	if($mybb->settings['avatarep_active'] == 1)
 	{
-		$avatarep_config_link = '<div style="float: right;"><a href="index.php?module=config&amp;action=change&amp;search=avatarep" style="color:#035488; background: url(../images/usercp/options.gif) no-repeat 0px 18px; padding: 18px; text-decoration: none;"> '.$db->escape_string($lang->avatarep_config).'</a></div>';
+		$avatarep_config_link = '<div style="float: right;"><a href="index.php?module=config&amp;action=change&amp;search=avatarep" style="color:#035488; background: url(../images/icons/brick.png) no-repeat 0px 18px; padding: 18px; text-decoration: none;"> '.$db->escape_string($lang->avatarep_config).'</a></div>';
 	}
-
+	else if($mybb->settings['avatarep_active'] == 0)
+	{
+		$avatarep_config_link = '<div style="float: right; color: rgba(136, 17, 3, 1); background: url(../images/icons/exclamation.png) no-repeat 0px 18px; padding: 21px; text-decoration: none;">Plugin disabled</div>';
+	}
+	
 	return array(
         "name"			=> $db->escape_string($lang->avatarep_name),
     	"description"	=> $db->escape_string($lang->avatarep_descrip) . " " . $avatarep_config_link,
