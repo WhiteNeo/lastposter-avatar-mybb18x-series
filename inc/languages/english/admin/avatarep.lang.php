@@ -1,7 +1,7 @@
 <?php
 /**
 *  Language English
-*  Last Poster Avatar on Threads and Forums v 2.8.2
+*  Last Poster Avatar on Threads and Forums v 2.8.6
 *
 *  Sitio Web: http://forosmybb.es
 *  Autor: Dark Neo - neogeoman@gmail.com
@@ -31,9 +31,15 @@ $l['avatarep_thread_lastposter_descrip'] = "Shows lastposter avatar on threadlis
 $l['avatarep_thread_announcements'] = "Avatar on Announcements";
 $l['avatarep_thread_announcements_descrip'] = "Shows avatar of announcements user";
 
+$l['avatarep_portal'] = "Avatar on portal";
+$l['avatarep_portal_descrip'] = "Shows avatars on latest threads and style announcements on portal";
+
 $l['avatarep_search'] = "Avatar on Search";
 $l['avatarep_search_descrip'] = "Shows avatar on search results";
 
-$l['avatarep_menu'] = "Onclick Menu";
+$l['avatarep_menu'] = "Modal Box popup";
 $l['avatarep_menu_descrip'] = "Shows a menu popup on event click for every user on his avatar";
+
+$l['avatarep_menu'] = "Mouse events";
+$l['avatarep_menu_descrip'] = "Select mouse event to show modal box.";
 ?>
