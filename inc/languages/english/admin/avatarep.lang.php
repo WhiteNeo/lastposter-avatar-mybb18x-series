@@ -31,8 +31,8 @@ $l['avatarep_thread_lastposter_descrip'] = "Shows lastposter avatar on threadlis
 $l['avatarep_thread_announcements'] = "Avatar on Announcements";
 $l['avatarep_thread_announcements_descrip'] = "Shows avatar of announcements user";
 
-$l['avatarep_portal'] = "Avatar on portal";
-$l['avatarep_portal_descrip'] = "Shows avatars on latest threads and style announcements on portal";
+$l['avatarep_portal'] = "Avatar in Portal - Latest Threads";
+$l['avatarep_portal_descrip'] = "Shows avatar of announcements user in Portal";
 
 $l['avatarep_search'] = "Avatar on Search";
 $l['avatarep_search_descrip'] = "Shows avatar on search results";
