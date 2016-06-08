@@ -43,7 +43,7 @@ $l['avatarep_menu_descrip'] = "Shows a menu popup on event click for every user 
 $l['avatarep_menu'] = "Mouse events";
 $l['avatarep_menu_descrip'] = "Select mouse event to show modal box.";
 
-$l['avatarep_guests'] = "Guest's Avatar";
+$l['avatarep_guests'] = "Guests Avatar";
 $l['avatarep_guests_descrip'] = "Show defaul avatar for guests";
 
 $l['avatarep_format'] = "Display formatted usernames";
