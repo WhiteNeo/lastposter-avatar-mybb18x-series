@@ -43,4 +43,9 @@ $l['avatarep_menu_descrip'] = "Muestra un menú con datos del usuario al hacer c
 $l['avatarep_menu_events'] = "Evento de la ventana";
 $l['avatarep_menu_events_descrip'] = "Elige el modo en que se mostrará la ventana (Evento del ratón).";
 
+$l['avatarep_guests'] = "Avatar de Invitados";
+$l['avatarep_guests_descrip'] = "Muestra el avatar predeterminado a usuarios invitados";
+
+$l['avatarep_format'] = "Nombres de usuario formateados";
+$l['avatarep_format_descrip'] = "Muestra los nombres de usuario con códigos html configurados en los grupos de usuario";
 ?>
