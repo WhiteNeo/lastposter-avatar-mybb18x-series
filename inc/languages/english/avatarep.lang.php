@@ -1,7 +1,7 @@
 <?php
 /**
 *  Language English
-*  Last Poster Avatar on Threads and Forums v 2.8.5
+*  Last Poster Avatar on Threads and Forums v 2.8.7
 *
 *  Sitio Web: http://forosmybb.es
 *  Autor: Dark Neo - neogeoman@gmail.com
@@ -15,4 +15,6 @@ $l['avatarep_user_error'] = " Error ";
 $l['avatarep_user_error_text'] = " You must login to see this content ";
 $l['avatarep_user_alt'] = "{1}'s Avatar";
 $l['avatarep_user_no_avatar'] = "No avatar";
+$l['avatarep_retrieving'] = "Retrieving Data";
+$l['avatarep_loading'] = "Loading...";
 ?>
