@@ -793,7 +793,7 @@ function forumlist_avatar(&$_f)
 		{
 			if($mybb->settings['avatarep_menu_events'] == 2)
 			{		
-				$_f['avatarep'] = "<a href=\"member.php?uid={$_f['uid']}&amp;action=avatarep_popup\" class=\"forum_member{$_f['uid']}\">".$_f['avatarep_lastpost']['avatarep']."</a>
+				$_f['avatarep'] = "<a href=\"member.php?uid={$_f['uid']}&amp;action=avatarep_popup\" id=\"forum_member{$myid}\">".$_f['avatarep_lastpost']['avatarep']."</a>
 					<script type=\"text/javascript\">
 					$(document).on(\"ready\", function(){
 						var myTimer;
