@@ -39,6 +39,7 @@ $plugins->add_hook('global_start', 'avatarep_popup');
 $plugins->add_hook('usercp_do_avatar_end', 'avatarep_avatar_update');
 $plugins->add_hook('global_end', 'avatarep_style_guser');
 $plugins->add_hook('pre_output_page', 'avatarep_style_output');
+$plugins->add_hook("class_moderation_delete_post", "avatarep_deletepost");
 if(THIS_SCRIPT == 'modcp.php' && in_array($mybb->input['action'], array('do_new_announcement', 'do_edit_announcement'))){
 $plugins->add_hook('redirect', 'avatarep_announcement_update');
 }
@@ -867,6 +868,19 @@ function forumlist_avatar(&$_f)
 		$_f['lastposter'] = $username;		
 	}
 	$_f['avatarep'] = '<div class="avatarep_fd">' . $_f['avatarep'] . '</div>';
+}
+
+// Recarga de cache al eliminar un mensaje para cargar bien el avatar del ultimo envío en los foros...
+function avatarep_deletepost()
+{
+	global $cache, $mybb;
+    //Revisar que la opcion este activa
+    if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_foros'] == 0)
+    {
+		return false;	
+	}	
+
+	$avatarep_cache = $cache->update('avatarep_cache');	
 }
 
 // Avatar en temas
