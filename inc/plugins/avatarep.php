@@ -40,6 +40,9 @@ $plugins->add_hook('usercp_do_avatar_end', 'avatarep_avatar_update');
 $plugins->add_hook('global_end', 'avatarep_style_guser');
 $plugins->add_hook('pre_output_page', 'avatarep_style_output');
 $plugins->add_hook("class_moderation_delete_post", "avatarep_deletepost");
+$plugins->add_hook("class_moderation_delete_thread", "avatarep_deletepost");
+$plugins->add_hook("class_moderation_soft_delete_posts", "avatarep_deletepost");
+$plugins->add_hook("class_moderation_restore_posts", "avatarep_deletepost");
 if(THIS_SCRIPT == 'modcp.php' && in_array($mybb->input['action'], array('do_new_announcement', 'do_edit_announcement'))){
 $plugins->add_hook('redirect', 'avatarep_announcement_update');
 }
