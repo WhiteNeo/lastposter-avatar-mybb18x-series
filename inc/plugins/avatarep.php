@@ -2,7 +2,7 @@
 /**
 *@ Autor: Dark Neo
 *@ Fecha: 2013-12-12
-*@ Version: 2.8.7
+*@ Version: 2.8.8
 *@ Contacto: neogeoman@gmail.com
 */
 
@@ -77,7 +77,7 @@ function avatarep_info()
 		"website"		=> "http://www.mybb.com",
 		"author"		=> "Dark Neo",
 		"authorsite"	=> "http://soportemybb.es",
-		"version"		=> "2.8.7",
+		"version"		=> "2.8.8",
 		"codename" 		=> "last_poster_avatar",
 		"compatibility" => "18*"
 	);
@@ -2571,7 +2571,7 @@ function avatarep_portal_lt()
 					}
 					else
 					{
-						$user['avatar'] = "<a href=\"javascript:void(0)\" id=\"plt_member{$myid}\" {$avatar_events}=\"MyBB.popupWindow('". $user['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
+						$user['avatar'] = "<a href=\"javascript:void(0)\" class=\"plt_member{$myid}\" {$avatar_events}=\"MyBB.popupWindow('". $user['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
 					}
 				}
 				else					
@@ -2582,13 +2582,13 @@ function avatarep_portal_lt()
 					}
 					else
 					{
-						$user['avatar'] = "<a href=\"javascript:void(0)\" id=\"plt_member{$myid}\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
+						$user['avatar'] = "<a href=\"javascript:void(0)\" class=\"plt_member{$myid}\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
 					}
 				}	
 			}
 			else
 			{
-				$user['avatar'] = 	"<a href=\"". $user['profilelink'] . "\" id=\"plt_member{$myid}\">".$user['avatar']."</a>";
+				$user['avatar'] = 	"<a href=\"". $user['profilelink'] . "\" class=\"plt_member{$myid}\">".$user['avatar']."</a>";
 			}		
 			$replace[] = $user['avatar'];		
 		}
@@ -2607,10 +2607,10 @@ function avatarep_portal_sb()
 	{
 		$avatar_events = "onmouseover";
 		$tids = array();
-		foreach(array($sblatestthreads) as $contentententententententent)
+		foreach(array($sblatestthreads) as $content)
 		{
-			if(!$contentententententententent) continue;
-			preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $contentententententententent, $matches);
+			if(!$content) continue;
+			preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $content, $matches);
 			if(is_array($matches[1]) && !empty($matches[1]))
 			{
 				foreach($matches[1] as $tid)
@@ -2631,10 +2631,10 @@ function avatarep_portal_sb()
 		}
 		if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);	
 		$tide = array();
-		foreach(array($sblatestthreads) as $contentententententententent)
+		foreach(array($sblatestthreads) as $content)
 		{
-			if(!$contentententententententent) continue;
-			preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $contentententententententent, $matches);
+			if(!$content) continue;
+			preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $content, $matches);
 			if(is_array($matches[1]) && !empty($matches[1]))
 			{
 				foreach($matches[1] as $myid)
@@ -2714,10 +2714,10 @@ function avatarep_portal_sb()
 	{
 		$avatar_events = "onclick";		
 		$tids = array();
-		foreach(array($sblatestthreads) as $contentententententententent)
+		foreach(array($sblatestthreads) as $content)
 		{
-			if(!$contentententententententent) continue;
-			preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $contentententententententent, $matches);
+			if(!$content) continue;
+			preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $content, $matches);
 			if(is_array($matches[1]) && !empty($matches[1]))
 			{
 				foreach($matches[1] as $tid)
@@ -2738,10 +2738,10 @@ function avatarep_portal_sb()
 		}
 		if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);	
 		$tide = array();
-		foreach(array($sblatestthreads) as $contentententententententent)
+		foreach(array($sblatestthreads) as $content)
 		{
-			if(!$contentententententententent) continue;
-			preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $contentententententententent, $matches);
+			if(!$content) continue;
+			preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $content, $matches);
 			if(is_array($matches[1]) && !empty($matches[1]))
 			{
 				foreach($matches[1] as $myid)
@@ -2763,10 +2763,10 @@ function avatarep_portal_sb()
 		if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);			
 	}	
 	$users = array();
-	foreach(array($sblatestthreads) as $contentententententententent)
+	foreach(array($sblatestthreads) as $content)
 	{
-		if(!$contentententententententent) continue;
-		preg_match_all('#<avatarep\[([0-9]+)\]#', $contentententententententent, $matches);
+		if(!$content) continue;
+		preg_match_all('#<avatarep\[([0-9]+)\]#', $content, $matches);
 		if(is_array($matches[1]) && !empty($matches[1]))
 		{
 			foreach($matches[1] as $user)
@@ -2802,7 +2802,7 @@ function avatarep_portal_sb()
 				$user['avatar'] = "";								
 			}else{
 				$user['avatar'] = htmlspecialchars_uni($user['avatar']);
-				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" {style=\"display: inline-block;\" /><br />";							
+				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" style=\"display: inline-block;\" /><br />";							
 			}
 			if($mybb->settings['avatarep_menu'] == 1)
 			{
@@ -2814,7 +2814,7 @@ function avatarep_portal_sb()
 					}
 					else
 					{
-						$user['avatar'] = "<a href=\"javascript:void(0)\" id=\"plt_member{$myid}\" {$avatar_events}=\"MyBB.popupWindow('". $user['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
+						$user['avatar'] = "<a href=\"javascript:void(0)\" class=\"plt_member{$myid}\" {$avatar_events}=\"MyBB.popupWindow('". $user['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
 					}
 				}
 				else					
@@ -2825,13 +2825,13 @@ function avatarep_portal_sb()
 					}
 					else
 					{
-						$user['avatar'] = "<a href=\"javascript:void(0)\" id=\"plt_member{$myid}\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
+						$user['avatar'] = "<a href=\"javascript:void(0)\" class=\"plt_member{$myid}\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
 					}
 				}	
 			}
 			else
 			{
-				$user['avatar'] = 	"<a href=\"". $user['profilelink'] . "\" id=\"plt_member{$myid}\">".$user['avatar']."</a>";
+				$user['avatar'] = 	"<a href=\"". $user['profilelink'] . "\" class=\"plt_member{$myid}\">".$user['avatar']."</a>";
 			}		
 			$replace[] = $user['avatar'];		
 		}
