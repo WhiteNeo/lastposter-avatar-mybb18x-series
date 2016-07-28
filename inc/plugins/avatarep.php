@@ -2,7 +2,7 @@
 /**
 *@ Autor: Dark Neo
 *@ Fecha: 2013-12-12
-*@ Version: 2.8.8
+*@ Version: 2.8.7
 *@ Contacto: neogeoman@gmail.com
 */
 
@@ -77,7 +77,7 @@ function avatarep_info()
 		"website"		=> "http://www.mybb.com",
 		"author"		=> "Dark Neo",
 		"authorsite"	=> "http://soportemybb.es",
-		"version"		=> "2.8.8",
+		"version"		=> "2.8.7",
 		"codename" 		=> "last_poster_avatar",
 		"compatibility" => "18*"
 	);
@@ -2287,7 +2287,6 @@ function avatarep_private_end()
 			$user['profilelink'] = get_profile_link($user['uid']);
 			$user['username'] = htmlspecialchars_uni($user['username']);
 			$uid = (int)$user['uid'];
-			//$myid = md5(time()."smybb".$user['uid']);
 			if($mybb->settings['avatarep_format'] == 1)
 			{
 				$find[] = ">".$user['userusername']."<";
@@ -2299,7 +2298,7 @@ function avatarep_private_end()
 			}else{
 				$user['avatar'] = htmlspecialchars_uni($user['avatar']);
 			}
-			$user['avatar'] = "<img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" style=\"display: inline-block;\"><br />";			
+			$user['avatar'] = "<img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" style=\"display: inline-block;\" /><br />";			
 			if($mybb->settings['avatarep_menu'] == 1)
 			{
 				if(function_exists("google_seo_url_profile"))
@@ -2552,15 +2551,15 @@ function avatarep_portal_lt()
 			$find[] = "<avatarep[{$user['uid']}]['avatar']>";
 			if(empty($user['avatar']) && $user['uid'] > 0){
 				$user['avatar'] = "images/default_avatar.png";
-				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" style=\"display: inline-block;\"><br />";							
+				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" style=\"display: inline-block;\" /><br />";							
 			}else if(empty($user['avatar']) && $user['uid'] == 0 && $mybb->settings['avatarep_guests'] == 1){
 				$user['avatar'] = "images/default_avatar.png";				
-				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" style=\"display: inline-block;\"><br />";							
+				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" style=\"display: inline-block;\" /><br />";							
 			}else if(empty($user['avatar']) && $user['uid'] == 0 && $mybb->settings['avatarep_guests'] == 0){
 				$user['avatar'] = "";								
 			}else{
 				$user['avatar'] = htmlspecialchars_uni($user['avatar']);
-				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" style=\"display: inline-block;\"><br />";							
+				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" style=\"display: inline-block;\" /><br />";							
 			}
 			if($mybb->settings['avatarep_menu'] == 1)
 			{
@@ -2795,15 +2794,15 @@ function avatarep_portal_sb()
 			$find[] = "<avatarep[{$user['uid']}]['avatar']>";
 			if(empty($user['avatar']) && $user['uid'] > 0){
 				$user['avatar'] = "images/default_avatar.png";
-				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" style=\"display: inline-block;\"><br />";							
+				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" style=\"display: inline-block;\" /><br />";							
 			}else if(empty($user['avatar']) && $user['uid'] == 0 && $mybb->settings['avatarep_guests'] == 1){
 				$user['avatar'] = "images/default_avatar.png";				
-				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" style=\"display: inline-block;\"><br />";							
+				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" style=\"display: inline-block;\" /><br />";							
 			}else if(empty($user['avatar']) && $user['uid'] == 0 && $mybb->settings['avatarep_guests'] == 0){
 				$user['avatar'] = "";								
 			}else{
 				$user['avatar'] = htmlspecialchars_uni($user['avatar']);
-				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" {style=\"display: inline-block;\"><br />";							
+				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" {style=\"display: inline-block;\" /><br />";							
 			}
 			if($mybb->settings['avatarep_menu'] == 1)
 			{
