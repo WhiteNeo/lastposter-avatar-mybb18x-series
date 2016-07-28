@@ -2,7 +2,7 @@
 /**
 *@ Autor: Dark Neo
 *@ Fecha: 2013-12-12
-*@ Version: 2.8.7
+*@ Version: 2.8.8
 *@ Contacto: neogeoman@gmail.com
 */
 
@@ -17,6 +17,8 @@ if(THIS_SCRIPT == 'index.php' || THIS_SCRIPT == 'forumdisplay.php'){
 $plugins->add_hook('build_forumbits_forum', 'forumlist_avatar');
 $plugins->add_hook('forumdisplay_thread', 'avatarep_thread');
 $plugins->add_hook('forumdisplay_announcement', 'avatarep_announcement');
+if($settings['sidebox5'] == 0 || $settings['sidebox5'] == 1)
+$plugins->add_hook('index_end', 'avatarep_portal_sb');	
 }
 else if(THIS_SCRIPT == 'showthread.php'){
 $plugins->add_hook('showthread_end', 'avatarep_threads');
@@ -32,8 +34,13 @@ $plugins->add_hook("private_results_end", "avatarep_private_end");
 $plugins->add_hook("private_tracking_end", "avatarep_private_end");
 }
 else if(THIS_SCRIPT == 'portal.php'){
-$plugins->add_hook("portal_announcement", "avatarep_portal");	
+if($settings['sidebox5'] == 1)
+$plugins->add_hook("portal_end", "avatarep_portal_sb");		
+else if($settings['sidebox5'] == 0)
+$plugins->add_hook("portal_end", "avatarep_portal_lt");
+else	
 $plugins->add_hook("portal_end", "avatarep_portal_lt");	
+$plugins->add_hook("portal_announcement", "avatarep_portal");	
 }
 $plugins->add_hook('global_start', 'avatarep_popup');
 $plugins->add_hook('usercp_do_avatar_end', 'avatarep_avatar_update');
@@ -70,7 +77,7 @@ function avatarep_info()
 		"website"		=> "http://www.mybb.com",
 		"author"		=> "Dark Neo",
 		"authorsite"	=> "http://soportemybb.es",
-		"version"		=> "2.8.7",
+		"version"		=> "2.8.8",
 		"codename" 		=> "last_poster_avatar",
 		"compatibility" => "18*"
 	);
@@ -355,10 +362,11 @@ function avatarep_activate() {
 	// Añadir el css para la tipsy
 	$avatarep_css = '// Avatars Menu //
 .modal_avatar{
+	display: none;
 	width: auto;
 	height: auto;
 	background: #f0f0f0;
-	border: 1px solid #ffffff;
+	border: none;
 	border-radius: 10px;
 	position: absolute;
 	z-index: 99999;
@@ -611,6 +619,18 @@ function avatarep_format_avatar($user)
 	return format_avatar($user);
 }		
 
+function avatarep_deletepost()
+{
+	global $cache, $mybb;
+    //Revisar que la opcion este activa
+    if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_foros'] == 0)
+    {
+		return false;	
+	}	
+
+	$avatarep_cache = $cache->update('avatarep_cache');	
+}
+
 // Avatar en foros
 function forumlist_avatar(&$_f)
 {
@@ -734,19 +754,22 @@ function forumlist_avatar(&$_f)
 			if($mybb->settings['avatarep_menu_events'] == 2)
 			{		
 				$_f['avatarep'] = "<a href=\"" . $_f['avatarep_lastpost']['profilelink'] . "?action=avatarep_popup\" id=\"forum_member{$myid}\">".$_f['avatarep_lastpost']['avatarep']."</a>
+				<div class=\"modal_avatar\" id=\"forum_mod{$myid}\"></div>				
 					<script type=\"text/javascript\">
 					$(document).on(\"ready\", function(){
+						var NavaT = 0;						
 						var myTimer;
-						$(\"#forum_member{$myid}\").on(\"click\", function(e){
+						$(\"a#forum_member{$myid}\").on(\"click\", function(e){
 							e.preventDefault();	
 							return false;
 						});
-						$(\"#forum_member{$myid}\").on(\"mouseenter\", function(){
+						$(\"a#forum_member{$myid}\").on(\"mouseenter\", function(){
+						var Nava = '{$myid}';
 						var ID_href = $(this).attr(\"href\");
 						var Data = \"id=\" + ID_href;
-						if($(\"div.modal_avatar\").attr(\"id\") != \"forum_mod{$myid}\")
+						console.log(NavaT);
+						if(Nava != NavaT)
 						{
-							$(\"div.modal_avatar\").remove();
 							myTimer = setTimeout( function()
 							{			
 								$.ajax({
@@ -756,19 +779,18 @@ function forumlist_avatar(&$_f)
 									dataType:\"json\",
 									beforeSend:function()
 									{
-										$(\"#forum_member{$myid}\").append('<div class=\"modal_avatar\"></div>');	
-										$(\"div.modal_avatar\").css({
+										$(\"div#forum_mod{$myid}\").css({
 											\"display\": \"block\",
 											\"margin-top\": \"2px\",
 											\"margin-left\": \"20px\",
 											\"position\": \"absolute\",
 											\"width\": 320														
 										});						
-										$(\"div.modal_avatar\").fadeIn(\"fast\");										
-										$(\"div.modal_avatar\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
-										$(\"div.modal_avatar\").attr(\"id\",\"forum_mod{$myid}\");										
+										$(\"div#forum_mod{$myid}\").fadeIn(\"fast\");										
+										$(\"div#forum_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
 									},									
-									success:function(res){																			
+									success:function(res){	
+										NavaT = '{$myid}';
 										$(\"div#forum_mod{$myid}\").html(res);
 									}
 								});	
@@ -798,19 +820,22 @@ function forumlist_avatar(&$_f)
 			if($mybb->settings['avatarep_menu_events'] == 2)
 			{		
 				$_f['avatarep'] = "<a href=\"member.php?uid={$_f['uid']}&amp;action=avatarep_popup\" id=\"forum_member{$myid}\">".$_f['avatarep_lastpost']['avatarep']."</a>
+				<div class=\"modal_avatar\" id=\"forum_mod{$myid}\"></div>				
 					<script type=\"text/javascript\">
 					$(document).on(\"ready\", function(){
+						var NavaT = 0;						
 						var myTimer;
-						$(\"#forum_member{$myid}\").on(\"click\", function(e){
+						$(\"a#forum_member{$myid}\").on(\"click\", function(e){
 							e.preventDefault();	
 							return false;
 						});
-						$(\"#forum_member{$myid}\").on(\"mouseenter\", function(){
+						$(\"a#forum_member{$myid}\").on(\"mouseenter\", function(){
+						var Nava = '{$myid}';
 						var ID_href = $(this).attr(\"href\");
 						var Data = \"id=\" + ID_href;
-						if($(\"div.modal_avatar\").attr(\"id\") != \"forum_mod{$myid}\")
+						console.log(NavaT);
+						if(Nava != NavaT)
 						{
-							$(\"div.modal_avatar\").remove();
 							myTimer = setTimeout( function()
 							{			
 								$.ajax({
@@ -820,19 +845,18 @@ function forumlist_avatar(&$_f)
 									dataType:\"json\",
 									beforeSend:function()
 									{
-										$(\"#forum_member{$myid}\").append('<div class=\"modal_avatar\"></div>');	
-										$(\"div.modal_avatar\").css({
+										$(\"div#forum_mod{$myid}\").css({
 											\"display\": \"block\",
 											\"margin-top\": \"2px\",
 											\"margin-left\": \"20px\",
 											\"position\": \"absolute\",
 											\"width\": 320														
 										});						
-										$(\"div.modal_avatar\").fadeIn(\"fast\");										
-										$(\"div.modal_avatar\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
-										$(\"div.modal_avatar\").attr(\"id\",\"forum_mod{$myid}\");										
+										$(\"div#forum_mod{$myid}\").fadeIn(\"fast\");										
+										$(\"div#forum_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
 									},									
-									success:function(res){																			
+									success:function(res){	
+										NavaT = '{$myid}';
 										$(\"div#forum_mod{$myid}\").html(res);
 									}
 								});	
@@ -871,19 +895,6 @@ function forumlist_avatar(&$_f)
 		$_f['lastposter'] = $username;		
 	}
 	$_f['avatarep'] = '<div class="avatarep_fd">' . $_f['avatarep'] . '</div>';
-}
-
-// Recarga de cache al eliminar un mensaje para cargar bien el avatar del ultimo envío en los foros...
-function avatarep_deletepost()
-{
-	global $cache, $mybb;
-    //Revisar que la opcion este activa
-    if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_foros'] == 0)
-    {
-		return false;	
-	}	
-
-	$avatarep_cache = $cache->update('avatarep_cache');	
 }
 
 // Avatar en temas
@@ -991,59 +1002,61 @@ function avatarep_thread() {
 				if($mybb->settings['avatarep_menu_events'] == 2)
 				{		
 					$avatarep_avatar['avatarep'] = "<a href=\"". $avatarep_avatar['profilelink'] . "?action=avatarep_popup\" id=\"tal_member{$myid}\">".$avatarep_avatar['avatarep']."</a>
-					<script type=\"text/javascript\">
-					$(document).on(\"ready\", function(){
-						var myTimer;
-						$(\"#tal_member{$myid}\").on(\"click\", function(e){
-							e.preventDefault();	
-							return false;
+					<div class=\"modal_avatar\" id=\"tal_mod{$myid}\"></div>				
+						<script type=\"text/javascript\">
+						$(document).on(\"ready\", function(){
+							var NavaT = 0;						
+							var myTimer;
+							$(\"a#tal_member{$myid}\").on(\"click\", function(e){
+								e.preventDefault();	
+								return false;
+							});
+							$(\"a#tal_member{$myid}\").on(\"mouseenter\", function(){
+							var Nava = '{$myid}';
+							var ID_href = $(this).attr(\"href\");
+							var Data = \"id=\" + ID_href;
+							console.log(NavaT);
+							if(Nava != NavaT)
+							{
+								myTimer = setTimeout( function()
+								{			
+									$.ajax({
+										url:ID_href,
+										data:Data,
+										type:\"post\",
+										dataType:\"json\",
+										beforeSend:function()
+										{
+											$(\"div#tal_mod{$myid}\").css({
+												\"display\": \"block\",
+												\"margin-top\": \"2px\",
+												\"margin-left\": \"20px\",
+												\"position\": \"absolute\",
+												\"width\": 320														
+											});						
+											$(\"div#tal_mod{$myid}\").fadeIn(\"fast\");										
+											$(\"div#tal_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
+										},									
+										success:function(res){	
+											NavaT = '{$myid}';
+											$(\"div#tal_mod{$myid}\").html(res);
+										}
+									});	
+								return false;
+								}, 2000);
+							}
+							else
+							{
+								$(\"div#tal_mod{$myid}\").fadeIn(\"slow\")
+							}						
+							}).on(\"mouseleave\", function(){
+								if(myTimer)
+								clearTimeout(myTimer);				
+								$(\"div#tal_mod{$myid}\").fadeOut(\"fast\")
+								$(this).stop();
+							});
 						});
-						$(\"#tal_member{$myid}\").on(\"mouseenter\", function(){
-						var ID_href = $(this).attr(\"href\");
-						var Data = \"id=\" + ID_href;
-						if($(\"div.modal_avatar\").attr(\"id\") != \"tal_mod{$myid}\")
-						{
-							$(\"div.modal_avatar\").remove();
-							myTimer = setTimeout( function()
-							{			
-								$.ajax({
-									url:ID_href,
-									data:Data,
-									type:\"post\",
-									dataType:\"json\",
-									beforeSend:function()
-									{
-										$(\"#tal_member{$myid}\").append('<div class=\"modal_avatar\"></div>');	
-										$(\"div.modal_avatar\").css({
-											\"display\": \"block\",
-											\"margin-top\": \"2px\",
-											\"margin-left\": \"20px\",
-											\"position\": \"absolute\",
-											\"width\": 320														
-										});						
-										$(\"div.modal_avatar\").fadeIn(\"fast\");										
-										$(\"div.modal_avatar\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
-										$(\"div.modal_avatar\").attr(\"id\",\"tal_mod{$myid}\");										
-									},									
-									success:function(res){																			
-										$(\"div#tal_mod{$myid}\").html(res);
-									}
-								});	
-							return false;
-							}, 2000);
-						}
-						else
-						{
-							$(\"div#tal_mod{$myid}\").fadeIn(\"slow\")
-						}						
-						}).on(\"mouseleave\", function(){
-							if(myTimer)
-							clearTimeout(myTimer);				
-							$(\"div#tal_mod{$myid}\").fadeOut(\"fast\")
-							$(this).stop();
-						});
-					});
-				</script>";
+					</script>";
 				}
 				else
 				{
@@ -1055,59 +1068,61 @@ function avatarep_thread() {
 				if($mybb->settings['avatarep_menu_events'] == 2)
 				{		
 					$avatarep_avatar['avatarep'] = "<a href=\"member.php?uid={$uid}&amp;action=avatarep_popup\" id=\"tal_member{$myid}\">".$avatarep_avatar['avatarep']."</a>
-					<script type=\"text/javascript\">
-					$(document).on(\"ready\", function(){
-						var myTimer;
-						$(\"#tal_member{$myid}\").on(\"click\", function(e){
-							e.preventDefault();	
-							return false;
+					<div class=\"modal_avatar\" id=\"tal_mod{$myid}\"></div>				
+						<script type=\"text/javascript\">
+						$(document).on(\"ready\", function(){
+							var NavaT = 0;						
+							var myTimer;
+							$(\"a#tal_member{$myid}\").on(\"click\", function(e){
+								e.preventDefault();	
+								return false;
+							});
+							$(\"a#tal_member{$myid}\").on(\"mouseenter\", function(){
+							var Nava = '{$myid}';
+							var ID_href = $(this).attr(\"href\");
+							var Data = \"id=\" + ID_href;
+							console.log(NavaT);
+							if(Nava != NavaT)
+							{
+								myTimer = setTimeout( function()
+								{			
+									$.ajax({
+										url:ID_href,
+										data:Data,
+										type:\"post\",
+										dataType:\"json\",
+										beforeSend:function()
+										{
+											$(\"div#tal_mod{$myid}\").css({
+												\"display\": \"block\",
+												\"margin-top\": \"2px\",
+												\"margin-left\": \"20px\",
+												\"position\": \"absolute\",
+												\"width\": 320														
+											});						
+											$(\"div#tal_mod{$myid}\").fadeIn(\"fast\");										
+											$(\"div#tal_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
+										},									
+										success:function(res){	
+											NavaT = '{$myid}';
+											$(\"div#tal_mod{$myid}\").html(res);
+										}
+									});	
+								return false;
+								}, 2000);
+							}
+							else
+							{
+								$(\"div#tal_mod{$myid}\").fadeIn(\"slow\")
+							}						
+							}).on(\"mouseleave\", function(){
+								if(myTimer)
+								clearTimeout(myTimer);				
+								$(\"div#tal_mod{$myid}\").fadeOut(\"fast\")
+								$(this).stop();
+							});
 						});
-						$(\"#tal_member{$myid}\").on(\"mouseenter\", function(){
-						var ID_href = $(this).attr(\"href\");
-						var Data = \"id=\" + ID_href;
-						if($(\"div.modal_avatar\").attr(\"id\") != \"tal_mod{$myid}\")
-						{
-							$(\"div.modal_avatar\").remove();
-							myTimer = setTimeout( function()
-							{			
-								$.ajax({
-									url:ID_href,
-									data:Data,
-									type:\"post\",
-									dataType:\"json\",
-									beforeSend:function()
-									{
-										$(\"#tal_member{$myid}\").append('<div class=\"modal_avatar\"></div>');	
-										$(\"div.modal_avatar\").css({
-											\"display\": \"block\",
-											\"margin-top\": \"2px\",
-											\"margin-left\": \"20px\",
-											\"position\": \"absolute\",
-											\"width\": 320														
-										});						
-										$(\"div.modal_avatar\").fadeIn(\"fast\");										
-										$(\"div.modal_avatar\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
-										$(\"div.modal_avatar\").attr(\"id\",\"tal_mod{$myid}\");										
-									},									
-									success:function(res){																			
-										$(\"div#tal_mod{$myid}\").html(res);
-									}
-								});	
-							return false;
-							}, 2000);
-						}
-						else
-						{
-							$(\"div#tal_mod{$myid}\").fadeIn(\"slow\")
-						}						
-						}).on(\"mouseleave\", function(){
-							if(myTimer)
-							clearTimeout(myTimer);				
-							$(\"div#tal_mod{$myid}\").fadeOut(\"fast\")
-							$(this).stop();
-						});
-					});
-				</script>";
+					</script>";
 				}
 				else
 				{						
@@ -1140,59 +1155,61 @@ function avatarep_thread() {
 				if($mybb->settings['avatarep_menu_events'] == 2)
 				{		
 					$avatarep_lastpost['avatarep'] = "<a href=\"". $avatarep_lastpost['profilelink'] . "?action=avatarep_popup\" id=\"tao_member{$myid}\">".$avatarep_lastpost['avatarep']."</a>
-					<script type=\"text/javascript\">
-					$(document).on(\"ready\", function(){
-						var myTimer;
-						$(\"#tao_member{$myid}\").on(\"click\", function(e){
-							e.preventDefault();	
-							return false;
+					<div class=\"modal_avatar\" id=\"tao_mod{$myid}\"></div>				
+						<script type=\"text/javascript\">
+						$(document).on(\"ready\", function(){
+							var NavaT = 0;						
+							var myTimer;
+							$(\"a#tao_member{$myid}\").on(\"click\", function(e){
+								e.preventDefault();	
+								return false;
+							});
+							$(\"a#tao_member{$myid}\").on(\"mouseenter\", function(){
+							var Nava = '{$myid}';
+							var ID_href = $(this).attr(\"href\");
+							var Data = \"id=\" + ID_href;
+							console.log(NavaT);
+							if(Nava != NavaT)
+							{
+								myTimer = setTimeout( function()
+								{			
+									$.ajax({
+										url:ID_href,
+										data:Data,
+										type:\"post\",
+										dataType:\"json\",
+										beforeSend:function()
+										{
+											$(\"div#tao_mod{$myid}\").css({
+												\"display\": \"block\",
+												\"margin-top\": \"2px\",
+												\"margin-left\": \"20px\",
+												\"position\": \"absolute\",
+												\"width\": 320														
+											});						
+											$(\"div#tao_mod{$myid}\").fadeIn(\"fast\");										
+											$(\"div#tao_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
+										},									
+										success:function(res){	
+											NavaT = '{$myid}';
+											$(\"div#tao_mod{$myid}\").html(res);
+										}
+									});	
+								return false;
+								}, 2000);
+							}
+							else
+							{
+								$(\"div#tao_mod{$myid}\").fadeIn(\"slow\")
+							}						
+							}).on(\"mouseleave\", function(){
+								if(myTimer)
+								clearTimeout(myTimer);				
+								$(\"div#tao_mod{$myid}\").fadeOut(\"fast\")
+								$(this).stop();
+							});
 						});
-						$(\"#tao_member{$myid}\").on(\"mouseenter\", function(){
-						var ID_href = $(this).attr(\"href\");
-						var Data = \"id=\" + ID_href;
-						if($(\"div.modal_avatar\").attr(\"id\") != \"tao_mod{$myid}\")
-						{
-							$(\"div.modal_avatar\").remove();
-							myTimer = setTimeout( function()
-							{			
-								$.ajax({
-									url:ID_href,
-									data:Data,
-									type:\"post\",
-									dataType:\"json\",
-									beforeSend:function()
-									{
-										$(\"#tao_member{$myid}\").append('<div class=\"modal_avatar\"></div>');	
-										$(\"div.modal_avatar\").css({
-											\"display\": \"block\",
-											\"margin-top\": \"2px\",
-											\"margin-left\": \"20px\",
-											\"position\": \"absolute\",
-											\"width\": 320														
-										});						
-										$(\"div.modal_avatar\").fadeIn(\"fast\");										
-										$(\"div.modal_avatar\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
-										$(\"div.modal_avatar\").attr(\"id\",\"tao_mod{$myid}\");										
-									},									
-									success:function(res){																			
-										$(\"div#tao_mod{$myid}\").html(res);
-									}
-								});	
-							return false;
-							}, 2000);
-						}
-						else
-						{
-							$(\"div#tao_mod{$myid}\").fadeIn(\"slow\")
-						}						
-						}).on(\"mouseleave\", function(){
-							if(myTimer)
-							clearTimeout(myTimer);				
-							$(\"div#tao_mod{$myid}\").fadeOut(\"fast\")
-							$(this).stop();
-						});
-					});
-				</script>";
+					</script>";
 				}
 				else
 				{				
@@ -1204,59 +1221,61 @@ function avatarep_thread() {
 				if($mybb->settings['avatarep_menu_events'] == 2)
 				{		
 					$avatarep_lastpost['avatarep'] = "<a href=\"member.php?uid={$uid}&amp;action=avatarep_popup\" id=\"tao_member{$thread['tid']}\">".$avatarep_lastpost['avatarep']."</a>
-					<script type=\"text/javascript\">
-					$(document).on(\"ready\", function(){
-						var myTimer;
-						$(\"#tao_member{$myid}\").on(\"click\", function(e){
-							e.preventDefault();	
-							return false;
+					<div class=\"modal_avatar\" id=\"tao_mod{$myid}\"></div>				
+						<script type=\"text/javascript\">
+						$(document).on(\"ready\", function(){
+							var NavaT = 0;						
+							var myTimer;
+							$(\"a#tao_member{$myid}\").on(\"click\", function(e){
+								e.preventDefault();	
+								return false;
+							});
+							$(\"a#tao_member{$myid}\").on(\"mouseenter\", function(){
+							var Nava = '{$myid}';
+							var ID_href = $(this).attr(\"href\");
+							var Data = \"id=\" + ID_href;
+							console.log(NavaT);
+							if(Nava != NavaT)
+							{
+								myTimer = setTimeout( function()
+								{			
+									$.ajax({
+										url:ID_href,
+										data:Data,
+										type:\"post\",
+										dataType:\"json\",
+										beforeSend:function()
+										{
+											$(\"div#tao_mod{$myid}\").css({
+												\"display\": \"block\",
+												\"margin-top\": \"2px\",
+												\"margin-left\": \"20px\",
+												\"position\": \"absolute\",
+												\"width\": 320														
+											});						
+											$(\"div#tao_mod{$myid}\").fadeIn(\"fast\");										
+											$(\"div#tao_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
+										},									
+										success:function(res){	
+											NavaT = '{$myid}';
+											$(\"div#tao_mod{$myid}\").html(res);
+										}
+									});	
+								return false;
+								}, 2000);
+							}
+							else
+							{
+								$(\"div#tao_mod{$myid}\").fadeIn(\"slow\")
+							}						
+							}).on(\"mouseleave\", function(){
+								if(myTimer)
+								clearTimeout(myTimer);				
+								$(\"div#tao_mod{$myid}\").fadeOut(\"fast\")
+								$(this).stop();
+							});
 						});
-						$(\"#tao_member{$myid}\").on(\"mouseenter\", function(){
-						var ID_href = $(this).attr(\"href\");
-						var Data = \"id=\" + ID_href;
-						if($(\"div.modal_avatar\").attr(\"id\") != \"tao_mod{$myid}\")
-						{
-							$(\"div.modal_avatar\").remove();
-							myTimer = setTimeout( function()
-							{			
-								$.ajax({
-									url:ID_href,
-									data:Data,
-									type:\"post\",
-									dataType:\"json\",
-									beforeSend:function()
-									{
-										$(\"#tao_member{$myid}\").append('<div class=\"modal_avatar\"></div>');	
-										$(\"div.modal_avatar\").css({
-											\"display\": \"block\",
-											\"margin-top\": \"2px\",
-											\"margin-left\": \"20px\",
-											\"position\": \"absolute\",
-											\"width\": 320														
-										});						
-										$(\"div.modal_avatar\").fadeIn(\"fast\");										
-										$(\"div.modal_avatar\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
-										$(\"div.modal_avatar\").attr(\"id\",\"tao_mod{$myid}\");										
-									},									
-									success:function(res){																			
-										$(\"div#tao_mod{$myid}\").html(res);
-									}
-								});	
-							return false;
-							}, 2000);
-						}
-						else
-						{
-							$(\"div#tao_mod{$myid}\").fadeIn(\"slow\")
-						}						
-						}).on(\"mouseleave\", function(){
-							if(myTimer)
-							clearTimeout(myTimer);				
-							$(\"div#tao_mod{$myid}\").fadeOut(\"fast\")
-							$(this).stop();
-						});
-					});
-				</script>";
+					</script>";
 				}
 				else
 				{				
@@ -1360,19 +1379,22 @@ function avatarep_announcement()
 			if($mybb->settings['avatarep_menu_events'] == 2)
 			{		
 				$anno_avatar['avatarep'] = "<a href=\"". $anno_avatar['profilelink'] . "?action=avatarep_popup\" id=\"aa_member{$myid}\">".$anno_avatar['avatarep']."</a>
+				<div class=\"modal_avatar\" id=\"aa_mod{$myid}\"></div>				
 					<script type=\"text/javascript\">
 					$(document).on(\"ready\", function(){
+						var NavaT = 0;						
 						var myTimer;
-						$(\"#aa_member{$myid}\").on(\"click\", function(e){
+						$(\"a#aa_member{$myid}\").on(\"click\", function(e){
 							e.preventDefault();	
 							return false;
 						});
-						$(\"#aa_member{$myid}\").on(\"mouseenter\", function(){
+						$(\"a#aa_member{$myid}\").on(\"mouseenter\", function(){
+						var Nava = '{$myid}';
 						var ID_href = $(this).attr(\"href\");
 						var Data = \"id=\" + ID_href;
-						if($(\"div.modal_avatar\").attr(\"id\") != \"aa_mod{$myid}\")
+						console.log(NavaT);
+						if(Nava != NavaT)
 						{
-							$(\"div.modal_avatar\").remove();
 							myTimer = setTimeout( function()
 							{			
 								$.ajax({
@@ -1382,19 +1404,18 @@ function avatarep_announcement()
 									dataType:\"json\",
 									beforeSend:function()
 									{
-										$(\"#aa_member{$myid}\").append('<div class=\"modal_avatar\"></div>');	
-										$(\"div.modal_avatar\").css({
+										$(\"div#aa_mod{$myid}\").css({
 											\"display\": \"block\",
 											\"margin-top\": \"2px\",
 											\"margin-left\": \"20px\",
 											\"position\": \"absolute\",
 											\"width\": 320														
 										});						
-										$(\"div.modal_avatar\").fadeIn(\"fast\");										
-										$(\"div.modal_avatar\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
-										$(\"div.modal_avatar\").attr(\"id\",\"aa_mod{$myid}\");										
+										$(\"div#aa_mod{$myid}\").fadeIn(\"fast\");										
+										$(\"div#aa_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
 									},									
-									success:function(res){																			
+									success:function(res){	
+										NavaT = '{$myid}';
 										$(\"div#aa_mod{$myid}\").html(res);
 									}
 								});	
@@ -1424,19 +1445,22 @@ function avatarep_announcement()
 			if($mybb->settings['avatarep_menu_events'] == 2)
 			{		
 				$anno_avatar['avatarep'] = "<a href=\"member.php?uid={$uid}&amp;action=avatarep_popup\" id=\"aa_member{$myid}\">".$anno_avatar['avatarep']."</a>
+				<div class=\"modal_avatar\" id=\"aa_mod{$myid}\"></div>				
 					<script type=\"text/javascript\">
 					$(document).on(\"ready\", function(){
+						var NavaT = 0;						
 						var myTimer;
-						$(\"#aa_member{$myid}\").on(\"click\", function(e){
+						$(\"a#aa_member{$myid}\").on(\"click\", function(e){
 							e.preventDefault();	
 							return false;
 						});
-						$(\"#aa_member{$myid}\").on(\"mouseenter\", function(){
+						$(\"a#aa_member{$myid}\").on(\"mouseenter\", function(){
+						var Nava = '{$myid}';
 						var ID_href = $(this).attr(\"href\");
 						var Data = \"id=\" + ID_href;
-						if($(\"div.modal_avatar\").attr(\"id\") != \"aa_mod{$myid}\")
+						console.log(NavaT);
+						if(Nava != NavaT)
 						{
-							$(\"div.modal_avatar\").remove();
 							myTimer = setTimeout( function()
 							{			
 								$.ajax({
@@ -1446,19 +1470,18 @@ function avatarep_announcement()
 									dataType:\"json\",
 									beforeSend:function()
 									{
-										$(\"#aa_member{$myid}\").append('<div class=\"modal_avatar\"></div>');	
-										$(\"div.modal_avatar\").css({
+										$(\"div#aa_mod{$myid}\").css({
 											\"display\": \"block\",
 											\"margin-top\": \"2px\",
 											\"margin-left\": \"20px\",
 											\"position\": \"absolute\",
 											\"width\": 320														
 										});						
-										$(\"div.modal_avatar\").fadeIn(\"fast\");										
-										$(\"div.modal_avatar\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
-										$(\"div.modal_avatar\").attr(\"id\",\"aa_mod{$myid}\");										
+										$(\"div#aa_mod{$myid}\").fadeIn(\"fast\");										
+										$(\"div#aa_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
 									},									
-									success:function(res){																			
+									success:function(res){	
+										NavaT = '{$myid}';
 										$(\"div#aa_mod{$myid}\").html(res);
 									}
 								});	
@@ -1683,19 +1706,22 @@ function avatarep_search()
 			if($mybb->settings['avatarep_menu_events'] == 2)
 			{
 				$avatarep_avatar['avatarep'] = "<a href=\"". $avatarep_avatar['profilelink'] . "?action=avatarep_popup\" id=\"tal_member{$myid}\">".$avatarep_avatar['avatarep']."</a>
+				<div class=\"modal_avatar\" id=\"tal_mod{$myid}\"></div>				
 					<script type=\"text/javascript\">
 					$(document).on(\"ready\", function(){
+						var NavaT = 0;						
 						var myTimer;
-						$(\"#tal_member{$myid}\").on(\"click\", function(e){
+						$(\"a#tal_member{$myid}\").on(\"click\", function(e){
 							e.preventDefault();	
 							return false;
 						});
-						$(\"#tal_member{$myid}\").on(\"mouseenter\", function(){
+						$(\"a#tal_member{$myid}\").on(\"mouseenter\", function(){
+						var Nava = '{$myid}';
 						var ID_href = $(this).attr(\"href\");
 						var Data = \"id=\" + ID_href;
-						if($(\"div.modal_avatar\").attr(\"id\") != \"tal_mod{$myid}\")
+						console.log(NavaT);
+						if(Nava != NavaT)
 						{
-							$(\"div.modal_avatar\").remove();
 							myTimer = setTimeout( function()
 							{			
 								$.ajax({
@@ -1705,19 +1731,18 @@ function avatarep_search()
 									dataType:\"json\",
 									beforeSend:function()
 									{
-										$(\"#tal_member{$myid}\").append('<div class=\"modal_avatar\"></div>');	
-										$(\"div.modal_avatar\").css({
+										$(\"div#tal_mod{$myid}\").css({
 											\"display\": \"block\",
 											\"margin-top\": \"2px\",
 											\"margin-left\": \"20px\",
 											\"position\": \"absolute\",
 											\"width\": 320														
 										});						
-										$(\"div.modal_avatar\").fadeIn(\"fast\");										
-										$(\"div.modal_avatar\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
-										$(\"div.modal_avatar\").attr(\"id\",\"tal_mod{$myid}\");										
+										$(\"div#tal_mod{$myid}\").fadeIn(\"fast\");										
+										$(\"div#tal_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
 									},									
-									success:function(res){																			
+									success:function(res){	
+										NavaT = '{$myid}';
 										$(\"div#tal_mod{$myid}\").html(res);
 									}
 								});	
@@ -1738,59 +1763,61 @@ function avatarep_search()
 				</script>";
 		
 				$avatarep_lastpost['avatarep'] = "<a href=\"". $avatarep_lastpost['profilelink'] . "?action=avatarep_popup\" id=\"tao_member{$myid}\">".$avatarep_lastpost['avatarep']."</a>
-					<script type=\"text/javascript\">
-					$(document).on(\"ready\", function(){
-						var myTimer;
-						$(\"#tao_member{$myid}\").on(\"click\", function(e){
-							e.preventDefault();	
-							return false;
+					<div class=\"modal_avatar\" id=\"tao_mod{$myid}\"></div>				
+						<script type=\"text/javascript\">
+						$(document).on(\"ready\", function(){
+							var NavaT = 0;						
+							var myTimer;
+							$(\"a#tao_member{$myid}\").on(\"click\", function(e){
+								e.preventDefault();	
+								return false;
+							});
+							$(\"a#tao_member{$myid}\").on(\"mouseenter\", function(){
+							var Nava = '{$myid}';
+							var ID_href = $(this).attr(\"href\");
+							var Data = \"id=\" + ID_href;
+							console.log(NavaT);
+							if(Nava != NavaT)
+							{
+								myTimer = setTimeout( function()
+								{			
+									$.ajax({
+										url:ID_href,
+										data:Data,
+										type:\"post\",
+										dataType:\"json\",
+										beforeSend:function()
+										{
+											$(\"div#tao_mod{$myid}\").css({
+												\"display\": \"block\",
+												\"margin-top\": \"2px\",
+												\"margin-left\": \"20px\",
+												\"position\": \"absolute\",
+												\"width\": 320														
+											});						
+											$(\"div#tao_mod{$myid}\").fadeIn(\"fast\");										
+											$(\"div#tao_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
+										},									
+										success:function(res){	
+											NavaT = '{$myid}';
+											$(\"div#tao_mod{$myid}\").html(res);
+										}
+									});	
+								return false;
+								}, 2000);
+							}
+							else
+							{
+								$(\"div#tao_mod{$myid}\").fadeIn(\"slow\")
+							}						
+							}).on(\"mouseleave\", function(){
+								if(myTimer)
+								clearTimeout(myTimer);				
+								$(\"div#tao_mod{$myid}\").fadeOut(\"fast\")
+								$(this).stop();
+							});
 						});
-						$(\"#tao_member{$myid}\").on(\"mouseenter\", function(){
-						var ID_href = $(this).attr(\"href\");
-						var Data = \"id=\" + ID_href;
-						if($(\"div.modal_avatar\").attr(\"id\") != \"tao_mod{$myid}\")
-						{
-							$(\"div.modal_avatar\").remove();
-							myTimer = setTimeout( function()
-							{			
-								$.ajax({
-									url:ID_href,
-									data:Data,
-									type:\"post\",
-									dataType:\"json\",
-									beforeSend:function()
-									{
-										$(\"#tao_member{$myid}\").append('<div class=\"modal_avatar\"></div>');	
-										$(\"div.modal_avatar\").css({
-											\"display\": \"block\",
-											\"margin-top\": \"2px\",
-											\"margin-left\": \"20px\",
-											\"position\": \"absolute\",
-											\"width\": 320														
-										});						
-										$(\"div.modal_avatar\").fadeIn(\"fast\");										
-										$(\"div.modal_avatar\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
-										$(\"div.modal_avatar\").attr(\"id\",\"tao_mod{$myid}\");										
-									},									
-									success:function(res){																			
-										$(\"div#tao_mod{$myid}\").html(res);
-									}
-								});	
-							return false;
-							}, 2000);
-						}
-						else
-						{
-							$(\"div#tao_mod{$myid}\").fadeIn(\"slow\")
-						}						
-						}).on(\"mouseleave\", function(){
-							if(myTimer)
-							clearTimeout(myTimer);				
-							$(\"div#tao_mod{$myid}\").fadeOut(\"fast\")
-							$(this).stop();
-						});
-					});
-				</script>";
+					</script>";
 			}	
 			else
 			{
@@ -1803,19 +1830,22 @@ function avatarep_search()
 			if($mybb->settings['avatarep_menu_events'] == 2)
 			{
 				$avatarep_avatar['avatarep'] = "<a href=\"member.php?uid={$uid}&amp;action=avatarep_popup\" id=\"tal_member{$uid}\">".$avatarep_avatar['avatarep']."</a>
+				<div class=\"modal_avatar\" id=\"tal_mod{$myid}\"></div>				
 					<script type=\"text/javascript\">
 					$(document).on(\"ready\", function(){
+						var NavaT = 0;						
 						var myTimer;
-						$(\"#tal_member{$myid}\").on(\"click\", function(e){
+						$(\"a#tal_member{$myid}\").on(\"click\", function(e){
 							e.preventDefault();	
 							return false;
 						});
-						$(\"#tal_member{$myid}\").on(\"mouseenter\", function(){
+						$(\"a#tal_member{$myid}\").on(\"mouseenter\", function(){
+						var Nava = '{$myid}';
 						var ID_href = $(this).attr(\"href\");
 						var Data = \"id=\" + ID_href;
-						if($(\"div.modal_avatar\").attr(\"id\") != \"tal_mod{$myid}\")
+						console.log(NavaT);
+						if(Nava != NavaT)
 						{
-							$(\"div.modal_avatar\").remove();
 							myTimer = setTimeout( function()
 							{			
 								$.ajax({
@@ -1825,19 +1855,18 @@ function avatarep_search()
 									dataType:\"json\",
 									beforeSend:function()
 									{
-										$(\"#tal_member{$myid}\").append('<div class=\"modal_avatar\"></div>');	
-										$(\"div.modal_avatar\").css({
+										$(\"div#tal_mod{$myid}\").css({
 											\"display\": \"block\",
 											\"margin-top\": \"2px\",
 											\"margin-left\": \"20px\",
 											\"position\": \"absolute\",
 											\"width\": 320														
 										});						
-										$(\"div.modal_avatar\").fadeIn(\"fast\");										
-										$(\"div.modal_avatar\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
-										$(\"div.modal_avatar\").attr(\"id\",\"tal_mod{$myid}\");										
+										$(\"div#tal_mod{$myid}\").fadeIn(\"fast\");										
+										$(\"div#tal_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
 									},									
-									success:function(res){																			
+									success:function(res){	
+										NavaT = '{$myid}';
 										$(\"div#tal_mod{$myid}\").html(res);
 									}
 								});	
@@ -1858,19 +1887,22 @@ function avatarep_search()
 				</script>";
 				
 				$avatarep_lastpost['avatarep'] = "<a href=\"member.php?uid={$uid2}&amp;action=avatarep_popup\" id=\"tao_member{$myid}\">".$avatarep_lastpost['avatarep']."</a>
+				<div class=\"modal_avatar\" id=\"tao_mod{$myid}\"></div>				
 					<script type=\"text/javascript\">
 					$(document).on(\"ready\", function(){
+						var NavaT = 0;						
 						var myTimer;
-						$(\"#tao_member{$myid}\").on(\"click\", function(e){
+						$(\"a#tao_member{$myid}\").on(\"click\", function(e){
 							e.preventDefault();	
 							return false;
 						});
-						$(\"#tao_member{$myid}\").on(\"mouseenter\", function(){
+						$(\"a#tao_member{$myid}\").on(\"mouseenter\", function(){
+						var Nava = '{$myid}';
 						var ID_href = $(this).attr(\"href\");
 						var Data = \"id=\" + ID_href;
-						if($(\"div.modal_avatar\").attr(\"id\") != \"tao_mod{$myid}\")
+						console.log(NavaT);
+						if(Nava != NavaT)
 						{
-							$(\"div.modal_avatar\").remove();
 							myTimer = setTimeout( function()
 							{			
 								$.ajax({
@@ -1880,19 +1912,18 @@ function avatarep_search()
 									dataType:\"json\",
 									beforeSend:function()
 									{
-										$(\"#tao_member{$myid}\").append('<div class=\"modal_avatar\"></div>');	
-										$(\"div.modal_avatar\").css({
+										$(\"div#tao_mod{$myid}\").css({
 											\"display\": \"block\",
 											\"margin-top\": \"2px\",
 											\"margin-left\": \"20px\",
 											\"position\": \"absolute\",
 											\"width\": 320														
 										});						
-										$(\"div.modal_avatar\").fadeIn(\"fast\");										
-										$(\"div.modal_avatar\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
-										$(\"div.modal_avatar\").attr(\"id\",\"tao_mod{$myid}\");										
+										$(\"div#tao_mod{$myid}\").fadeIn(\"fast\");										
+										$(\"div#tao_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
 									},									
-									success:function(res){																			
+									success:function(res){	
+										NavaT = '{$myid}';
 										$(\"div#tao_mod{$myid}\").html(res);
 									}
 								});	
@@ -2114,58 +2145,62 @@ function avatarep_private_end()
 			foreach($tide as $myid)
 			{
 				$find[] = "<avatareplt_end[{$myid}]>";
-				$replace[] = "<script type=\"text/javascript\">
-				$(document).on(\"ready\", function(){
-					var myTimer;	
-					$(\"#pm_member{$myid}\").on(\"click\", function(e){
-						e.preventDefault();	
-						return false;
-					});
-					$(\"#pm_member{$myid}\").on(\"mouseenter\", function(){							
-					var ID_href = $(this).attr(\"href\");
-					var Data = \"id=\" + ID_href;	
-					if($(\"div.modal_avatar\").attr(\"id\") != \"pm_mod{$myid}\")
-					{
-						$(\"div.modal_avatar\").remove();
-						myTimer = setTimeout( function()
-						{			
-							$.ajax({
-								url:ID_href,
-								data:Data,
-								type:\"post\",
-								dataType:\"json\",
-								beforeSend:function()
-								{
-									$(\"#pm_member{$myid}\").append('<div class=\"modal_avatar\"></div>');								
-									$(\"div.modal_avatar\").css({
-										\"display\": \"block\",
-										\"margin-top\": \"2px\",
-										\"margin-left\": \"20px\",
-										\"position\": \"absolute\",
-										\"width\": 320														
-									});									
-									$(\"div.modal_avatar\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
-									$(\"div.modal_avatar\").attr(\"id\",\"pm_mod{$myid}\");										
-								},									
-								success:function(res){																			
-									$(\"div#pm_mod{$myid}\").html(res);
-								}
-							});										
+				$replace[] = "<div class=\"modal_avatar\" id=\"pm_mod{$myid}\"></div>				
+				<script type=\"text/javascript\">
+					$(document).on(\"ready\", function(){
+						var NavaT = 0;						
+						var myTimer;
+						$(\"a#pm_member{$myid}\").on(\"click\", function(e){
+							e.preventDefault();	
 							return false;
-						}, 2000);
-					}
-					else
-					{
-						$(\"div#pm_mod{$myid}\").fadeIn(\"slow\")
-					}											
-					}).on(\"mouseleave\", function(){
-						if(myTimer)
-						clearTimeout(myTimer);
-						$(\"div#pm_mod{$myid}\").fadeOut(\"fast\")
-						$(this).stop();
+						});
+						$(\"a#pm_member{$myid}\").on(\"mouseenter\", function(){
+						var Nava = '{$myid}';
+						var ID_href = $(this).attr(\"href\");
+						var Data = \"id=\" + ID_href;
+						console.log(NavaT);
+						if(Nava != NavaT)
+						{
+							myTimer = setTimeout( function()
+							{			
+								$.ajax({
+									url:ID_href,
+									data:Data,
+									type:\"post\",
+									dataType:\"json\",
+									beforeSend:function()
+									{
+										$(\"div#pm_mod{$myid}\").css({
+											\"display\": \"block\",
+											\"margin-top\": \"2px\",
+											\"margin-left\": \"20px\",
+											\"position\": \"absolute\",
+											\"width\": 320														
+										});						
+										$(\"div#pm_mod{$myid}\").fadeIn(\"fast\");										
+										$(\"div#pm_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
+									},									
+									success:function(res){	
+										NavaT = '{$myid}';
+										$(\"div#pm_mod{$myid}\").html(res);
+									}
+								});	
+							return false;
+							}, 2000);
+						}
+						else
+						{
+							$(\"div#pm_mod{$myid}\").fadeIn(\"slow\")
+						}						
+						}).on(\"mouseleave\", function(){
+							if(myTimer)
+							clearTimeout(myTimer);				
+							$(\"div#pm_mod{$myid}\").fadeOut(\"fast\")
+							$(this).stop();
+						});
 					});
-				});
-			</script>";			
+				</script>
+				<!-- Coded with ♪♥ by Dark Neo -->";
 			}
 		}				
 		if(isset($messagelist)) $messagelist = str_replace($find, $replace, $messagelist);
@@ -2250,6 +2285,7 @@ function avatarep_private_end()
 		while($user = $db->fetch_array($query))
 		{
 			$user['profilelink'] = get_profile_link($user['uid']);
+			$user['username'] = htmlspecialchars_uni($user['username']);
 			$uid = (int)$user['uid'];
 			//$myid = md5(time()."smybb".$user['uid']);
 			if($mybb->settings['avatarep_format'] == 1)
@@ -2263,35 +2299,35 @@ function avatarep_private_end()
 			}else{
 				$user['avatar'] = htmlspecialchars_uni($user['avatar']);
 			}
-			$user['avatar'] = "<img class=\"avatarep_img\" src=\"{$user['avatar']}\" style=\"display: inline-block;\"><br />";			
+			$user['avatar'] = "<img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" style=\"display: inline-block;\"><br />";			
 			if($mybb->settings['avatarep_menu'] == 1)
 			{
 				if(function_exists("google_seo_url_profile"))
 				{
 					if($mybb->settings['avatarep_menu_events'] == 2)
 					{
-						$user['avatar'] = "=\"". $user['profilelink'] . "?action=avatarep_popup\" class=\"pm_member{$myid}\">".$user['avatar']."</a>";						
+						$user['avatar'] = "=\"". $user['profilelink'] . "?action=avatarep_popup\" class=\"pm_member{$uid}\">".$user['avatar']."</a>";						
 					}
 					else
 					{
-						$user['avatar'] = "<a href=\"javascript:void(0)\" id=\"pm_member{$uid}\" {$avatar_events}=\"MyBB.popupWindow('". $user['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";						
+						$user['avatar'] = "<a href=\"javascript:void(0)\" id=\"pm_member{$myid}\" {$avatar_events}=\"MyBB.popupWindow('". $user['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";						
 					}				
 				}
 				else
 				{
 					if($mybb->settings['avatarep_menu_events'] == 2)
 					{
-						$user['avatar'] = "=\"member.php?uid={$uid}&amp;action=avatarep_popup\" class=\"pm_member{$myid}\">".$user['avatar']."</a>";
+						$user['avatar'] = "=\"member.php?uid={$uid}&amp;action=avatarep_popup\" class=\"pm_member{$uid}\">".$user['avatar']."</a>";
 					}
 					else
 					{
-						$user['avatar'] = "<a href=\"javascript:void(0)\" id=\"pm_member{$uid}\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";						
+						$user['avatar'] = "<a href=\"javascript:void(0)\" id=\"pm_member{$myid}\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";						
 					}
 				}			
 			}
 			else
 			{
-				$user['avatar'] = 	"<a href=\"". $user['profilelink'] . "\" id=\"pm_member{$uid}\">".$user['avatar']."</a>";
+				$user['avatar'] = 	"<a href=\"". $user['profilelink'] . "\" id=\"pm_member{$myid}\">".$user['avatar']."</a>";
 			}			
 			$replace[] = $user['avatar'];
 		}
@@ -2372,58 +2408,62 @@ function avatarep_portal_lt()
 			foreach($tide as $myid)
 			{
 				$find[] = "<avatareplt_end[{$myid}]>";
-				$replace[] = "<script type=\"text/javascript\">
-				$(document).on(\"ready\", function(){
-					var myTimer;	
-					$(\"#plt_member{$myid}\").on(\"click\", function(e){
-						e.preventDefault();	
-						return false;
-					});
-					$(\"#plt_member{$myid}\").on(\"mouseenter\", function(){							
-					var ID_href = $(this).attr(\"href\");
-					var Data = \"id=\" + ID_href;	
-					if($(\"div.modal_avatar\").attr(\"id\") != \"plt_mod{$myid}\")
-					{
-						$(\"div.modal_avatar\").remove();
-						myTimer = setTimeout( function()
-						{			
-							$.ajax({
-								url:ID_href,
-								data:Data,
-								type:\"post\",
-								dataType:\"json\",
-								beforeSend:function()
-								{
-									$(\"#plt_member{$myid}\").append('<div class=\"modal_avatar\"></div>');								
-									$(\"div.modal_avatar\").css({
-										\"display\": \"block\",
-										\"margin-top\": \"2px\",
-										\"margin-left\": \"20px\",
-										\"position\": \"absolute\",
-										\"width\": 320														
-									});									
-									$(\"div.modal_avatar\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
-									$(\"div.modal_avatar\").attr(\"id\",\"plt_mod{$myid}\");										
-								},									
-								success:function(res){																			
-									$(\"div#plt_mod{$myid}\").html(res);
-								}
-							});										
+				$replace[] = "<div class=\"modal_avatar\" id=\"plt_mod{$myid}\"></div>				
+				<script type=\"text/javascript\">
+					$(document).on(\"ready\", function(){
+						var NavaT = 0;						
+						var myTimer;
+						$(\"a#plt_member{$myid}\").on(\"click\", function(e){
+							e.preventDefault();	
 							return false;
-						}, 2000);
-					}
-					else
-					{
-						$(\"div#plt_mod{$myid}\").fadeIn(\"slow\")
-					}											
-					}).on(\"mouseleave\", function(){
-						if(myTimer)
-						clearTimeout(myTimer);
-						$(\"div#plt_mod{$myid}\").fadeOut(\"fast\")
-						$(this).stop();
+						});
+						$(\"a#plt_member{$myid}\").on(\"mouseenter\", function(){
+						var Nava = '{$myid}';
+						var ID_href = $(this).attr(\"href\");
+						var Data = \"id=\" + ID_href;
+						console.log(NavaT);
+						if(Nava != NavaT)
+						{
+							myTimer = setTimeout( function()
+							{			
+								$.ajax({
+									url:ID_href,
+									data:Data,
+									type:\"post\",
+									dataType:\"json\",
+									beforeSend:function()
+									{
+										$(\"div#plt_mod{$myid}\").css({
+											\"display\": \"block\",
+											\"margin-top\": \"2px\",
+											\"margin-left\": \"20px\",
+											\"position\": \"absolute\",
+											\"width\": 320														
+										});						
+										$(\"div#plt_mod{$myid}\").fadeIn(\"fast\");										
+										$(\"div#plt_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
+									},									
+									success:function(res){	
+										NavaT = '{$myid}';
+										$(\"div#plt_mod{$myid}\").html(res);
+									}
+								});	
+							return false;
+							}, 2000);
+						}
+						else
+						{
+							$(\"div#plt_mod{$myid}\").fadeIn(\"slow\")
+						}						
+						}).on(\"mouseleave\", function(){
+							if(myTimer)
+							clearTimeout(myTimer);				
+							$(\"div#plt_mod{$myid}\").fadeOut(\"fast\")
+							$(this).stop();
+						});
 					});
-				});
-			</script>";			
+				</script>
+				<!-- Coded with ♪♥ by Dark Neo -->";
 			}
 		}				
 		if(isset($latestthreads)) $latestthreads = str_replace($find, $replace, $latestthreads);	
@@ -2503,6 +2543,7 @@ function avatarep_portal_lt()
 		{		
 			$user['profilelink'] = get_profile_link($user['uid']);
 			$uid = (int)$user['uid'];			
+			$user['username'] = htmlspecialchars_uni($user['username']);			
 			if($mybb->settings['avatarep_format'] == 1)	
 			{
 				$find[] = ">".$user['userusername']."<";
@@ -2511,15 +2552,15 @@ function avatarep_portal_lt()
 			$find[] = "<avatarep[{$user['uid']}]['avatar']>";
 			if(empty($user['avatar']) && $user['uid'] > 0){
 				$user['avatar'] = "images/default_avatar.png";
-				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" style=\"display: inline-block;\"><br />";							
+				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" style=\"display: inline-block;\"><br />";							
 			}else if(empty($user['avatar']) && $user['uid'] == 0 && $mybb->settings['avatarep_guests'] == 1){
 				$user['avatar'] = "images/default_avatar.png";				
-				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" style=\"display: inline-block;\"><br />";							
+				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" style=\"display: inline-block;\"><br />";							
 			}else if(empty($user['avatar']) && $user['uid'] == 0 && $mybb->settings['avatarep_guests'] == 0){
 				$user['avatar'] = "";								
 			}else{
 				$user['avatar'] = htmlspecialchars_uni($user['avatar']);
-				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" style=\"display: inline-block;\"><br />";							
+				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" style=\"display: inline-block;\"><br />";							
 			}
 			if($mybb->settings['avatarep_menu'] == 1)
 			{
@@ -2527,32 +2568,275 @@ function avatarep_portal_lt()
 				{
 					if($mybb->settings['avatarep_menu_events'] == 2)
 					{
-						$user['avatar'] = "=\"{$user['profilelink']}?action=avatarep_popup\" class=\"plt_member{$myid}\">".$user['avatar']."</a>";					
+						$user['avatar'] = "=\"{$user['profilelink']}?action=avatarep_popup\" class=\"plt_member{$uid}\">".$user['avatar']."</a>";					
 					}
 					else
 					{
-						$user['avatar'] = "<a href=\"javascript:void(0)\" id=\"plt_member{$uid}\" {$avatar_events}=\"MyBB.popupWindow('". $user['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
+						$user['avatar'] = "<a href=\"javascript:void(0)\" id=\"plt_member{$myid}\" {$avatar_events}=\"MyBB.popupWindow('". $user['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
 					}
 				}
 				else					
 				{
 					if($mybb->settings['avatarep_menu_events'] == 2)
 					{
-						$user['avatar'] = "=\"member.php?uid={$uid}&amp;action=avatarep_popup\" class=\"plt_member{$myid}\">".$user['avatar']."</a>";
+						$user['avatar'] = "=\"member.php?uid={$uid}&amp;action=avatarep_popup\" class=\"plt_member{$uid}\">".$user['avatar']."</a>";
 					}
 					else
 					{
-						$user['avatar'] = "<a href=\"javascript:void(0)\" id=\"plt_member{$uid}\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
+						$user['avatar'] = "<a href=\"javascript:void(0)\" id=\"plt_member{$myid}\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
 					}
 				}	
 			}
 			else
 			{
-				$user['avatar'] = 	"<a href=\"". $user['profilelink'] . "\" id=\"plt_member{$uid}\">".$user['avatar']."</a>";
+				$user['avatar'] = 	"<a href=\"". $user['profilelink'] . "\" id=\"plt_member{$myid}\">".$user['avatar']."</a>";
 			}		
 			$replace[] = $user['avatar'];		
 		}
 		if(isset($latestthreads)) $latestthreads = str_replace($find, $replace, $latestthreads);	
+	}	
+}
+
+function avatarep_portal_sb()
+{
+	global $db, $mybb, $sblatestthreads, $avatar_events;
+	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_portal'] == 0)
+    {
+        return false;
+    }
+	if($mybb->settings['avatarep_menu_events'] == 2)
+	{
+		$avatar_events = "onmouseover";
+		$tids = array();
+		foreach(array($sblatestthreads) as $contentententententententent)
+		{
+			if(!$contentententententententent) continue;
+			preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $contentententententententent, $matches);
+			if(is_array($matches[1]) && !empty($matches[1]))
+			{
+				foreach($matches[1] as $tid)
+				{
+					if(!intval($tid)) continue;
+					$tids[] = (int)$tid;
+				}
+			}
+		}
+		if(!empty($tids))
+		{
+			$find = $replace = array();
+			foreach($tids as $tid)
+			{
+				$find[] = "<avatareplt_start[{$tid}]>";
+				$replace[] = "<a id=\"plt_member{$tid}\" href";				
+			}
+		}
+		if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);	
+		$tide = array();
+		foreach(array($sblatestthreads) as $contentententententententent)
+		{
+			if(!$contentententententententent) continue;
+			preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $contentententententententent, $matches);
+			if(is_array($matches[1]) && !empty($matches[1]))
+			{
+				foreach($matches[1] as $myid)
+				{
+					if(!intval($myid)) continue;
+					$tide[] = (int)$myid;
+				}
+			}
+		}
+		if(!empty($tide))
+		{
+			$find = $replace = array();
+			foreach($tide as $myid)
+			{
+				$find[] = "<avatareplt_end[{$myid}]>";
+				$replace[] = "<div class=\"modal_avatar\" id=\"plt_mod{$myid}\"></div>				
+				<script type=\"text/javascript\">
+					$(document).on(\"ready\", function(){
+						var NavaT = 0;						
+						var myTimer;
+						$(\"a#plt_member{$myid}\").on(\"click\", function(e){
+							e.preventDefault();	
+							return false;
+						});
+						$(\"a#plt_member{$myid}\").on(\"mouseenter\", function(){
+						var Nava = '{$myid}';
+						var ID_href = $(this).attr(\"href\");
+						var Data = \"id=\" + ID_href;
+						console.log(NavaT);
+						if(Nava != NavaT)
+						{
+							myTimer = setTimeout( function()
+							{			
+								$.ajax({
+									url:ID_href,
+									data:Data,
+									type:\"post\",
+									dataType:\"json\",
+									beforeSend:function()
+									{
+										$(\"div#plt_mod{$myid}\").css({
+											\"display\": \"block\",
+											\"margin-top\": \"2px\",
+											\"margin-left\": \"20px\",
+											\"position\": \"absolute\",
+											\"width\": 320														
+										});						
+										$(\"div#plt_mod{$myid}\").fadeIn(\"fast\");										
+										$(\"div#plt_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
+									},									
+									success:function(res){	
+										NavaT = '{$myid}';
+										$(\"div#plt_mod{$myid}\").html(res);
+									}
+								});	
+							return false;
+							}, 2000);
+						}
+						else
+						{
+							$(\"div#plt_mod{$myid}\").fadeIn(\"slow\")
+						}						
+						}).on(\"mouseleave\", function(){
+							if(myTimer)
+							clearTimeout(myTimer);				
+							$(\"div#plt_mod{$myid}\").fadeOut(\"fast\")
+							$(this).stop();
+						});
+					});
+				</script>
+				<!-- Coded with ♪♥ by Dark Neo -->";
+			}
+		}				
+		if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);	
+	}
+	else
+	{
+		$avatar_events = "onclick";		
+		$tids = array();
+		foreach(array($sblatestthreads) as $contentententententententent)
+		{
+			if(!$contentententententententent) continue;
+			preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $contentententententententent, $matches);
+			if(is_array($matches[1]) && !empty($matches[1]))
+			{
+				foreach($matches[1] as $tid)
+				{
+					if(!intval($tid)) continue;
+					$tids[] = (int)$tid;
+				}
+			}
+		}
+		if(!empty($tids))
+		{
+			$find = $replace = array();
+			foreach($tids as $tid)
+			{
+				$find[] = "<avatareplt_start[{$tid}]>";
+				$replace[] = "<!-- Last post avatar v2.8.x -->";				
+			}
+		}
+		if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);	
+		$tide = array();
+		foreach(array($sblatestthreads) as $contentententententententent)
+		{
+			if(!$contentententententententent) continue;
+			preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $contentententententententent, $matches);
+			if(is_array($matches[1]) && !empty($matches[1]))
+			{
+				foreach($matches[1] as $myid)
+				{
+					if(!intval($myid)) continue;
+					$tide[] = (int)$myid;
+				}
+			}
+		}
+		if(!empty($tide))
+		{
+			$find = $replace = array();
+			foreach($tide as $myid)
+			{
+				$find[] = "<avatareplt_end[{$myid}]>";
+				$replace[] = "<!-- Coded with ♪♥ by Dark Neo -->";				
+			}
+		}
+		if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);			
+	}	
+	$users = array();
+	foreach(array($sblatestthreads) as $contentententententententent)
+	{
+		if(!$contentententententententent) continue;
+		preg_match_all('#<avatarep\[([0-9]+)\]#', $contentententententententent, $matches);
+		if(is_array($matches[1]) && !empty($matches[1]))
+		{
+			foreach($matches[1] as $user)
+			{
+				if(!intval($user)) continue;
+				$users[] = intval($user);
+			}
+		}
+	}
+	if(!empty($users))
+	{
+		$sql = implode(',', $users);
+		$query = $db->simple_select('users', 'uid, username, username AS userusername, avatar, usergroup, displaygroup', "uid IN ({$sql})");
+		$find = $replace = array();		
+		while($user = $db->fetch_array($query))
+		{		
+			$user['profilelink'] = get_profile_link($user['uid']);
+			$uid = (int)$user['uid'];			
+			$user['username'] = htmlspecialchars_uni($user['username']);
+			if($mybb->settings['avatarep_format'] == 1)	
+			{
+				$find[] = ">".$user['userusername']."<";
+				$replace[] = ">".format_name($user['userusername'],$user['usergroup'],$user['displaygroup'])."<";	
+			}
+			$find[] = "<avatarep[{$user['uid']}]['avatar']>";
+			if(empty($user['avatar']) && $user['uid'] > 0){
+				$user['avatar'] = "images/default_avatar.png";
+				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" style=\"display: inline-block;\"><br />";							
+			}else if(empty($user['avatar']) && $user['uid'] == 0 && $mybb->settings['avatarep_guests'] == 1){
+				$user['avatar'] = "images/default_avatar.png";				
+				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" style=\"display: inline-block;\"><br />";							
+			}else if(empty($user['avatar']) && $user['uid'] == 0 && $mybb->settings['avatarep_guests'] == 0){
+				$user['avatar'] = "";								
+			}else{
+				$user['avatar'] = htmlspecialchars_uni($user['avatar']);
+				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" {style=\"display: inline-block;\"><br />";							
+			}
+			if($mybb->settings['avatarep_menu'] == 1)
+			{
+				if(function_exists("google_seo_url_profile"))
+				{
+					if($mybb->settings['avatarep_menu_events'] == 2)
+					{
+						$user['avatar'] = "=\"{$user['profilelink']}?action=avatarep_popup\" class=\"plt_member{$uid}\">".$user['avatar']."</a>";					
+					}
+					else
+					{
+						$user['avatar'] = "<a href=\"javascript:void(0)\" id=\"plt_member{$myid}\" {$avatar_events}=\"MyBB.popupWindow('". $user['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
+					}
+				}
+				else					
+				{
+					if($mybb->settings['avatarep_menu_events'] == 2)
+					{
+						$user['avatar'] = "=\"member.php?uid={$uid}&amp;action=avatarep_popup\" class=\"plt_member{$uid}\">".$user['avatar']."</a>";
+					}
+					else
+					{
+						$user['avatar'] = "<a href=\"javascript:void(0)\" id=\"plt_member{$myid}\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
+					}
+				}	
+			}
+			else
+			{
+				$user['avatar'] = 	"<a href=\"". $user['profilelink'] . "\" id=\"plt_member{$myid}\">".$user['avatar']."</a>";
+			}		
+			$replace[] = $user['avatar'];		
+		}
+		if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);	
 	}	
 }
 
