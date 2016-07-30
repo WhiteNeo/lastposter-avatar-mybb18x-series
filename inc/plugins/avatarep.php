@@ -2096,6 +2096,7 @@ function avatarep_private_end()
     {
         return false;
     }
+	if($mybb->settings['avatarep_menu'] == 1){	
 	if($mybb->settings['avatarep_menu_events'] == 2)
 	{
 		$avatar_events = "onmouseover";
@@ -2263,6 +2264,63 @@ function avatarep_private_end()
 		if(isset($readmessages)) $readmessages = str_replace($find, $replace, $readmessages);
 		if(isset($unreadmessages)) $unreadmessages = str_replace($find, $replace, $unreadmessages);		
 	}	
+	}
+	else
+	{
+		$avatar_events = "onclick";		
+		$tids = array();
+		foreach(array($messagelist, $unreadmessages, $readmessages) as $content)
+		{
+			if(!$content) continue;
+			preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $content, $matches);
+			if(is_array($matches[1]) && !empty($matches[1]))
+			{
+				foreach($matches[1] as $tid)
+				{
+					if(!intval($tid)) continue;
+					$tids[] = (int)$tid;
+				}
+			}
+		}
+		if(!empty($tids))
+		{
+			$find = $replace = array();
+			foreach($tids as $tid)
+			{
+				$find[] = "<avatareplt_start[{$tid}]>";
+				$replace[] = "<!-- Last post avatar v2.8.x -->";				
+			}
+		}
+		if(isset($messagelist)) $messagelist = str_replace($find, $replace, $messagelist);
+		if(isset($readmessages)) $readmessages = str_replace($find, $replace, $readmessages);
+		if(isset($unreadmessages)) $unreadmessages = str_replace($find, $replace, $unreadmessages);		
+		$tide = array();
+		foreach(array($messagelist, $unreadmessages, $readmessages) as $content)
+		{
+			if(!$content) continue;
+			preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $content, $matches);
+			if(is_array($matches[1]) && !empty($matches[1]))
+			{
+				foreach($matches[1] as $myid)
+				{
+					if(!intval($myid)) continue;
+					$tide[] = (int)$myid;
+				}
+			}
+		}
+		if(!empty($tide))
+		{
+			$find = $replace = array();
+			foreach($tide as $myid)
+			{
+				$find[] = "<avatareplt_end[{$myid}]>";
+				$replace[] = "<!-- Coded with ♪♥ by Dark Neo -->";				
+			}
+		}
+		if(isset($messagelist)) $messagelist = str_replace($find, $replace, $messagelist);
+		if(isset($readmessages)) $readmessages = str_replace($find, $replace, $readmessages);
+		if(isset($unreadmessages)) $unreadmessages = str_replace($find, $replace, $unreadmessages);		
+	}		
 	$users = array();
 	foreach(array($messagelist, $unreadmessages, $readmessages) as $content)
 	{
@@ -2360,6 +2418,7 @@ function avatarep_portal_lt()
     {
         return false;
     }
+	if($mybb->settings['avatarep_menu'] == 1){	
 	if($mybb->settings['avatarep_menu_events'] == 2)
 	{
 		$avatar_events = "onmouseover";
@@ -2519,6 +2578,59 @@ function avatarep_portal_lt()
 		}
 		if(isset($latestthreads)) $latestthreads = str_replace($find, $replace, $latestthreads);			
 	}	
+	}
+	else
+	{
+		$avatar_events = "onclick";		
+		$tids = array();
+		foreach(array($latestthreads) as $content)
+		{
+			if(!$content) continue;
+			preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $content, $matches);
+			if(is_array($matches[1]) && !empty($matches[1]))
+			{
+				foreach($matches[1] as $tid)
+				{
+					if(!intval($tid)) continue;
+					$tids[] = (int)$tid;
+				}
+			}
+		}
+		if(!empty($tids))
+		{
+			$find = $replace = array();
+			foreach($tids as $tid)
+			{
+				$find[] = "<avatareplt_start[{$tid}]>";
+				$replace[] = "<!-- Last post avatar v2.8.x -->";				
+			}
+		}
+		if(isset($latestthreads)) $latestthreads = str_replace($find, $replace, $latestthreads);	
+		$tide = array();
+		foreach(array($latestthreads) as $content)
+		{
+			if(!$content) continue;
+			preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $content, $matches);
+			if(is_array($matches[1]) && !empty($matches[1]))
+			{
+				foreach($matches[1] as $myid)
+				{
+					if(!intval($myid)) continue;
+					$tide[] = (int)$myid;
+				}
+			}
+		}
+		if(!empty($tide))
+		{
+			$find = $replace = array();
+			foreach($tide as $myid)
+			{
+				$find[] = "<avatareplt_end[{$myid}]>";
+				$replace[] = "<!-- Coded with ♪♥ by Dark Neo -->";				
+			}
+		}
+		if(isset($latestthreads)) $latestthreads = str_replace($find, $replace, $latestthreads);			
+	}		
 	$users = array();
 	foreach(array($latestthreads) as $content)
 	{
@@ -2603,6 +2715,7 @@ function avatarep_portal_sb()
     {
         return false;
     }
+	if($mybb->settings['avatarep_menu'] == 1){	
 	if($mybb->settings['avatarep_menu_events'] == 2)
 	{
 		$avatar_events = "onmouseover";
@@ -2762,6 +2875,59 @@ function avatarep_portal_sb()
 		}
 		if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);			
 	}	
+	}
+	else
+	{
+		$avatar_events = "onclick";		
+		$tids = array();
+		foreach(array($sblatestthreads) as $content)
+		{
+			if(!$content) continue;
+			preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $content, $matches);
+			if(is_array($matches[1]) && !empty($matches[1]))
+			{
+				foreach($matches[1] as $tid)
+				{
+					if(!intval($tid)) continue;
+					$tids[] = (int)$tid;
+				}
+			}
+		}
+		if(!empty($tids))
+		{
+			$find = $replace = array();
+			foreach($tids as $tid)
+			{
+				$find[] = "<avatareplt_start[{$tid}]>";
+				$replace[] = "<!-- Last post avatar v2.8.x -->";				
+			}
+		}
+		if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);	
+		$tide = array();
+		foreach(array($sblatestthreads) as $content)
+		{
+			if(!$content) continue;
+			preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $content, $matches);
+			if(is_array($matches[1]) && !empty($matches[1]))
+			{
+				foreach($matches[1] as $myid)
+				{
+					if(!intval($myid)) continue;
+					$tide[] = (int)$myid;
+				}
+			}
+		}
+		if(!empty($tide))
+		{
+			$find = $replace = array();
+			foreach($tide as $myid)
+			{
+				$find[] = "<avatareplt_end[{$myid}]>";
+				$replace[] = "<!-- Coded with ♪♥ by Dark Neo -->";				
+			}
+		}
+		if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);			
+	}		
 	$users = array();
 	foreach(array($sblatestthreads) as $content)
 	{
