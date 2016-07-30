@@ -38,13 +38,13 @@ $l['avatarep_search'] = "Avatar on Search";
 $l['avatarep_search_descrip'] = "Shows avatar on search results";
 
 $l['avatarep_menu'] = "Modal Box popup";
-$l['avatarep_menu_descrip'] = "Shows a menu popup on event click for every user on his avatar";
+$l['avatarep_menu_descrip'] = "Shows a nice popup menu for mouse events selected down for every avatar of user";
 
 $l['avatarep_menu'] = "Mouse events";
 $l['avatarep_menu_descrip'] = "Select mouse event to show modal box.";
 
 $l['avatarep_guests'] = "Guests Avatar";
-$l['avatarep_guests_descrip'] = "Show defaul avatar for guests";
+$l['avatarep_guests_descrip'] = "Shows default avatar for guests";
 
 $l['avatarep_format'] = "Display formatted usernames";
 $l['avatarep_format_descrip'] = "Shows format names for every usergroup with html code configured";
