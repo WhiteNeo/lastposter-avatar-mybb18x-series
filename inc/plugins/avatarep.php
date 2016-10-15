@@ -627,8 +627,11 @@ function avatarep_deletepost()
     {
 		return false;	
 	}	
-
-	$avatarep_cache = $cache->update('avatarep_cache');	
+	
+	if(isset($cache->cache['avatarep_cache']))
+	{
+		$avatarep_cache = $cache->update('avatarep_cache');	
+	}
 }
 
 // Avatar en foros
