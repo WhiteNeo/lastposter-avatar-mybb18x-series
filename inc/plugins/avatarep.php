@@ -506,15 +506,22 @@ function avatarep_activate() {
 		Mostrar Tema:
 		$avatarep['avatar'] - plugin SEO
 		
+		Mensajería Privada:
+		<avatarep[{$tofromuid}]['avatar']>
+		<avatarep[{$readmessage['toid']}]['avatar']>
+		<avatarep[{$unreadmessage['toid']}]['avatar']>
+		
+		Portal:
+		<avatarep[{$thread['lastposteruid']}]['avatar']>				
 		*/
 		
     //Archivo requerido para reemplazo de templates
     require_once '../inc/adminfunctions_templates.php';
 	
     // Reemplazos que vamos a hacer en las plantillas 1.- Platilla 2.- Contenido a Reemplazar 3.- Contenido que reemplaza lo anterior
-    find_replace_templatesets("forumbit_depth2_forum_lastpost", '#'.preg_quote('{$lastpost_profilelink}').'#', '{$forum[\'avatarep\']}{$lastpost_profilelink}');
-    find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$thread[\'profilelink\']}').'#', '{$avatarep_avatar[\'avatarep\']}{$thread[\'profilelink\']}');
-    find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$lastposterlink}').'#', '{$avatarep_lastpost[\'avatarep\']}{$lastposterlink}');
+    find_replace_templatesets("forumbit_depth2_forum_lastpost", '#'.preg_quote('{$lastpost_profilelink}').'#', '{$forum[\'avatarep\']}{$forum[\'lastposter\']}');
+    find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$thread[\'profilelink\']}').'#', '{$avatarep_avatar[\'avatarep\']}{$thread[\'owner\']}');
+    find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$lastposterlink}').'#', '{$avatarep_lastpost[\'avatarep\']}{$thread[\'lastposter\']}');
     find_replace_templatesets("forumdisplay_announcements_announcement", '#'.preg_quote('{$announcement[\'profilelink\']}').'#', '{$anno_avatar[\'avatarep\']}{$announcement[\'profilelink\']}');	
     find_replace_templatesets("search_results_threads_thread", '#'.preg_quote('{$thread[\'profilelink\']}').'#', '{$avatarep_avatar[\'avatarep\']}{$thread[\'profilelink\']}');
     find_replace_templatesets("search_results_threads_thread", '#'.preg_quote('{$lastposterlink}').'#', '{$avatarep_lastpost[\'avatarep\']}{$lastposterlink}');
@@ -553,8 +560,11 @@ function avatarep_deactivate() {
     //Reemplazos que vamos a hacer en las plantillas 1.- Platilla 2.- Contenido a Reemplazar 3.- Contenido que reemplaza lo anterior
 	find_replace_templatesets("headerinclude", '#'.preg_quote('<script type="text/javascript" src="{$mybb->settings[\'bburl\']}/images/avatarep/avatarep.js"></script>').'#', '', 0);
     find_replace_templatesets("forumbit_depth2_forum_lastpost", '#'.preg_quote('{$forum[\'avatarep\']}').'#', '', 0);	
+    find_replace_templatesets("forumbit_depth2_forum_lastpost", '#'.preg_quote('{$forum[\'lastposter\']}').'#', '{$lastpost_profilelink}');
     find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$avatarep_avatar[\'avatarep\']}').'#', '',0);
+    find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$thread[\'owner\']}').'#', '{$thread[\'profilelink\']}');
     find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$avatarep_lastpost[\'avatarep\']}').'#', '',0);
+    find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$thread[\'lastposter\']}').'#', '{$lastposterlink}');	
     find_replace_templatesets("forumdisplay_announcements_announcement", '#'.preg_quote('{$anno_avatar[\'avatarep\']}').'#', '',0);
     find_replace_templatesets("search_results_threads_thread", '#'.preg_quote('{$avatarep_avatar[\'avatarep\']}').'#', '',0);
     find_replace_templatesets("search_results_threads_thread", '#'.preg_quote('{$avatarep_lastpost[\'avatarep\']}').'#', '',0);
@@ -627,7 +637,6 @@ function avatarep_deletepost()
     {
 		return false;	
 	}	
-	
 	if(isset($cache->cache['avatarep_cache']))
 	{
 		$avatarep_cache = $cache->update('avatarep_cache');	
@@ -894,8 +903,9 @@ function forumlist_avatar(&$_f)
 	}
 	if($mybb->settings['avatarep_format'] == 1)
 	{
-		$username = format_name($_f['lastposter'], $_f['avatarep_lastpost']['usergroup'], $_f['avatarep_lastpost']['displaygroup']);	
-		$_f['lastposter'] = $username;		
+		$username = format_name($_f['avatarep_lastpost']['username'], $_f['avatarep_lastpost']['usergroup'], $_f['avatarep_lastpost']['displaygroup']);	
+		$_f['lastposterav'] = $username;
+		$_f['lastposter'] = build_profile_link($_f['lastposterav'], $_f['avatarep_lastpost']['uid']);	
 	}
 	$_f['avatarep'] = '<div class="avatarep_fd">' . $_f['avatarep'] . '</div>';
 }
@@ -995,7 +1005,12 @@ function avatarep_thread() {
    {
 		if($mybb->settings['avatarep_format'] == 1)
 		{
-			$thread['username'] = format_name($avatarep_avatar['username'], $avatarep_avatar['usergroup'], $avatarep_avatar['displaygroup']);
+			$thread['ownerav'] = format_name($avatarep_avatar['username'], $avatarep_avatar['usergroup'], $avatarep_avatar['displaygroup']);
+			$thread['owner'] = build_profile_link($thread['ownerav'], $avatarep_avatar['uid']);				
+		}
+		else
+		{
+			$thread['owner'] = htmlspecialchars_uni($thread['username']);			
 		}
 		$uid = (int)$avatarep_avatar['uid'];
 		if($mybb->settings['avatarep_menu'] == 1)
@@ -1144,7 +1159,8 @@ function avatarep_thread() {
 	{
 		if($mybb->settings['avatarep_format'] == 1)
 		{	
-			$thread['lastposter'] = format_name($avatarep_lastpost['username'], $avatarep_lastpost['usergroup'], $avatarep_lastpost['displaygroup']);
+			$thread['lastposterav'] = format_name($avatarep_lastpost['username'], $avatarep_lastpost['usergroup'], $avatarep_lastpost['displaygroup']);
+			$thread['lastposter'] = build_profile_link($thread['lastposterav'], $avatarep_lastpost['uid']);		
 		}	
 		else
 		{
@@ -1358,7 +1374,9 @@ function avatarep_announcement()
 	}
 	if($mybb->settings['avatarep_format'] == 1)
 	{
-		$announcement['profilelink'] = format_name($announcement['username'], $anno_avatar['usergroup'], $anno_avatar['displaygroup']);
+		$announcement['username'] = format_name($announcement['username'], $anno_avatar['usergroup'], $anno_avatar['displaygroup']);
+		$announcement['profilelink'] = build_profile_link($announcement['username'], $anno_avatar['uid']);		
+		
 	}	
 	$uid = $anno_avatar['uid'];
 	if($mybb->settings['avatarep_guests'] == 1 && $uid == 0)
@@ -2100,177 +2118,177 @@ function avatarep_private_end()
         return false;
     }
 	if($mybb->settings['avatarep_menu'] == 1){	
-	if($mybb->settings['avatarep_menu_events'] == 2)
-	{
-		$avatar_events = "onmouseover";
-		$tids = array();
-		foreach(array($messagelist, $unreadmessages, $readmessages) as $content)
+		if($mybb->settings['avatarep_menu_events'] == 2)
 		{
-			if(!$content) continue;
-			preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $content, $matches);
-			if(is_array($matches[1]) && !empty($matches[1]))
+			$avatar_events = "onmouseover";
+			$tids = array();
+			foreach(array($messagelist, $unreadmessages, $readmessages) as $content)
 			{
-				foreach($matches[1] as $tid)
+				if(!$content) continue;
+				preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $content, $matches);
+				if(is_array($matches[1]) && !empty($matches[1]))
 				{
-					if(!intval($tid)) continue;
-					$tids[] = (int)$tid;
+					foreach($matches[1] as $tid)
+					{
+						if(!intval($tid)) continue;
+						$tids[] = (int)$tid;
+					}
 				}
 			}
-		}
-		if(!empty($tids))
-		{
-			$find = $replace = array();
-			foreach($tids as $tid)
+			if(!empty($tids))
 			{
-				$find[] = "<avatareplt_start[{$tid}]>";
-				$replace[] = "<a id=\"pm_member{$tid}\" href";				
-			}
-		}
-		if(isset($messagelist)) $messagelist = str_replace($find, $replace, $messagelist);
-		if(isset($readmessages)) $readmessages = str_replace($find, $replace, $readmessages);
-		if(isset($unreadmessages)) $unreadmessages = str_replace($find, $replace, $unreadmessages);		
-		$tide = array();
-		foreach(array($messagelist, $unreadmessages, $readmessages) as $content)
-		{
-			if(!$content) continue;
-			preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $content, $matches);
-			if(is_array($matches[1]) && !empty($matches[1]))
-			{
-				foreach($matches[1] as $myid)
+				$find = $replace = array();
+				foreach($tids as $tid)
 				{
-					if(!intval($myid)) continue;
-					$tide[] = (int)$myid;
+					$find[] = "<avatareplt_start[{$tid}]>";
+					$replace[] = "<a id=\"pm_member{$tid}\" href";				
 				}
 			}
-		}
-		if(!empty($tide))
-		{
-			$find = $replace = array();
-			foreach($tide as $myid)
+			if(isset($messagelist)) $messagelist = str_replace($find, $replace, $messagelist);
+			if(isset($readmessages)) $readmessages = str_replace($find, $replace, $readmessages);
+			if(isset($unreadmessages)) $unreadmessages = str_replace($find, $replace, $unreadmessages);		
+			$tide = array();
+			foreach(array($messagelist, $unreadmessages, $readmessages) as $content)
 			{
-				$find[] = "<avatareplt_end[{$myid}]>";
-				$replace[] = "<div class=\"modal_avatar\" id=\"pm_mod{$myid}\"></div>				
-				<script type=\"text/javascript\">
-					$(document).on(\"ready\", function(){
-						var NavaT = 0;						
-						var myTimer;
-						$(\"a#pm_member{$myid}\").on(\"click\", function(e){
-							e.preventDefault();	
-							return false;
-						});
-						$(\"a#pm_member{$myid}\").on(\"mouseenter\", function(){
-						var Nava = '{$myid}';
-						var ID_href = $(this).attr(\"href\");
-						var Data = \"id=\" + ID_href;
-						console.log(NavaT);
-						if(Nava != NavaT)
-						{
-							myTimer = setTimeout( function()
-							{			
-								$.ajax({
-									url:ID_href,
-									data:Data,
-									type:\"post\",
-									dataType:\"json\",
-									beforeSend:function()
-									{
-										$(\"div#pm_mod{$myid}\").css({
-											\"display\": \"block\",
-											\"margin-top\": \"2px\",
-											\"margin-left\": \"20px\",
-											\"position\": \"absolute\",
-											\"width\": 320														
-										});						
-										$(\"div#pm_mod{$myid}\").fadeIn(\"fast\");										
-										$(\"div#pm_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
-									},									
-									success:function(res){	
-										NavaT = '{$myid}';
-										$(\"div#pm_mod{$myid}\").html(res);
-									}
-								});	
-							return false;
-							}, 2000);
-						}
-						else
-						{
-							$(\"div#pm_mod{$myid}\").fadeIn(\"slow\")
-						}						
-						}).on(\"mouseleave\", function(){
-							if(myTimer)
-							clearTimeout(myTimer);				
-							$(\"div#pm_mod{$myid}\").fadeOut(\"fast\")
-							$(this).stop();
-						});
-					});
-				</script>
-				<!-- Coded with ♪♥ by Dark Neo -->";
+				if(!$content) continue;
+				preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $content, $matches);
+				if(is_array($matches[1]) && !empty($matches[1]))
+				{
+					foreach($matches[1] as $myid)
+					{
+						if(!intval($myid)) continue;
+						$tide[] = (int)$myid;
+					}
+				}
 			}
-		}				
-		if(isset($messagelist)) $messagelist = str_replace($find, $replace, $messagelist);
-		if(isset($readmessages)) $readmessages = str_replace($find, $replace, $readmessages);
-		if(isset($unreadmessages)) $unreadmessages = str_replace($find, $replace, $unreadmessages);		
+			if(!empty($tide))
+			{
+				$find = $replace = array();
+				foreach($tide as $myid)
+				{
+					$find[] = "<avatareplt_end[{$myid}]>";
+					$replace[] = "<div class=\"modal_avatar\" id=\"pm_mod{$myid}\"></div>				
+					<script type=\"text/javascript\">
+						$(document).on(\"ready\", function(){
+							var NavaT = 0;						
+							var myTimer;
+							$(\"a#pm_member{$myid}\").on(\"click\", function(e){
+								e.preventDefault();	
+								return false;
+							});
+							$(\"a#pm_member{$myid}\").on(\"mouseenter\", function(){
+							var Nava = '{$myid}';
+							var ID_href = $(this).attr(\"href\");
+							var Data = \"id=\" + ID_href;
+							console.log(NavaT);
+							if(Nava != NavaT)
+							{
+								myTimer = setTimeout( function()
+								{			
+									$.ajax({
+										url:ID_href,
+										data:Data,
+										type:\"post\",
+										dataType:\"json\",
+										beforeSend:function()
+										{
+											$(\"div#pm_mod{$myid}\").css({
+												\"display\": \"block\",
+												\"margin-top\": \"2px\",
+												\"margin-left\": \"20px\",
+												\"position\": \"absolute\",
+												\"width\": 320														
+											});						
+											$(\"div#pm_mod{$myid}\").fadeIn(\"fast\");										
+											$(\"div#pm_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
+										},									
+										success:function(res){	
+											NavaT = '{$myid}';
+											$(\"div#pm_mod{$myid}\").html(res);
+										}
+									});	
+								return false;
+								}, 2000);
+							}
+							else
+							{
+								$(\"div#pm_mod{$myid}\").fadeIn(\"slow\")
+							}						
+							}).on(\"mouseleave\", function(){
+								if(myTimer)
+								clearTimeout(myTimer);				
+								$(\"div#pm_mod{$myid}\").fadeOut(\"fast\")
+								$(this).stop();
+							});
+						});
+					</script>
+					<!-- Coded with ♪♥ by Dark Neo -->";
+				}
+			}				
+			if(isset($messagelist)) $messagelist = str_replace($find, $replace, $messagelist);
+			if(isset($readmessages)) $readmessages = str_replace($find, $replace, $readmessages);
+			if(isset($unreadmessages)) $unreadmessages = str_replace($find, $replace, $unreadmessages);		
+		}
+		else
+		{
+			$avatar_events = "onclick";		
+			$tids = array();
+			foreach(array($messagelist, $unreadmessages, $readmessages) as $content)
+			{
+				if(!$content) continue;
+				preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $content, $matches);
+				if(is_array($matches[1]) && !empty($matches[1]))
+				{
+					foreach($matches[1] as $tid)
+					{
+						if(!intval($tid)) continue;
+						$tids[] = (int)$tid;
+					}
+				}
+			}
+			if(!empty($tids))
+			{
+				$find = $replace = array();
+				foreach($tids as $tid)
+				{
+					$find[] = "<avatareplt_start[{$tid}]>";
+					$replace[] = "<!-- Last post avatar v2.8.x -->";				
+				}
+			}
+			if(isset($messagelist)) $messagelist = str_replace($find, $replace, $messagelist);
+			if(isset($readmessages)) $readmessages = str_replace($find, $replace, $readmessages);
+			if(isset($unreadmessages)) $unreadmessages = str_replace($find, $replace, $unreadmessages);		
+			$tide = array();
+			foreach(array($messagelist, $unreadmessages, $readmessages) as $content)
+			{
+				if(!$content) continue;
+				preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $content, $matches);
+				if(is_array($matches[1]) && !empty($matches[1]))
+				{
+					foreach($matches[1] as $myid)
+					{
+						if(!intval($myid)) continue;
+						$tide[] = (int)$myid;
+					}
+				}
+			}
+			if(!empty($tide))
+			{
+				$find = $replace = array();
+				foreach($tide as $myid)
+				{
+					$find[] = "<avatareplt_end[{$myid}]>";
+					$replace[] = "<!-- Coded with ♪♥ by Dark Neo -->";				
+				}
+			}
+			if(isset($messagelist)) $messagelist = str_replace($find, $replace, $messagelist);
+			if(isset($readmessages)) $readmessages = str_replace($find, $replace, $readmessages);
+			if(isset($unreadmessages)) $unreadmessages = str_replace($find, $replace, $unreadmessages);		
+		}	
 	}
 	else
 	{
-		$avatar_events = "onclick";		
-		$tids = array();
-		foreach(array($messagelist, $unreadmessages, $readmessages) as $content)
-		{
-			if(!$content) continue;
-			preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $content, $matches);
-			if(is_array($matches[1]) && !empty($matches[1]))
-			{
-				foreach($matches[1] as $tid)
-				{
-					if(!intval($tid)) continue;
-					$tids[] = (int)$tid;
-				}
-			}
-		}
-		if(!empty($tids))
-		{
-			$find = $replace = array();
-			foreach($tids as $tid)
-			{
-				$find[] = "<avatareplt_start[{$tid}]>";
-				$replace[] = "<!-- Last post avatar v2.8.x -->";				
-			}
-		}
-		if(isset($messagelist)) $messagelist = str_replace($find, $replace, $messagelist);
-		if(isset($readmessages)) $readmessages = str_replace($find, $replace, $readmessages);
-		if(isset($unreadmessages)) $unreadmessages = str_replace($find, $replace, $unreadmessages);		
-		$tide = array();
-		foreach(array($messagelist, $unreadmessages, $readmessages) as $content)
-		{
-			if(!$content) continue;
-			preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $content, $matches);
-			if(is_array($matches[1]) && !empty($matches[1]))
-			{
-				foreach($matches[1] as $myid)
-				{
-					if(!intval($myid)) continue;
-					$tide[] = (int)$myid;
-				}
-			}
-		}
-		if(!empty($tide))
-		{
-			$find = $replace = array();
-			foreach($tide as $myid)
-			{
-				$find[] = "<avatareplt_end[{$myid}]>";
-				$replace[] = "<!-- Coded with ♪♥ by Dark Neo -->";				
-			}
-		}
-		if(isset($messagelist)) $messagelist = str_replace($find, $replace, $messagelist);
-		if(isset($readmessages)) $readmessages = str_replace($find, $replace, $readmessages);
-		if(isset($unreadmessages)) $unreadmessages = str_replace($find, $replace, $unreadmessages);		
-	}	
-	}
-	else
-	{
-		$avatar_events = "onclick";		
+		$avatar_events = "none";		
 		$tids = array();
 		foreach(array($messagelist, $unreadmessages, $readmessages) as $content)
 		{
@@ -2422,169 +2440,169 @@ function avatarep_portal_lt()
         return false;
     }
 	if($mybb->settings['avatarep_menu'] == 1){	
-	if($mybb->settings['avatarep_menu_events'] == 2)
-	{
-		$avatar_events = "onmouseover";
-		$tids = array();
-		foreach(array($latestthreads) as $content)
+		if($mybb->settings['avatarep_menu_events'] == 2)
 		{
-			if(!$content) continue;
-			preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $content, $matches);
-			if(is_array($matches[1]) && !empty($matches[1]))
+			$avatar_events = "onmouseover";
+			$tids = array();
+			foreach(array($latestthreads) as $content)
 			{
-				foreach($matches[1] as $tid)
+				if(!$content) continue;
+				preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $content, $matches);
+				if(is_array($matches[1]) && !empty($matches[1]))
 				{
-					if(!intval($tid)) continue;
-					$tids[] = (int)$tid;
+					foreach($matches[1] as $tid)
+					{
+						if(!intval($tid)) continue;
+						$tids[] = (int)$tid;
+					}
 				}
 			}
-		}
-		if(!empty($tids))
-		{
-			$find = $replace = array();
-			foreach($tids as $tid)
+			if(!empty($tids))
 			{
-				$find[] = "<avatareplt_start[{$tid}]>";
-				$replace[] = "<a id=\"plt_member{$tid}\" href";				
-			}
-		}
-		if(isset($latestthreads)) $latestthreads = str_replace($find, $replace, $latestthreads);	
-		$tide = array();
-		foreach(array($latestthreads) as $content)
-		{
-			if(!$content) continue;
-			preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $content, $matches);
-			if(is_array($matches[1]) && !empty($matches[1]))
-			{
-				foreach($matches[1] as $myid)
+				$find = $replace = array();
+				foreach($tids as $tid)
 				{
-					if(!intval($myid)) continue;
-					$tide[] = (int)$myid;
+					$find[] = "<avatareplt_start[{$tid}]>";
+					$replace[] = "<a id=\"plt_member{$tid}\" href";				
 				}
 			}
-		}
-		if(!empty($tide))
-		{
-			$find = $replace = array();
-			foreach($tide as $myid)
+			if(isset($latestthreads)) $latestthreads = str_replace($find, $replace, $latestthreads);	
+			$tide = array();
+			foreach(array($latestthreads) as $content)
 			{
-				$find[] = "<avatareplt_end[{$myid}]>";
-				$replace[] = "<div class=\"modal_avatar\" id=\"plt_mod{$myid}\"></div>				
-				<script type=\"text/javascript\">
-					$(document).on(\"ready\", function(){
-						var NavaT = 0;						
-						var myTimer;
-						$(\"a#plt_member{$myid}\").on(\"click\", function(e){
-							e.preventDefault();	
-							return false;
-						});
-						$(\"a#plt_member{$myid}\").on(\"mouseenter\", function(){
-						var Nava = '{$myid}';
-						var ID_href = $(this).attr(\"href\");
-						var Data = \"id=\" + ID_href;
-						console.log(NavaT);
-						if(Nava != NavaT)
-						{
-							myTimer = setTimeout( function()
-							{			
-								$.ajax({
-									url:ID_href,
-									data:Data,
-									type:\"post\",
-									dataType:\"json\",
-									beforeSend:function()
-									{
-										$(\"div#plt_mod{$myid}\").css({
-											\"display\": \"block\",
-											\"margin-top\": \"2px\",
-											\"margin-left\": \"20px\",
-											\"position\": \"absolute\",
-											\"width\": 320														
-										});						
-										$(\"div#plt_mod{$myid}\").fadeIn(\"fast\");										
-										$(\"div#plt_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
-									},									
-									success:function(res){	
-										NavaT = '{$myid}';
-										$(\"div#plt_mod{$myid}\").html(res);
-									}
-								});	
-							return false;
-							}, 2000);
-						}
-						else
-						{
-							$(\"div#plt_mod{$myid}\").fadeIn(\"slow\")
-						}						
-						}).on(\"mouseleave\", function(){
-							if(myTimer)
-							clearTimeout(myTimer);				
-							$(\"div#plt_mod{$myid}\").fadeOut(\"fast\")
-							$(this).stop();
-						});
-					});
-				</script>
-				<!-- Coded with ♪♥ by Dark Neo -->";
+				if(!$content) continue;
+				preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $content, $matches);
+				if(is_array($matches[1]) && !empty($matches[1]))
+				{
+					foreach($matches[1] as $myid)
+					{
+						if(!intval($myid)) continue;
+						$tide[] = (int)$myid;
+					}
+				}
 			}
-		}				
-		if(isset($latestthreads)) $latestthreads = str_replace($find, $replace, $latestthreads);	
+			if(!empty($tide))
+			{
+				$find = $replace = array();
+				foreach($tide as $myid)
+				{
+					$find[] = "<avatareplt_end[{$myid}]>";
+					$replace[] = "<div class=\"modal_avatar\" id=\"plt_mod{$myid}\"></div>				
+					<script type=\"text/javascript\">
+						$(document).on(\"ready\", function(){
+							var NavaT = 0;						
+							var myTimer;
+							$(\"a#plt_member{$myid}\").on(\"click\", function(e){
+								e.preventDefault();	
+								return false;
+							});
+							$(\"a#plt_member{$myid}\").on(\"mouseenter\", function(){
+							var Nava = '{$myid}';
+							var ID_href = $(this).attr(\"href\");
+							var Data = \"id=\" + ID_href;
+							console.log(NavaT);
+							if(Nava != NavaT)
+							{
+								myTimer = setTimeout( function()
+								{			
+									$.ajax({
+										url:ID_href,
+										data:Data,
+										type:\"post\",
+										dataType:\"json\",
+										beforeSend:function()
+										{
+											$(\"div#plt_mod{$myid}\").css({
+												\"display\": \"block\",
+												\"margin-top\": \"2px\",
+												\"margin-left\": \"20px\",
+												\"position\": \"absolute\",
+												\"width\": 320														
+											});						
+											$(\"div#plt_mod{$myid}\").fadeIn(\"fast\");										
+											$(\"div#plt_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
+										},									
+										success:function(res){	
+											NavaT = '{$myid}';
+											$(\"div#plt_mod{$myid}\").html(res);
+										}
+									});	
+								return false;
+								}, 2000);
+							}
+							else
+							{
+								$(\"div#plt_mod{$myid}\").fadeIn(\"slow\")
+							}						
+							}).on(\"mouseleave\", function(){
+								if(myTimer)
+								clearTimeout(myTimer);				
+								$(\"div#plt_mod{$myid}\").fadeOut(\"fast\")
+								$(this).stop();
+							});
+						});
+					</script>
+					<!-- Coded with ♪♥ by Dark Neo -->";
+				}
+			}				
+			if(isset($latestthreads)) $latestthreads = str_replace($find, $replace, $latestthreads);	
+		}
+		else
+		{
+			$avatar_events = "onclick";		
+			$tids = array();
+			foreach(array($latestthreads) as $content)
+			{
+				if(!$content) continue;
+				preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $content, $matches);
+				if(is_array($matches[1]) && !empty($matches[1]))
+				{
+					foreach($matches[1] as $tid)
+					{
+						if(!intval($tid)) continue;
+						$tids[] = (int)$tid;
+					}
+				}
+			}
+			if(!empty($tids))
+			{
+				$find = $replace = array();
+				foreach($tids as $tid)
+				{
+					$find[] = "<avatareplt_start[{$tid}]>";
+					$replace[] = "<!-- Last post avatar v2.8.x -->";				
+				}
+			}
+			if(isset($latestthreads)) $latestthreads = str_replace($find, $replace, $latestthreads);	
+			$tide = array();
+			foreach(array($latestthreads) as $content)
+			{
+				if(!$content) continue;
+				preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $content, $matches);
+				if(is_array($matches[1]) && !empty($matches[1]))
+				{
+					foreach($matches[1] as $myid)
+					{
+						if(!intval($myid)) continue;
+						$tide[] = (int)$myid;
+					}
+				}
+			}
+			if(!empty($tide))
+			{
+				$find = $replace = array();
+				foreach($tide as $myid)
+				{
+					$find[] = "<avatareplt_end[{$myid}]>";
+					$replace[] = "<!-- Coded with ♪♥ by Dark Neo -->";				
+				}
+			}
+			if(isset($latestthreads)) $latestthreads = str_replace($find, $replace, $latestthreads);			
+		}	
 	}
 	else
 	{
-		$avatar_events = "onclick";		
-		$tids = array();
-		foreach(array($latestthreads) as $content)
-		{
-			if(!$content) continue;
-			preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $content, $matches);
-			if(is_array($matches[1]) && !empty($matches[1]))
-			{
-				foreach($matches[1] as $tid)
-				{
-					if(!intval($tid)) continue;
-					$tids[] = (int)$tid;
-				}
-			}
-		}
-		if(!empty($tids))
-		{
-			$find = $replace = array();
-			foreach($tids as $tid)
-			{
-				$find[] = "<avatareplt_start[{$tid}]>";
-				$replace[] = "<!-- Last post avatar v2.8.x -->";				
-			}
-		}
-		if(isset($latestthreads)) $latestthreads = str_replace($find, $replace, $latestthreads);	
-		$tide = array();
-		foreach(array($latestthreads) as $content)
-		{
-			if(!$content) continue;
-			preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $content, $matches);
-			if(is_array($matches[1]) && !empty($matches[1]))
-			{
-				foreach($matches[1] as $myid)
-				{
-					if(!intval($myid)) continue;
-					$tide[] = (int)$myid;
-				}
-			}
-		}
-		if(!empty($tide))
-		{
-			$find = $replace = array();
-			foreach($tide as $myid)
-			{
-				$find[] = "<avatareplt_end[{$myid}]>";
-				$replace[] = "<!-- Coded with ♪♥ by Dark Neo -->";				
-			}
-		}
-		if(isset($latestthreads)) $latestthreads = str_replace($find, $replace, $latestthreads);			
-	}	
-	}
-	else
-	{
-		$avatar_events = "onclick";		
+		$avatar_events = "none";		
 		$tids = array();
 		foreach(array($latestthreads) as $content)
 		{
@@ -2719,169 +2737,169 @@ function avatarep_portal_sb()
         return false;
     }
 	if($mybb->settings['avatarep_menu'] == 1){	
-	if($mybb->settings['avatarep_menu_events'] == 2)
-	{
-		$avatar_events = "onmouseover";
-		$tids = array();
-		foreach(array($sblatestthreads) as $content)
+		if($mybb->settings['avatarep_menu_events'] == 2)
 		{
-			if(!$content) continue;
-			preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $content, $matches);
-			if(is_array($matches[1]) && !empty($matches[1]))
+			$avatar_events = "onmouseover";
+			$tids = array();
+			foreach(array($sblatestthreads) as $content)
 			{
-				foreach($matches[1] as $tid)
+				if(!$content) continue;
+				preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $content, $matches);
+				if(is_array($matches[1]) && !empty($matches[1]))
 				{
-					if(!intval($tid)) continue;
-					$tids[] = (int)$tid;
+					foreach($matches[1] as $tid)
+					{
+						if(!intval($tid)) continue;
+						$tids[] = (int)$tid;
+					}
 				}
 			}
-		}
-		if(!empty($tids))
-		{
-			$find = $replace = array();
-			foreach($tids as $tid)
+			if(!empty($tids))
 			{
-				$find[] = "<avatareplt_start[{$tid}]>";
-				$replace[] = "<a id=\"plt_member{$tid}\" href";				
-			}
-		}
-		if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);	
-		$tide = array();
-		foreach(array($sblatestthreads) as $content)
-		{
-			if(!$content) continue;
-			preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $content, $matches);
-			if(is_array($matches[1]) && !empty($matches[1]))
-			{
-				foreach($matches[1] as $myid)
+				$find = $replace = array();
+				foreach($tids as $tid)
 				{
-					if(!intval($myid)) continue;
-					$tide[] = (int)$myid;
+					$find[] = "<avatareplt_start[{$tid}]>";
+					$replace[] = "<a id=\"plt_member{$tid}\" href";				
 				}
 			}
-		}
-		if(!empty($tide))
-		{
-			$find = $replace = array();
-			foreach($tide as $myid)
+			if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);	
+			$tide = array();
+			foreach(array($sblatestthreads) as $content)
 			{
-				$find[] = "<avatareplt_end[{$myid}]>";
-				$replace[] = "<div class=\"modal_avatar\" id=\"plt_mod{$myid}\"></div>				
-				<script type=\"text/javascript\">
-					$(document).on(\"ready\", function(){
-						var NavaT = 0;						
-						var myTimer;
-						$(\"a#plt_member{$myid}\").on(\"click\", function(e){
-							e.preventDefault();	
-							return false;
-						});
-						$(\"a#plt_member{$myid}\").on(\"mouseenter\", function(){
-						var Nava = '{$myid}';
-						var ID_href = $(this).attr(\"href\");
-						var Data = \"id=\" + ID_href;
-						console.log(NavaT);
-						if(Nava != NavaT)
-						{
-							myTimer = setTimeout( function()
-							{			
-								$.ajax({
-									url:ID_href,
-									data:Data,
-									type:\"post\",
-									dataType:\"json\",
-									beforeSend:function()
-									{
-										$(\"div#plt_mod{$myid}\").css({
-											\"display\": \"block\",
-											\"margin-top\": \"2px\",
-											\"margin-left\": \"20px\",
-											\"position\": \"absolute\",
-											\"width\": 320														
-										});						
-										$(\"div#plt_mod{$myid}\").fadeIn(\"fast\");										
-										$(\"div#plt_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
-									},									
-									success:function(res){	
-										NavaT = '{$myid}';
-										$(\"div#plt_mod{$myid}\").html(res);
-									}
-								});	
-							return false;
-							}, 2000);
-						}
-						else
-						{
-							$(\"div#plt_mod{$myid}\").fadeIn(\"slow\")
-						}						
-						}).on(\"mouseleave\", function(){
-							if(myTimer)
-							clearTimeout(myTimer);				
-							$(\"div#plt_mod{$myid}\").fadeOut(\"fast\")
-							$(this).stop();
-						});
-					});
-				</script>
-				<!-- Coded with ♪♥ by Dark Neo -->";
+				if(!$content) continue;
+				preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $content, $matches);
+				if(is_array($matches[1]) && !empty($matches[1]))
+				{
+					foreach($matches[1] as $myid)
+					{
+						if(!intval($myid)) continue;
+						$tide[] = (int)$myid;
+					}
+				}
 			}
-		}				
-		if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);	
+			if(!empty($tide))
+			{
+				$find = $replace = array();
+				foreach($tide as $myid)
+				{
+					$find[] = "<avatareplt_end[{$myid}]>";
+					$replace[] = "<div class=\"modal_avatar\" id=\"plt_mod{$myid}\"></div>				
+					<script type=\"text/javascript\">
+						$(document).on(\"ready\", function(){
+							var NavaT = 0;						
+							var myTimer;
+							$(\"a#plt_member{$myid}\").on(\"click\", function(e){
+								e.preventDefault();	
+								return false;
+							});
+							$(\"a#plt_member{$myid}\").on(\"mouseenter\", function(){
+							var Nava = '{$myid}';
+							var ID_href = $(this).attr(\"href\");
+							var Data = \"id=\" + ID_href;
+							console.log(NavaT);
+							if(Nava != NavaT)
+							{
+								myTimer = setTimeout( function()
+								{			
+									$.ajax({
+										url:ID_href,
+										data:Data,
+										type:\"post\",
+										dataType:\"json\",
+										beforeSend:function()
+										{
+											$(\"div#plt_mod{$myid}\").css({
+												\"display\": \"block\",
+												\"margin-top\": \"2px\",
+												\"margin-left\": \"20px\",
+												\"position\": \"absolute\",
+												\"width\": 320														
+											});						
+											$(\"div#plt_mod{$myid}\").fadeIn(\"fast\");										
+											$(\"div#plt_mod{$myid}\").html(\"<center><img src='images/spinner_big.gif' alt='{$lang->avatarep_retrieving}'><br>{$lang->avatarep_loading}<br></center>\");
+										},									
+										success:function(res){	
+											NavaT = '{$myid}';
+											$(\"div#plt_mod{$myid}\").html(res);
+										}
+									});	
+								return false;
+								}, 2000);
+							}
+							else
+							{
+								$(\"div#plt_mod{$myid}\").fadeIn(\"slow\")
+							}						
+							}).on(\"mouseleave\", function(){
+								if(myTimer)
+								clearTimeout(myTimer);				
+								$(\"div#plt_mod{$myid}\").fadeOut(\"fast\")
+								$(this).stop();
+							});
+						});
+					</script>
+					<!-- Coded with ♪♥ by Dark Neo -->";
+				}
+			}				
+			if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);	
+		}
+		else
+		{
+			$avatar_events = "onclick";		
+			$tids = array();
+			foreach(array($sblatestthreads) as $content)
+			{
+				if(!$content) continue;
+				preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $content, $matches);
+				if(is_array($matches[1]) && !empty($matches[1]))
+				{
+					foreach($matches[1] as $tid)
+					{
+						if(!intval($tid)) continue;
+						$tids[] = (int)$tid;
+					}
+				}
+			}
+			if(!empty($tids))
+			{
+				$find = $replace = array();
+				foreach($tids as $tid)
+				{
+					$find[] = "<avatareplt_start[{$tid}]>";
+					$replace[] = "<!-- Last post avatar v2.8.x -->";				
+				}
+			}
+			if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);	
+			$tide = array();
+			foreach(array($sblatestthreads) as $content)
+			{
+				if(!$content) continue;
+				preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $content, $matches);
+				if(is_array($matches[1]) && !empty($matches[1]))
+				{
+					foreach($matches[1] as $myid)
+					{
+						if(!intval($myid)) continue;
+						$tide[] = (int)$myid;
+					}
+				}
+			}
+			if(!empty($tide))
+			{
+				$find = $replace = array();
+				foreach($tide as $myid)
+				{
+					$find[] = "<avatareplt_end[{$myid}]>";
+					$replace[] = "<!-- Coded with ♪♥ by Dark Neo -->";				
+				}
+			}
+			if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);			
+		}	
 	}
 	else
 	{
-		$avatar_events = "onclick";		
-		$tids = array();
-		foreach(array($sblatestthreads) as $content)
-		{
-			if(!$content) continue;
-			preg_match_all('#<avatareplt_start\[([0-9]+)\]>#', $content, $matches);
-			if(is_array($matches[1]) && !empty($matches[1]))
-			{
-				foreach($matches[1] as $tid)
-				{
-					if(!intval($tid)) continue;
-					$tids[] = (int)$tid;
-				}
-			}
-		}
-		if(!empty($tids))
-		{
-			$find = $replace = array();
-			foreach($tids as $tid)
-			{
-				$find[] = "<avatareplt_start[{$tid}]>";
-				$replace[] = "<!-- Last post avatar v2.8.x -->";				
-			}
-		}
-		if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);	
-		$tide = array();
-		foreach(array($sblatestthreads) as $content)
-		{
-			if(!$content) continue;
-			preg_match_all('#<avatareplt_end\[([0-9]+)\]>#', $content, $matches);
-			if(is_array($matches[1]) && !empty($matches[1]))
-			{
-				foreach($matches[1] as $myid)
-				{
-					if(!intval($myid)) continue;
-					$tide[] = (int)$myid;
-				}
-			}
-		}
-		if(!empty($tide))
-		{
-			$find = $replace = array();
-			foreach($tide as $myid)
-			{
-				$find[] = "<avatareplt_end[{$myid}]>";
-				$replace[] = "<!-- Coded with ♪♥ by Dark Neo -->";				
-			}
-		}
-		if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);			
-	}	
-	}
-	else
-	{
-		$avatar_events = "onclick";		
+		$avatar_events = "none";		
 		$tids = array();
 		foreach(array($sblatestthreads) as $content)
 		{
