@@ -130,14 +130,14 @@ Change all content to this:
 ```HTML
 <table border="0">
   <tr>
-    <td width="20%" align="left" valign="middle"></td>
+    <td width="20%" align="left" valign="middle">{$forum['avatarep']}</td>
     <td width="80%" align="left" valign="top">
 <span class="smalltext">
 	<a href="{$lastpost_link}" title="{$full_lastpost_subject}">{$forum['icono']}{$forum['prefijo']}{$lastpost_subject}</a> 
 	<br />
 	{$lastpost_date}
 	<br />
-	{$lang->by} {$forum['avatarep']}{$forum['lastposter']}
+	{$lang->by} {$forum['lastposter']}
 </span>
    </td>
   </tr>
