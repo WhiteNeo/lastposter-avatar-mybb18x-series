@@ -1667,7 +1667,7 @@ function avatarep_search()
 				}
 			}
 		}
-		else
+		else if(!empty($search['posts']))
 		{
 			$query = $db->query("
 				SELECT u.uid, u.username, u.username as userusername, u.avatar, u.avatartype, u.usergroup, u.displaygroup
