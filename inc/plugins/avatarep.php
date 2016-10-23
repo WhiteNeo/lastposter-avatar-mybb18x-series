@@ -2007,27 +2007,30 @@ function avatarep_style_guser(){
         $cache->cache['moderators'] = $cache->read("moderators");
     }
 
-    foreach ($cache->cache['moderators'] as $fid => $fdata)
-    {
-        if (isset($fdata['usergroups']))
-        {
-            foreach ($fdata['usergroups'] as $gid => $gdata)
-            {
-                $cache->cache['moderators'][$fid]['usergroups'][$gid]['title'] = "#{$gdata['title']}{$gid}#";
-				$cache->cache['usergroups'][$gid]['title'] = $gdata['title'];
-                $cache->cache['groups'][] = $gid;
-            }
-        }
-        if (isset($fdata['users']))
-        {
-            foreach ($fdata['users'] as $uid => $udata)
-            {
-                $cache->cache['moderators'][$fid]['users'][$uid]['username'] = "#{$udata['username']}{$uid}#";				
-				$cache->cache['users'][$uid] = $udata['username'];
-                $cache->cache['mods'][] = $uid;
-            }
-        }
-    }
+	if(isset($cache->cache['moderators']))
+	{
+		foreach ($cache->cache['moderators'] as $fid => $fdata)
+		{
+			if (isset($fdata['usergroups']))
+			{
+				foreach ($fdata['usergroups'] as $gid => $gdata)
+				{
+					$cache->cache['moderators'][$fid]['usergroups'][$gid]['title'] = "#{$gdata['title']}{$gid}#";
+					$cache->cache['usergroups'][$gid]['title'] = $gdata['title'];
+					$cache->cache['groups'][] = $gid;
+				}
+			}
+			if (isset($fdata['users']))
+			{
+				foreach ($fdata['users'] as $uid => $udata)
+				{
+					$cache->cache['moderators'][$fid]['users'][$uid]['username'] = "#{$udata['username']}{$uid}#";				
+					$cache->cache['users'][$uid] = $udata['username'];
+					$cache->cache['mods'][] = $uid;
+				}
+			}
+		}		
+	}
 }
 
 function avatarep_style_output(&$content){
