@@ -101,20 +101,6 @@ KNOWN ISSUES:
 	font-size: 12px;
 }
 
-// Fix avatar margin for Chrome and Safari //
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-.avatarep_fs{ margin-left: 62px !important; }
-.avatarep_fd { margin-top: -30px; }
-}
-
-.avatarep_fd{
-	margin-left: -60px;
-	margin-top: -47px;
-	position: absolute;
-	float: left;
-	padding: 0 5px;
-}
-
 ```
 
 Save and refresh cache on your explorer.
@@ -133,7 +119,7 @@ Change all content to this:
     <td width="20%" align="left" valign="middle">{$forum['avatarep']}</td>
     <td width="80%" align="left" valign="top">
 <span class="smalltext">
-	<a href="{$lastpost_link}" title="{$full_lastpost_subject}">{$forum['icono']}{$forum['prefijo']}{$lastpost_subject}</a> 
+	<a href="{$lastpost_link}" title="{$full_lastpost_subject}">{$lastpost_subject}</a> 
 	<br />
 	{$lastpost_date}
 	<br />
@@ -179,7 +165,7 @@ Change all content to this:
 {$avatarep_avatar['avatarep']}
 </td>
     <td width="90%" align="left" valign="top">
-          <span>{$prefix} {$gotounread}{$thread['threadprefix']}<span class="{$inline_edit_class} {$new_class}" id="tid_{$inline_edit_tid}"><a href="{$thread['threadlink']}">{$thread['subject']}</a></span></span>{$th_hover}
+          <span>{$prefix} {$gotounread}{$thread['threadprefix']}<span class="{$inline_edit_class} {$new_class}" id="tid_{$inline_edit_tid}"><a href="{$thread['threadlink']}">{$thread['subject']}</a></span></span>
 			<div class="author smalltext">Iniciado por: {$thread['owner']} {$thread['multipage']}</div>
 		</div>
 </td>
