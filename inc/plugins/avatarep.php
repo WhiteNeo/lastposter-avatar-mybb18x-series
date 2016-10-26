@@ -437,10 +437,11 @@ function avatarep_activate() {
 .avatarep_img{
     padding: 3px;
 	border: 1px solid #D8DFEA;
-    width: 40px;
-	height: 40px;
-	border-radius: 50%;
+    width: 44px;
+	height: 44px;
+	border-radius: 4px;
 	opacity: 0.9;
+	margin: 0px 5px 0px 2px;
 }';
 
 	$stylesheet = array(
