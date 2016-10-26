@@ -2,7 +2,7 @@
 /**
 *@ Autor: Dark Neo
 *@ Fecha: 2013-12-12
-*@ Version: 2.8.8
+*@ Version: 2.8.9
 *@ Contacto: neogeoman@gmail.com
 */
 
@@ -77,7 +77,7 @@ function avatarep_info()
 		"website"		=> "http://www.mybb.com",
 		"author"		=> "Dark Neo",
 		"authorsite"	=> "http://soportemybb.es",
-		"version"		=> "2.8.8",
+		"version"		=> "2.8.9",
 		"codename" 		=> "last_poster_avatar",
 		"compatibility" => "18*"
 	);
@@ -441,25 +441,6 @@ function avatarep_activate() {
 	height: 40px;
 	border-radius: 50%;
 	opacity: 0.9;
-}
-
-.avatarep_fs{
-	position: relative; 
-	font-size: 12px;
-}
-
-// Fix avatar margin for Chrome and Safari //
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-.avatarep_fs{ margin-left: 62px !important; }
-.avatarep_fd { margin-top: -30px; }
-}
-
-.avatarep_fd{
-	margin-left: -60px;
-	margin-top: -47px;
-	position: absolute;
-	float: left;
-	padding: 0 5px;
 }';
 
 	$stylesheet = array(
