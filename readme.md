@@ -96,11 +96,6 @@ KNOWN ISSUES:
 	opacity: 0.9;
 }
 
-.avatarep_fs{
-	position: relative; 
-	font-size: 12px;
-}
-
 ```
 
 Save and refresh cache on your explorer.
@@ -114,10 +109,8 @@ forumbit_depth2_forum_lastpost:
 Change all content to this:
  
 ```HTML
-<table border="0">
-  <tr>
-    <td width="20%" align="left" valign="middle">{$forum['avatarep']}</td>
-    <td width="80%" align="left" valign="top">
+<div style="float:left;">{$forum['avatarep']}</div>
+<div>
 <span class="smalltext">
 	<a href="{$lastpost_link}" title="{$full_lastpost_subject}">{$lastpost_subject}</a> 
 	<br />
@@ -125,9 +118,7 @@ Change all content to this:
 	<br />
 	{$lang->by} {$forum['lastposter']}
 </span>
-   </td>
-  </tr>
-</table>
+</div>
 ```
 
 
@@ -159,34 +150,23 @@ Change all content to this:
 	<td class="{$bgcolor}{$thread_type_class}">
 		{$attachment_count}
 		<div>
-<table width="100%" border="0">
-  <tr>
-    <td width="10%" align="left" valign="middle">
-{$avatarep_avatar['avatarep']}
-</td>
-    <td width="90%" align="left" valign="top">
+<div style="float:left;">{$avatarep_avatar['avatarep']}</div>
+<div>
           <span>{$prefix} {$gotounread}{$thread['threadprefix']}<span class="{$inline_edit_class} {$new_class}" id="tid_{$inline_edit_tid}"><a href="{$thread['threadlink']}">{$thread['subject']}</a></span></span>
 			<div class="author smalltext">Iniciado por: {$thread['owner']} {$thread['multipage']}</div>
 		</div>
-</td>
-</tr>
-</table>
+</div>
 	</td>
 	<td align="center" class="{$bgcolor}{$thread_type_class}"><a href="javascript:MyBB.whoPosted({$thread['tid']});">{$thread['replies']}</a>{$unapproved_posts}</td>
 	<td align="center" class="{$bgcolor}{$thread_type_class}">{$thread['views']}</td>
 	{$rating}
 	<td class="{$bgcolor}{$thread_type_class}" style="white-space: nowrap; text-align: right;">
-<table border="0">
-  <tr>
-    <td width="10%" align="left" valign="middle">
-{$avatarep_lastpost['avatarep']}
-</td>
-    <td width="90%" align="left" valign="top">
+<div style="float:left;">
+{$avatarep_lastpost['avatarep']}</div>
+<div>
 		<span class="lastpost smalltext">{$lastpostdate}<br />
 		<a href="{$thread['lastpostlink']}">{$lang->lastpost}</a>: {$thread['lastposter']}</span>
-</td>
-</tr>
-</table>
+</div>
 	</td>
 {$modbit}
 </tr>
@@ -255,19 +235,13 @@ Change all content to this:
             <td align="center" class="{$bgcolor}"><a href="javascript:MyBB.whoPosted({$thread['tid']});">{$thread['replies']}</a></td>
             <td align="center" class="{$bgcolor}">{$thread['views']}</td>
             <td class="{$bgcolor}" style="white-space: nowrap">
-            <table border"0">
-                <tr>
-                                                           <td width="2%">
-                                                                       {$avatarep_lastpost['avatarep']}
-                                                           </td>
-                                                           <td>
+<div style="float:left;">{$avatarep_lastpost['avatarep']}</div>
+<div>
                                                                        <span class="smalltext">
                                                                                   {$lastpostdate}<br />
                                                                                   <a href="{$thread['lastpostlink']}">{$lang->lastpost}</a>: {$lastposterlink}
                                                                        </span>
-                                                           </td>
-                                               </tr>
-                                   </table>
+</div>
             </td>
             {$inline_mod_checkbox}
 </tr>
@@ -282,22 +256,17 @@ Change all content to this:
 
 <tr>
 <td class="{$altbg}">
+<div style="float:left;">  <avatareplt_start[{$thread['tid']}]><avatarep[{$thread['lastposteruid']}]['avatar']><avatareplt_end[{$thread['tid']}]></div>
+<div>
 <strong><a href="{$mybb->settings['bburl']}/{$thread['threadlink']}">{$thread['subject']}</a></strong>
 <span class="smalltext"><br />
 {$lang->forum} <a href="{$thread['forumlink']}">{$thread['forumname']}</a><br />
 <a href="{$thread['lastpostlink']}"><img src="images/jump.png" alt="{$lang->latest_threads_lastpost}" /></a> {$lastpostdate}
-<table border="0">
-<tr>
-<td align="left" valign="middle" width="100">
 {$lang->latest_threads_replies} {$thread['replies']}<br />
 {$lang->latest_threads_views} {$thread['views']}
-</td>
-<td align="right" valign="middle" width="100">
-  <avatareplt_start[{$thread['tid']}]><avatarep[{$thread['lastposteruid']}]['avatar']><avatareplt_end[{$thread['tid']}]>{$lastposterlink}
-</td>
-</tr>
-</table>
+{$lastposterlink}
 </span>
+</div>
 </td>
 </tr>
 
