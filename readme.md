@@ -165,7 +165,7 @@ Change all content to this:
 {$avatarep_lastpost['avatarep']}</div>
 <div>
 		<span class="lastpost smalltext">{$lastpostdate}<br />
-		<a href="{$thread['lastpostlink']}">{$lang->lastpost}</a>: {$thread['lastposter']}</span>
+		<a href="{$thread['lastpostlink']}">{$lang->lastpost}</a>:<br />{$thread['lastposter']}</span>
 </div>
 	</td>
 {$modbit}
@@ -256,15 +256,15 @@ Change all content to this:
 
 <tr>
 <td class="{$altbg}">
-<div style="float:left;">  <avatareplt_start[{$thread['tid']}]><avatarep[{$thread['lastposteruid']}]['avatar']><avatareplt_end[{$thread['tid']}]></div>
-<div>
 <strong><a href="{$mybb->settings['bburl']}/{$thread['threadlink']}">{$thread['subject']}</a></strong>
 <span class="smalltext"><br />
+<div style="float:left;"><avatareplt_start[{$thread['tid']}]><avatarep[{$thread['lastposteruid']}]['avatar']><avatareplt_end[{$thread['tid']}]></div>
+<div>
+<a href="{$thread['lastpostlink']}">{$lang->latest_threads_lastpost}</a> {$lastposterlink}<br />
+{$lastpostdate}<br />
 {$lang->forum} <a href="{$thread['forumlink']}">{$thread['forumname']}</a><br />
-<a href="{$thread['lastpostlink']}"><img src="images/jump.png" alt="{$lang->latest_threads_lastpost}" /></a> {$lastpostdate}
-{$lang->latest_threads_replies} {$thread['replies']}<br />
-{$lang->latest_threads_views} {$thread['views']}
-{$lastposterlink}
+<strong>&raquo; </strong>{$lang->latest_threads_replies} {$thread['replies']}<br />
+<strong>&raquo; </strong>{$lang->latest_threads_views} {$thread['views']}
 </span>
 </div>
 </td>
