@@ -276,14 +276,16 @@ private_messagebit
 Change all content to this:
 
 ```HTML
+
 <tr>
-<td align="center" class="trow1" width="1%"><img src="{$theme['imgdir']}/{$msgfolder}" alt="{$msgalt}" title="{$msgalt}" /></td>
-<td align="center" class="trow2" width="1%">{$icon}</td>
-<td class="trow1" width="35%">{$msgprefix}<a href="private.php?action=read&amp;pmid={$message['pmid']}">{$message['subject']}</a>{$msgsuffix}{$denyreceipt}</td>
-<td align="center" class="trow2"><avatareplt_start[{$message['pmid']}]><avatarep[{$tofromuid}]['avatar']><avatareplt_end[{$message['pmid']}]>{$tofromusername}</td>
-<td class="trow1" align="right" style="white-space: nowrap"><span class="smalltext">{$senddate}</span></td>
-<td class="trow2" align="center"><input type="checkbox" class="checkbox" name="check[{$message['pmid']}]" value="1" /></td>
+	<td align="center" class="trow1" width="1%"><img src="{$theme['imgdir']}/{$msgstatus}.png" alt="{$msgalt}" title="{$msgalt}" /></td>
+	<td align="center" class="trow2" width="1%">{$icon}</td>
+	<td class="trow1" width="35%"><a class="{$msgstatus}" href="private.php?action=read&amp;pmid={$message['pmid']}">{$message['subject']}</a>{$denyreceipt}</td>
+	<td align="center" class="trow2"><avatareplt_start[{$message['pmid']}]><avatarep[{$tofromuid}]['avatar']><avatareplt_end[{$message['pmid']}]>{$tofromusername}</td>
+	<td class="trow1" align="right" style="white-space: nowrap"><span class="smalltext">{$senddate}</span></td>
+	<td class="trow2" align="center"><input type="checkbox" class="checkbox" name="check[{$message['pmid']}]" value="1" /></td>
 </tr>
+
 ```
 
 private_tracking_readmessage
@@ -291,11 +293,11 @@ Change all content to this:
 
 ```HTML
 <tr>
-<td align="center" class="trow1" width="1%"><img src="{$theme['imgdir']}/old_pm.png" alt="" /></td>
-<td class="trow2">{$readmessage['subject']}</td>
-<td class="trow1" align="center"><avatareplt_start[{$readmessage['pmid']}]><avatarep[{$readmessage['toid']}]['avatar']><avatareplt_end[{$readmessage['pmid']}]>{$readmessage['profilelink']}</td>
-<td class="trow2" align="right"><span class="smalltext">{$readdate}</span></td>
-<td class="trow1"><input type="checkbox" class="checkbox" name="readcheck[{$readmessage['pmid']}]" value="1" /></td>
+	<td align="center" class="trow1" width="1%"><img src="{$theme['imgdir']}/old_pm.png" alt="" /></td>
+	<td class="trow2">{$readmessage['subject']}</td>
+	<td class="trow1" align="center"><avatareplt_start[{$readmessage['pmid']}]><avatarep[{$readmessage['toid']}]['avatar']><avatareplt_end[{$readmessage['pmid']}]>{$readmessage['profilelink']}</td>
+	<td class="trow2" align="right"><span class="smalltext">{$readdate}</span></td>
+	<td class="trow1"><input type="checkbox" class="checkbox" name="readcheck[{$readmessage['pmid']}]" value="1" /></td>
 </tr>
 ```
 
@@ -304,11 +306,11 @@ Change all content to this:
 
 ```HTML
 <tr>
-<td align="center" class="trow1" width="1%"><img src="{$theme['imgdir']}/new_pm.png" alt="" /></td>
-<td class="trow2">{$unreadmessage['subject']}</td>
-<td class="trow1" align="center"><avatareplt_start[{$unreadmessage['pmid']}]><avatarep[{$unreadmessage['toid']}]['avatar']><avatareplt_end[{$unreadmessage['pmid']}]>{$unreadmessage['profilelink']}</td>
-<td class="trow2" align="right"><span class="smalltext">{$senddate}</span></td>
-<td class="trow1"><input type="checkbox" class="checkbox" name="unreadcheck[{$unreadmessage['pmid']}]" value="1" /></td>
+	<td align="center" class="trow1" width="1%"><img src="{$theme['imgdir']}/new_pm.png" alt="" /></td>
+	<td class="trow2">{$unreadmessage['subject']}</td>
+	<td class="trow1" align="center"><avatareplt_start[{$unreadmessage['pmid']}]><avatarep[{$unreadmessage['toid']}]['avatar']><avatareplt_end[{$unreadmessage['pmid']}]>{$unreadmessage['profilelink']}</td>
+	<td class="trow2" align="right"><span class="smalltext">{$senddate}</span></td>
+	<td class="trow1"><input type="checkbox" class="checkbox" name="unreadcheck[{$unreadmessage['pmid']}]" value="1" /></td>
 </tr>
 ```
 
