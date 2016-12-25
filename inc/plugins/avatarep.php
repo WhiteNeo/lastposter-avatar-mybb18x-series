@@ -2,7 +2,7 @@
 /**
 *@ Autor: Dark Neo
 *@ Fecha: 2013-12-12
-*@ Version: 2.8.9
+*@ Version: 2.9
 *@ Contacto: neogeoman@gmail.com
 */
 
@@ -77,7 +77,7 @@ function avatarep_info()
 		"website"		=> "http://www.mybb.com",
 		"author"		=> "Dark Neo",
 		"authorsite"	=> "http://soportemybb.es",
-		"version"		=> "2.8.9",
+		"version"		=> "2.9",
 		"codename" 		=> "last_poster_avatar",
 		"compatibility" => "18*"
 	);
@@ -501,10 +501,13 @@ function avatarep_activate() {
     require_once '../inc/adminfunctions_templates.php';
 	
     // Reemplazos que vamos a hacer en las plantillas 1.- Platilla 2.- Contenido a Reemplazar 3.- Contenido que reemplaza lo anterior
-    find_replace_templatesets("forumbit_depth2_forum_lastpost", '#'.preg_quote('{$lastpost_profilelink}').'#', '{$forum[\'avatarep\']}{$forum[\'lastposter\']}');
+    /*find_replace_templatesets("forumbit_depth2_forum_lastpost", '#'.preg_quote('{$lastpost_profilelink}').'#', '{$forum[\'avatarep\']}{$forum[\'lastposter\']}');
     find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$thread[\'profilelink\']}').'#', '{$avatarep_avatar[\'avatarep\']}{$thread[\'owner\']}');
-    find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$lastposterlink}').'#', '{$avatarep_lastpost[\'avatarep\']}{$thread[\'lastposter\']}');
-    find_replace_templatesets("forumdisplay_announcements_announcement", '#'.preg_quote('{$announcement[\'profilelink\']}').'#', '{$anno_avatar[\'avatarep\']}{$announcement[\'profilelink\']}');	
+    find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$lastposterlink}').'#', '{$avatarep_lastpost[\'avatarep\']}{$thread[\'lastposter\']}');*/
+	find_replace_templatesets("forumbit_depth2_forum_lastpost", '#'.preg_quote('{$lastpost_profilelink}').'#', '{$forum[\'avatarep\']}{$lastposterlink}');
+    find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$thread[\'profilelink\']}').'#', '{$avatarep_avatar[\'avatarep\']}{$thread[\'profilelink\']}');
+    find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$lastposterlink}').'#', '{$avatarep_lastpost[\'avatarep\']}{$lastposterlink}');	   
+	find_replace_templatesets("forumdisplay_announcements_announcement", '#'.preg_quote('{$announcement[\'profilelink\']}').'#', '{$anno_avatar[\'avatarep\']}{$announcement[\'profilelink\']}');	
     find_replace_templatesets("search_results_threads_thread", '#'.preg_quote('{$thread[\'profilelink\']}').'#', '{$avatarep_avatar[\'avatarep\']}{$thread[\'profilelink\']}');
     find_replace_templatesets("search_results_threads_thread", '#'.preg_quote('{$lastposterlink}').'#', '{$avatarep_lastpost[\'avatarep\']}{$lastposterlink}');
     find_replace_templatesets("search_results_posts_post", '#'.preg_quote('{$post[\'profilelink\']}').'#', '{$avatarep_avatar[\'avatarep\']}{$post[\'profilelink\']}');
@@ -885,9 +888,17 @@ function forumlist_avatar(&$_f)
 	}
 	if($mybb->settings['avatarep_format'] == 1)
 	{
-		$username = format_name($_f['avatarep_lastpost']['username'], $_f['avatarep_lastpost']['usergroup'], $_f['avatarep_lastpost']['displaygroup']);	
-		$_f['lastposterav'] = $username;
-		$_f['lastposter'] = build_profile_link($_f['lastposterav'], $_f['avatarep_lastpost']['uid']);	
+		if($mybb->version_code >= 1808)
+		{
+			$cache->cache['users'][$_f['lastposteruid']] = $_f['lastposter'];
+			$_f['lastposter'] = "#{$_f['avatarep_lastpost']['username']}{$_f['avatarep_lastpost']['uid']}#";
+		}
+		else
+		{
+			$username = format_name($_f['avatarep_lastpost']['username'], $_f['avatarep_lastpost']['usergroup'], $_f['avatarep_lastpost']['displaygroup']);	
+			$_f['lastposterav'] = $username;
+			$_f['lastposter'] = build_profile_link($_f['lastposterav'], $_f['avatarep_lastpost']['uid']);				
+		}
 	}
 	$_f['avatarep'] = '<div class="avatarep_fd">' . $_f['avatarep'] . '</div>';
 }
@@ -987,12 +998,20 @@ function avatarep_thread() {
    {
 		if($mybb->settings['avatarep_format'] == 1)
 		{
-			$thread['ownerav'] = format_name($avatarep_avatar['username'], $avatarep_avatar['usergroup'], $avatarep_avatar['displaygroup']);
-			$thread['owner'] = build_profile_link($thread['ownerav'], $avatarep_avatar['uid']);				
+			if($mybb->version_code >= 1808)
+			{
+				$cache->cache['users'][$thread['uid']] = $thread['username'];
+				$thread['username'] = "#{$avatarep_avatar['username']}{$avatarep_avatar['uid']}#";
+			}
+			else
+			{
+				$thread['ownerav'] = format_name($avatarep_avatar['username'], $avatarep_avatar['usergroup'], $avatarep_avatar['displaygroup']);
+				$thread['username'] = build_profile_link($thread['ownerav'], $avatarep_avatar['uid']);				
+			}
 		}
 		else
 		{
-			$thread['owner'] = htmlspecialchars_uni($thread['username']);			
+			$thread['username'] = htmlspecialchars_uni($thread['username']);			
 		}
 		$uid = (int)$avatarep_avatar['uid'];
 		if($mybb->settings['avatarep_menu'] == 1)
@@ -1141,8 +1160,16 @@ function avatarep_thread() {
 	{
 		if($mybb->settings['avatarep_format'] == 1)
 		{	
-			$thread['lastposterav'] = format_name($avatarep_lastpost['username'], $avatarep_lastpost['usergroup'], $avatarep_lastpost['displaygroup']);
-			$thread['lastposter'] = build_profile_link($thread['lastposterav'], $avatarep_lastpost['uid']);		
+			if($mybb->version_code >= 1808)
+			{
+				$cache->cache['users'][$thread['lastposteruid']] = $thread['lastposter'];
+				$thread['lastposter'] = "#{$avatarep_lastpost['username']}{$avatarep_lastpost['uid']}#";
+			}
+			else
+			{	
+				$thread['lastposterav'] = format_name($avatarep_lastpost['username'], $avatarep_lastpost['usergroup'], $avatarep_lastpost['displaygroup']);
+				$thread['lastposter'] = build_profile_link($thread['lastposterav'], $avatarep_lastpost['uid']);	
+			}
 		}	
 		else
 		{
@@ -1356,9 +1383,16 @@ function avatarep_announcement()
 	}
 	if($mybb->settings['avatarep_format'] == 1)
 	{
-		$announcement['username'] = format_name($announcement['username'], $anno_avatar['usergroup'], $anno_avatar['displaygroup']);
-		$announcement['profilelink'] = build_profile_link($announcement['username'], $anno_avatar['uid']);		
-		
+		if($mybb->version_code >= 1808)
+		{
+			$cache->cache['users'][$announcement['uid']] = $announcement['username'];
+			$announcement['username'] = "#{$announcement['username']}{$anno_avatar['uid']}#";
+		}
+		else
+		{		
+			$announcement['username'] = format_name($announcement['username'], $anno_avatar['usergroup'], $anno_avatar['displaygroup']);
+			$announcement['profilelink'] = build_profile_link($announcement['username'], $anno_avatar['uid']);				
+		}
 	}	
 	$uid = $anno_avatar['uid'];
 	if($mybb->settings['avatarep_guests'] == 1 && $uid == 0)
