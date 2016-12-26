@@ -907,7 +907,7 @@ function forumlist_avatar(&$_f)
 function avatarep_thread() {
 
 	// Puedes definir las variables deseadas para usar en las plantillas
-	global $db, $lang, $avatarep_avatar, $avatarep_firstpost, $avatarep_lastpost, $mybb, $post, $search, $thread, $threadcache, $thread_cache, $avatar_events;
+	global $cache, $db, $lang, $avatarep_avatar, $avatarep_firstpost, $avatarep_lastpost, $mybb, $post, $search, $thread, $threadcache, $thread_cache, $avatar_events, $tcache;
 	static $avatarep_cache, $avatarep_type;
 
     $lang->load("avatarep", false, true);        
@@ -937,12 +937,12 @@ function avatarep_thread() {
 	if(!isset($avatarep_cache))
 	{
 		$users = $avatarep_cache = array();
-		$cache = ($thread_cache) ? $thread_cache : $threadcache;
+		$tcache = ($thread_cache) ? $thread_cache : $threadcache;
 
-		if(isset($cache))
+		if(isset($tcache))
 		{
 			// Obtenemos los resultados en lista de temas y la busqueda
-			foreach($cache as $t)
+			foreach($tcache as $t)
 			{
 				if(!in_array($t['uid'], $users))
 				{
