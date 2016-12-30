@@ -116,7 +116,7 @@ Change all content to this:
 	<br />
 	{$lastpost_date}
 	<br />
-	{$lang->by} {$forum['lastposter']}
+	{$lang->by} {$lastpost_profilelink}
 </span>
 </div>
 ```
@@ -153,7 +153,7 @@ Change all content to this:
 <div style="float:left;">{$avatarep_avatar['avatarep']}</div>
 <div>
           <span>{$prefix} {$gotounread}{$thread['threadprefix']}<span class="{$inline_edit_class} {$new_class}" id="tid_{$inline_edit_tid}"><a href="{$thread['threadlink']}">{$thread['subject']}</a></span></span>
-			<div class="author smalltext">Iniciado por: {$thread['owner']} {$thread['multipage']}</div>
+			<div class="author smalltext">Iniciado por: {$thread['profilelink']} {$thread['multipage']}</div>
 		</div>
 </div>
 	</td>
@@ -165,7 +165,7 @@ Change all content to this:
 {$avatarep_lastpost['avatarep']}</div>
 <div>
 		<span class="lastpost smalltext">{$lastpostdate}<br />
-		<a href="{$thread['lastpostlink']}">{$lang->lastpost}</a>:<br />{$thread['lastposter']}</span>
+		<a href="{$thread['lastpostlink']}">{$lang->lastpost}</a>:<br />{$lastposterlink}</span>
 </div>
 	</td>
 {$modbit}
@@ -315,6 +315,8 @@ Change all content to this:
 ```
 
 And done it !!!!
+
+This actual guide is only for latest releaded version, if you have lesser versions you have to follow previous guidances. And it's a reference only with default theme, you have to customie it as the latest sended information on mybb official siteif you have a customized theme.
 
 Sample of this guide on spanish only for 2.8.5 versions or lesser.
 
