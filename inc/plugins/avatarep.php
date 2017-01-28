@@ -77,7 +77,7 @@ function avatarep_info()
 		"website"		=> "http://www.mybb.com",
 		"author"		=> "Dark Neo",
 		"authorsite"	=> "http://soportemybb.es",
-		"version"		=> "2.9",
+		"version"		=> "2.9.1",
 		"codename" 		=> "last_poster_avatar",
 		"compatibility" => "18*"
 	);
@@ -2086,9 +2086,51 @@ function avatarep_style_output(&$content){
                     if ($old_username != '')
                     {
                         $content = str_replace($old_username, $format, $content);
+function avatarep_style_output(&$content){
+	global $mybb, $db, $cache;
+
+	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_format'] == 0)
+    {
+        return false;
+    }
+	if(isset($cache->cache['users']))
+	{
+		$cache->cache['users'] = array_unique($cache->cache['users']);
+	}
+	if(isset($cache->cache['guests']))
+	{
+		$cache->cache['guests'] = array_unique($cache->cache['guests']);
+	}
+	if(isset($cache->cache['mods']))
+	{
+		$cache->cache['mods'] = array_unique($cache->cache['mods']);
+	}
+	if(isset($cache->cache['groups']))
+	{
+		$cache->cache['groups'] = array_unique($cache->cache['groups']);
+	}
+	
+    if (sizeof($cache->cache['users']))
+    {	
+        $result = $db->simple_select('users', 'uid, username, usergroup, displaygroup', 'uid IN (' . implode(',', array_keys($cache->cache['users'])) . ')');
+        while ($avatarep = $db->fetch_array($result))
+        {
+			$username = format_name($avatarep['username'], $avatarep['usergroup'], $avatarep['displaygroup']);
+			$format = "#{$avatarep['username']}{$avatarep['uid']}#";
+			if(is_array($cache->cache['groups']))
+			{
+				$compare = explode(",", $cache->cache['mods']);
+				if(in_array($avatarep['uid'], $compare))
+                {
+                    $old_username = str_replace('{username}', $format, $cache->cache['usergroups'][$avatarep['usergroup']]['namestyle']);
+                    if ($old_username != '')
+                    {
+                        $content = str_replace($old_username, $format, $content);
                     }
                 }
-
+				
+			}
+	
             $content = str_replace($format, $username, $content);			
 			unset($cache->cache['users'][$avatarep['uid']]);
 		}
