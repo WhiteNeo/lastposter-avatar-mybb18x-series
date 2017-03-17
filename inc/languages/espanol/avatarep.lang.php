@@ -1,7 +1,7 @@
 <?php
 /**
 *  Idioma Español
-*  Avatar en Temas y Foros v 2.8.7
+*  Avatar en Temas y Foros v 2.9.2
 *
 *  Sitio Web: http://soportemybb.es
 *  Autor: Dark Neo - neogeoman@gmail.com
@@ -17,4 +17,7 @@ $l['avatarep_user_alt'] = "Avatar de {1}";
 $l['avatarep_user_no_avatar'] = "Sin avatar";
 $l['avatarep_retrieving'] = "Obteniendo Datos";
 $l['avatarep_loading'] = "Cargando...";
-?>
+$l['avatarep_user_alt_forums'] = "Último Envío: {1}";
+$l['avatarep_user_alt_thread_first'] = "Primer mensaje por: {1}";
+$l['avatarep_user_alt_thread_last'] = "Último mensaje por: {1}";
+$l['avatarep_user_alt_thread_contributor'] = "Creador del tema: {1}";
