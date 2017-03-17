@@ -2,7 +2,7 @@
 /**
 *@ Autor: Dark Neo
 *@ Fecha: 2013-12-12
-*@ Version: 2.9.1
+*@ Version: 2.9.2
 *@ Contacto: neogeoman@gmail.com
 */
 
@@ -77,7 +77,7 @@ function avatarep_info()
 		"website"		=> "http://www.mybb.com",
 		"author"		=> "Dark Neo",
 		"authorsite"	=> "http://soportemybb.es",
-		"version"		=> "2.9.1",
+		"version"		=> "2.9.2",
 		"codename" 		=> "last_poster_avatar",
 		"compatibility" => "18*"
 	);
@@ -222,7 +222,7 @@ function avatarep_activate() {
         'title' =>  "Version",
         'description' => "Plugin version of last poster avatar on threadlist and forumlist",
         'optionscode' => 'text',
-        'value' => 287,
+        'value' => 292,
         'disporder' => 120,
         'gid' => 0
     );
@@ -360,89 +360,20 @@ function avatarep_activate() {
 	$db->insert_query("templates", $templatearray);
 
 	// Añadir el css para la tipsy
-	$avatarep_css = '// Avatars Menu //
-.modal_avatar{
-	display: none;
-	width: auto;
-	height: auto;
-	background: #f0f0f0;
-	border: none;
-	border-radius: 10px;
-	position: absolute;
-	z-index: 99999;
-}
-
-.tavatar {
-	padding: 0px 10px;
-	text-align: center;
-}
-	
-.tavatar img {
-    height: 80px;
-    width: 80px;
-    padding: 8px;
-}
-
-.avatarep_online {
-	border: 1px solid #008000;
-	box-shadow: 1px 1px 4px 2px rgba(14, 252, 14, 0.8);
-	border-radius: 5px;
-	opacity: 0.8;
-}
-
-.avatarep_offline{
-    border: 1px solid #FFA500;
-	box-shadow: 1px 1px 4px 2px rgba(252, 165, 14, 0.8);
-	border-radius: 5px;
-	opacity: 0.8;
-}
-
-.hr {
-	background-color:#089;
-}
-
-.trow_profile{
-	vertical-align: top;
-	padding-left: 9px;
-	width:340px;
-	color:#424242;
-}
-
-.trow_profile a{
-	color: #051517;
-}
-
-.trow_profile a:hover{
-	color: #e09c09;
-}
-
-.trow_uprofile{
-	min-height:175px;
-	line-height:1.2;
-}
-
-.trow_uname{
-	font-size:15px;
-}
-
-.trow_memprofile{
-	font-size:11px;
-	font-weight:bold;
-}
-
-.trow_status{
-	font-size: 11px;
-}
-
-.avatarep_img{
-    padding: 3px;
-	border: 1px solid #D8DFEA;
-    width: 44px;
-	height: 44px;
-	border-radius: 4px;
-	opacity: 0.9;
-	margin: 0px 5px 0px 2px;
-}';
+	$avatarep_css = '.modal_avatar{display: none;width: auto;height: auto;background: #f0f0f0;border: none;border-radius: 10px;position: absolute;z-index: 99999;}
+.tavatar {padding: 0px 10px;text-align: center;}
+.tavatar img {height: 80px;width: 80px;padding: 8px;}
+.avatarep_online {border: 1px solid #008000;box-shadow: 1px 1px 4px 2px rgba(14, 252, 14, 0.8);border-radius: 5px;opacity: 0.8;}
+.avatarep_offline{border: 1px solid #FFA500;box-shadow: 1px 1px 4px 2px rgba(252, 165, 14, 0.8);border-radius: 5px;opacity: 0.8;}
+.hr {background-color:#089;}
+.trow_profile{vertical-align: top;padding-left: 9px;width:340px;color:#424242;}
+.trow_profile a{color: #051517;}
+.trow_profile a:hover{color: #e09c09;}
+.trow_uprofile{min-height:175px;line-height:1.2;}
+.trow_uname{font-size:15px;}
+.trow_memprofile{font-size:11px;font-weight:bold;}
+.trow_status{font-size: 11px;}
+.avatarep_img{padding: 3px;border: 1px solid #D8DFEA;width: 44px;height: 44px;border-radius: 50%;opacity: 0.9;margin: 0px 5px 0px 2px;}';
 
 	$stylesheet = array(
 		"name"			=> "avatarep.css",
@@ -573,7 +504,6 @@ function avatarep_deactivate() {
 function avatarep_format_avatar($user)
 {
 	global $mybb, $avatar;
-		
 		$size = 2048;
 		$dimensions = "30px";
 		$avatar = format_avatar($user['avatar'], $dimensions, $size);
@@ -597,10 +527,10 @@ function avatarep_format_avatar($user)
 				$avatar = $mybb->settings['bburl'] . "/images/default_avatar.png";
 			}	
 		}
-		
+
 		return array(
 			'avatar' => $avatar,
-			'avatarep' => "<img src='" . $avatar . "' class='avatarep_img' alt='{$user['userusername']}' />",
+			'avatarep' => "<img src='" . $avatar . "' class='avatarep_img' alt='".htmlspecialchars_uni($user['userusername'])."' />",
 			'username' => htmlspecialchars_uni($user['userusername']),
 			'profilelink' => get_profile_link($user['uid']),
 			'uid' => (int)$user['uid'],
@@ -743,11 +673,12 @@ function forumlist_avatar(&$_f)
 		$avatar_events = "onclick";		
 	}	
 	$myid = (int)$_f['fid'];
+	$_f['avatarep_title'] = $lang->sprintf($lang->avatarep_user_alt_forums, htmlspecialchars_uni($_f['avatarep_lastpost']['username']));
 	if($mybb->settings['avatarep_menu'] == 1){
 		if(function_exists("google_seo_url_profile")){
 			if($mybb->settings['avatarep_menu_events'] == 2)
 			{		
-				$_f['avatarep'] = "<a href=\"" . $_f['avatarep_lastpost']['profilelink'] . "?action=avatarep_popup\" title=\"".$_f['avatarep_lastpost']['username']."\" id=\"forum_member{$myid}\">".$_f['avatarep_lastpost']['avatarep']."</a>
+				$_f['avatarep'] = "<a href=\"" . $_f['avatarep_lastpost']['profilelink'] . "?action=avatarep_popup\" title=\"".$_f['avatarep_title']."\" id=\"forum_member{$myid}\">".$_f['avatarep_lastpost']['avatarep']."</a>
 				<div class=\"modal_avatar\" id=\"forum_mod{$myid}\"></div>				
 					<script type=\"text/javascript\">
 					$(document).on(\"ready\", function(){
@@ -806,14 +737,14 @@ function forumlist_avatar(&$_f)
 			}
 			else
 			{
-				$_f['avatarep'] = "<a href=\"javascript:void(0)\" id=\"forum_member{$_f['fid']}\" title=\"".$_f['avatarep_lastpost']['username']."\" {$avatar_events}=\"MyBB.popupWindow('". $_f['avatarep_lastpost']['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$_f['avatarep_lastpost']['avatarep']."</a>";		
+				$_f['avatarep'] = "<a href=\"javascript:void(0)\" id=\"forum_member{$_f['fid']}\" title=\"".$_f['avatarep_title']."\" {$avatar_events}=\"MyBB.popupWindow('". $_f['avatarep_lastpost']['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$_f['avatarep_lastpost']['avatarep']."</a>";		
 			}
 		}
 		else
 		{
 			if($mybb->settings['avatarep_menu_events'] == 2)
 			{		
-				$_f['avatarep'] = "<a href=\"member.php?uid={$_f['uid']}&amp;action=avatarep_popup\" id=\"forum_member{$myid}\" title=\"".$_f['avatarep_lastpost']['username']."\">".$_f['avatarep_lastpost']['avatarep']."</a>
+				$_f['avatarep'] = "<a href=\"member.php?uid={$_f['uid']}&amp;action=avatarep_popup\" id=\"forum_member{$myid}\" title=\"".$_f['avatarep_title']."\">".$_f['avatarep_lastpost']['avatarep']."</a>
 				<div class=\"modal_avatar\" id=\"forum_mod{$myid}\"></div>				
 					<script type=\"text/javascript\">
 					$(document).on(\"ready\", function(){
@@ -871,17 +802,17 @@ function forumlist_avatar(&$_f)
 				</script>";
 			}
 			else
-			{			
-				$_f['avatarep'] = "<a href=\"javascript:void(0)\" id=\"forum_member{$_f['fid']}\" title=\"".$_f['avatarep_lastpost']['username']."\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$_f['uid']}&amp;action=avatarep_popup', null, true); return false;\">".$_f['avatarep_lastpost']['avatarep']."</a>";
+			{	
+				$_f['avatarep'] = "<a href=\"javascript:void(0)\" id=\"forum_member{$_f['fid']}\" title=\"".$_f['avatarep_title']."\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$_f['uid']}&amp;action=avatarep_popup', null, true); return false;\">".$_f['avatarep_lastpost']['avatarep']."</a>";
 			}
 		}
 	}else{
-		$_f['avatarep'] = "<a href=\"". $_f['avatarep_lastpost']['profilelink'] . "\" id=\"forum_member{$_f['fid']}\" title=\"".$_f['avatarep_lastpost']['username']."\">".$_f['avatarep_lastpost']['avatarep']."</a>";
+		$_f['avatarep'] = "<a href=\"". $_f['avatarep_lastpost']['profilelink'] . "\" id=\"forum_member{$_f['fid']}\" title=\"".$_f['avatarep_title']."\">".$_f['avatarep_lastpost']['avatarep']."</a>";
 	}	
 	if($mybb->settings['avatarep_guests'] == 1 && $_f['avatarep_lastpost']['uid'] === NULL)
 	{
-		$no_avatar = htmlspecialchars_uni($_f['lastposter']);
-		$_f['avatarep'] = '<img class="avatarep_img" src="images/default_avatar.png" alt="{$no_avatar}\'s avatar" />';
+		$_f['avatarep_alt'] = $lang->sprintf($lang->avatarep_user_alt, htmlspecialchars_uni($_f['lastposter']));	
+		$_f['avatarep'] = '<img class="avatarep_img" src="images/default_avatar.png" alt="'.$_f['avatarep_alt'].'" />';
 	}
 	if($mybb->settings['avatarep_format'] == 1)
 	{
@@ -917,7 +848,8 @@ function avatarep_thread() {
 
 	if($mybb->settings['avatarep_temas'] == 1 && $mybb->settings['avatarep_guests'] == 1 && $thread['uid'] == 0 && $thread['username'] != "")
 	{
-		$avatarep_avatar['avatarep'] = "<img src='images/default_avatar.png' class='avatarep_img' alt='{$thread['threadusername']} Avatar' />";
+		$thread['thread_alt'] = $lang->sprintf($lang->avatarep_user_alt, htmlspecialchars_uni($thread['threadusername']));		
+		$avatarep_avatar['avatarep'] = "<img src='images/default_avatar.png' class='avatarep_img' alt='{$thread['thread_alt']}' />";
 	}
 	else if($mybb->settings['avatarep_temas'] == 1 && $mybb->settings['avatarep_guests'] == 0 && $thread['uid'] == 0 && $thread['username'] != "")
 	{
@@ -925,7 +857,8 @@ function avatarep_thread() {
 	}
 	if($mybb->settings['avatarep_temas2'] == 1 && $mybb->settings['avatarep_guests'] == 1 && $thread['lastposteruid'] == 0 && $thread['lastposter'] != "")
 	{
-		$avatarep_lastpost['avatarep'] = "<img src='images/default_avatar.png' class='avatarep_img' alt='{$thread['lastposter']} Avatar' />";
+		$thread['thread_alt_lp'] = $lang->sprintf($lang->avatarep_user_alt, htmlspecialchars_uni($thread['lastposter']));		
+		$avatarep_lastpost['avatarep'] = "<img src='images/default_avatar.png' class='avatarep_img' alt='{$thread['thread_alt_lp']}' />";
 	}
 	else if($mybb->settings['avatarep_temas2'] == 1 && $mybb->settings['avatarep_guests'] == 0 && $thread['lastposteruid'] == 0 && $thread['lastposter'] != "")
 	{
@@ -1017,7 +950,8 @@ function avatarep_thread() {
 			{
 				if($mybb->settings['avatarep_menu_events'] == 2)
 				{		
-					$avatarep_avatar['avatarep'] = "<a href=\"". $avatarep_avatar['profilelink'] . "?action=avatarep_popup\" id=\"tal_member{$myid}\" title=\"".$avatarep_avatar['username']."\">".$avatarep_avatar['avatarep']."</a>
+					$avatarep_avatar['thread_first_title'] = $lang->sprintf($lang->avatarep_user_alt_thread_first, htmlspecialchars_uni($avatarep_avatar['username']));
+					$avatarep_avatar['avatarep'] = "<a href=\"". $avatarep_avatar['profilelink'] . "?action=avatarep_popup\" id=\"tal_member{$myid}\" title=\"".$avatarep_avatar['thread_first_title']."\">".$avatarep_avatar['avatarep']."</a>
 					<div class=\"modal_avatar\" id=\"tal_mod{$myid}\"></div>				
 						<script type=\"text/javascript\">
 						$(document).on(\"ready\", function(){
@@ -1076,14 +1010,16 @@ function avatarep_thread() {
 				}
 				else
 				{
-					$avatarep_avatar['avatarep'] = "<a href=\"javascript:void(0)\" id=\"tal_member{$thread['tid']}\" title=\"".$avatarep_avatar['username']."\" {$avatar_events}=\"MyBB.popupWindow('". $avatarep_avatar['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$avatarep_avatar['avatarep']."</a>";  				
+					$avatarep_avatar['thread_first_title'] = $lang->sprintf($lang->avatarep_user_alt_thread_first, htmlspecialchars_uni($avatarep_avatar['username']));					
+					$avatarep_avatar['avatarep'] = "<a href=\"javascript:void(0)\" id=\"tal_member{$thread['tid']}\" title=\"".$avatarep_avatar['thread_first_title']."\" {$avatar_events}=\"MyBB.popupWindow('". $avatarep_avatar['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$avatarep_avatar['avatarep']."</a>";  				
 				}
 			}
 			else
 			{
 				if($mybb->settings['avatarep_menu_events'] == 2)
 				{		
-					$avatarep_avatar['avatarep'] = "<a href=\"member.php?uid={$uid}&amp;action=avatarep_popup\" id=\"tal_member{$myid}\" title=\"".$avatarep_avatar['username']."\">".$avatarep_avatar['avatarep']."</a>
+					$avatarep_avatar['thread_first_title'] = $lang->sprintf($lang->avatarep_user_alt_thread_first, htmlspecialchars_uni($avatarep_avatar['username']));			
+					$avatarep_avatar['avatarep'] = "<a href=\"member.php?uid={$uid}&amp;action=avatarep_popup\" id=\"tal_member{$myid}\" title=\"".$avatarep_avatar['thread_first_title']."\">".$avatarep_avatar['avatarep']."</a>
 					<div class=\"modal_avatar\" id=\"tal_mod{$myid}\"></div>				
 						<script type=\"text/javascript\">
 						$(document).on(\"ready\", function(){
@@ -1142,13 +1078,15 @@ function avatarep_thread() {
 				}
 				else
 				{						
-					$avatarep_avatar['avatarep'] = "<a href=\"javascript:void(0)\" id=\"tal_member{$thread['tid']}\" title=\"".$avatarep_avatar['username']."\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$avatarep_avatar['avatarep']."</a>";
+					$avatarep_avatar['thread_first_title'] = $lang->sprintf($lang->avatarep_user_alt_thread_first, htmlspecialchars_uni($avatarep_avatar['username']));			
+					$avatarep_avatar['avatarep'] = "<a href=\"javascript:void(0)\" id=\"tal_member{$thread['tid']}\" title=\"".$avatarep_avatar['thread_first_title']."\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$avatarep_avatar['avatarep']."</a>";
 				}
 			}		
 		}
 		else
 		{
-			$avatarep_avatar['avatarep'] = "<a href=\"". $avatarep_avatar['profilelink'] . "\" id=\"tal_member{$thread['tid']}\" title=\"".$avatarep_avatar['username']."\">".$avatarep_avatar['avatarep']."</a>";
+			$avatarep_avatar['thread_first_title'] = $lang->sprintf($lang->avatarep_user_alt_thread_first, htmlspecialchars_uni($avatarep_avatar['username']));						
+			$avatarep_avatar['avatarep'] = "<a href=\"". $avatarep_avatar['profilelink'] . "\" id=\"tal_member{$thread['tid']}\" title=\"".$avatarep_avatar['thread_first_title']."\">".$avatarep_avatar['avatarep']."</a>";
 		}
 		$avatarep_avatar['avatarep'] = '<div class="avatarep_fda">' . $avatarep_avatar['avatarep'] . '</div>';	 
 	}
@@ -1179,7 +1117,8 @@ function avatarep_thread() {
 			{
 				if($mybb->settings['avatarep_menu_events'] == 2)
 				{		
-					$avatarep_lastpost['avatarep'] = "<a href=\"". $avatarep_lastpost['profilelink'] . "?action=avatarep_popup\" id=\"tao_member{$myid}\" title=\"".$avatarep_lastpost['username']."\">".$avatarep_lastpost['avatarep']."</a>
+					$avatarep_avatar['thread_last_title'] = $lang->sprintf($lang->avatarep_user_alt_thread_last, htmlspecialchars_uni($avatarep_lastpost['username']));
+					$avatarep_lastpost['avatarep'] = "<a href=\"". $avatarep_lastpost['profilelink'] . "?action=avatarep_popup\" id=\"tao_member{$myid}\" title=\"".$avatarep_avatar['thread_last_title']."\">".$avatarep_lastpost['avatarep']."</a>
 					<div class=\"modal_avatar\" id=\"tao_mod{$myid}\"></div>				
 						<script type=\"text/javascript\">
 						$(document).on(\"ready\", function(){
@@ -1237,15 +1176,17 @@ function avatarep_thread() {
 					</script>";
 				}
 				else
-				{				
-					$avatarep_lastpost['avatarep'] = "<a href=\"javascript:void(0)\" id=\"tao_member{$thread['tid']}\" title=\"".$avatarep_lastpost['username']."\" {$avatar_events}=\"MyBB.popupWindow('". $avatarep_lastpost['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$avatarep_lastpost['avatarep']."</a>";
+				{	
+					$avatarep_avatar['thread_last_title'] = $lang->sprintf($lang->avatarep_user_alt_thread_last, htmlspecialchars_uni($avatarep_lastpost['username']));			
+					$avatarep_lastpost['avatarep'] = "<a href=\"javascript:void(0)\" id=\"tao_member{$thread['tid']}\" title=\"".$avatarep_avatar['thread_last_title']."\" {$avatar_events}=\"MyBB.popupWindow('". $avatarep_lastpost['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$avatarep_lastpost['avatarep']."</a>";
 				}
 			}
 			else
 			{
 				if($mybb->settings['avatarep_menu_events'] == 2)
 				{		
-					$avatarep_lastpost['avatarep'] = "<a href=\"member.php?uid={$uid}&amp;action=avatarep_popup\" id=\"tao_member{$thread['tid']}\" title=\"".$avatarep_lastpost['username']."\">".$avatarep_lastpost['avatarep']."</a>
+					$avatarep_avatar['thread_last_title'] = $lang->sprintf($lang->avatarep_user_alt_thread_last, htmlspecialchars_uni($avatarep_lastpost['username']));			
+					$avatarep_lastpost['avatarep'] = "<a href=\"member.php?uid={$uid}&amp;action=avatarep_popup\" id=\"tao_member{$thread['tid']}\" title=\"".$avatarep_avatar['thread_last_title']."\">".$avatarep_lastpost['avatarep']."</a>
 					<div class=\"modal_avatar\" id=\"tao_mod{$myid}\"></div>				
 						<script type=\"text/javascript\">
 						$(document).on(\"ready\", function(){
@@ -1303,14 +1244,16 @@ function avatarep_thread() {
 					</script>";
 				}
 				else
-				{				
-					$avatarep_lastpost['avatarep'] = "<a href=\"javascript:void(0)\" id=\"tao_member{$thread['tid']}\" title=\"".$avatarep_lastpost['username']."\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$avatarep_lastpost['avatarep']."</a>";
+				{	
+					$avatarep_avatar['thread_last_title'] = $lang->sprintf($lang->avatarep_user_alt_thread_last, htmlspecialchars_uni($avatarep_lastpost['username']));			
+					$avatarep_lastpost['avatarep'] = "<a href=\"javascript:void(0)\" id=\"tao_member{$thread['tid']}\" title=\"".$avatarep_avatar['thread_last_title']."\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$avatarep_lastpost['avatarep']."</a>";
 				}
 			}			
 		}
 		else
 		{
-			$avatarep_lastpost['avatarep'] = 	"<a href=\"". $avatarep_lastpost['profilelink'] . "\" id=\"tao_member{$thread['tid']}\" title=\"".$avatarep_lastpost['username']."\">".$avatarep_lastpost['avatarep']."</a>";
+			$avatarep_avatar['thread_last_title'] = $lang->sprintf($lang->avatarep_user_alt_thread_last, htmlspecialchars_uni($avatarep_lastpost['username']));						
+			$avatarep_lastpost['avatarep'] = 	"<a href=\"". $avatarep_lastpost['profilelink'] . "\" id=\"tao_member{$thread['tid']}\" title=\"".$avatarep_avatar['thread_last_title']."\">".$avatarep_lastpost['avatarep']."</a>";
 		}
 		$avatarep_lastpost['avatarep'] = '<div class="avatarep_fdl">' . $avatarep_lastpost['avatarep'] . '</div>';
 	}
@@ -1395,7 +1338,8 @@ function avatarep_announcement()
 	$uid = $anno_avatar['uid'];
 	if($mybb->settings['avatarep_guests'] == 1 && $uid == 0)
 	{
-		$anno_avatar['avatarep'] = "<img src='images/default_avatar.png' class='avatarep_img' alt='{$announcement['username']} Avatar' />";
+		$anno_avatar['title'] = $lang->sprintf($lang->avatarep_user_alt, htmlspecialchars_uni($announcement['username']));		
+		$anno_avatar['avatarep'] = "<img src='images/default_avatar.png' class='avatarep_img' alt='{$anno_avatar['title']}' />";
 	}	
 	if($mybb->settings['avatarep_menu_events'] == 2)
 	{
@@ -1413,7 +1357,8 @@ function avatarep_announcement()
 		{
 			if($mybb->settings['avatarep_menu_events'] == 2)
 			{		
-				$anno_avatar['avatarep'] = "<a href=\"". $anno_avatar['profilelink'] . "?action=avatarep_popup\" id=\"aa_member{$myid}\" title=\"".$anno_avatar['username']."\">".$anno_avatar['avatarep']."</a>
+				$anno_avatar['title'] = $lang->sprintf($lang->avatarep_user_alt_thread_announcement, $anno_avatar['username']);		
+				$anno_avatar['avatarep'] = "<a href=\"". $anno_avatar['profilelink'] . "?action=avatarep_popup\" id=\"aa_member{$myid}\" title=\"".$anno_avatar['title']."\">".$anno_avatar['avatarep']."</a>
 				<div class=\"modal_avatar\" id=\"aa_mod{$myid}\"></div>				
 					<script type=\"text/javascript\">
 					$(document).on(\"ready\", function(){
@@ -1472,14 +1417,16 @@ function avatarep_announcement()
 				}
 			else
 			{				
-				$anno_avatar['avatarep'] = "<a href=\"javascript:void(0)\" id=\"aa_member{$thread['tid']}\" title=\"".$anno_avatar['username']."\" {$avatar_events}=\"MyBB.popupWindow('". $anno_avatar['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$anno_avatar['avatarep']."</a>";
+				$anno_avatar['title'] = $lang->sprintf($lang->avatarep_user_alt_thread_announcement, $anno_avatar['username']);				
+				$anno_avatar['avatarep'] = "<a href=\"javascript:void(0)\" id=\"aa_member{$thread['tid']}\" title=\"".$anno_avatar['title']."\" {$avatar_events}=\"MyBB.popupWindow('". $anno_avatar['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$anno_avatar['avatarep']."</a>";
 			}
 		}
 		else
 		{			
 			if($mybb->settings['avatarep_menu_events'] == 2)
 			{		
-				$anno_avatar['avatarep'] = "<a href=\"member.php?uid={$uid}&amp;action=avatarep_popup\" id=\"aa_member{$myid}\" title=\"".$anno_avatar['username']."\">".$anno_avatar['avatarep']."</a>
+				$anno_avatar['title'] = $lang->sprintf($lang->avatarep_user_alt_thread_announcement, $anno_avatar['username']);		
+				$anno_avatar['avatarep'] = "<a href=\"member.php?uid={$uid}&amp;action=avatarep_popup\" id=\"aa_member{$myid}\" title=\"".$anno_avatar['title']."\">".$anno_avatar['avatarep']."</a>
 				<div class=\"modal_avatar\" id=\"aa_mod{$myid}\"></div>				
 					<script type=\"text/javascript\">
 					$(document).on(\"ready\", function(){
@@ -1537,14 +1484,16 @@ function avatarep_announcement()
 				</script>";
 				}
 			else
-			{		
-				$anno_avatar['avatarep'] = "<a href=\"javascript:void(0)\" id=\"aa_member{$thread['tid']}\" title=\"".$anno_avatar['username']."\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$anno_avatar['avatarep']."</a>";
+			{
+				$anno_avatar['title'] = $lang->sprintf($lang->avatarep_user_alt_thread_announcement, $anno_avatar['username']);										
+				$anno_avatar['avatarep'] = "<a href=\"javascript:void(0)\" id=\"aa_member{$thread['tid']}\" title=\"".$anno_avatar['title']."\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$anno_avatar['avatarep']."</a>";
 			}
 		}	
 	}
 	else
 	{
-		$anno_avatar['avatarep'] = "<a href=\"". $anno_avatar['profilelink'] . "\" id=\"aa_member{$thread['tid']}\" title=\"".$anno_avatar['username']."\">".$anno_avatar['avatarep']."</a>";
+		$anno_avatar['title'] = $lang->sprintf($lang->avatarep_user_alt_thread_announcement, $anno_avatar['username']);		
+		$anno_avatar['avatarep'] = "<a href=\"". $anno_avatar['profilelink'] . "\" id=\"aa_member{$thread['tid']}\" title=\"".$anno_avatar['title']."\">".$anno_avatar['avatarep']."</a>";
 	}
 	$anno_avatar['avatarep'] = '<div class="avatarep_fdan">' . $anno_avatar['avatarep'] . '</div>';
 }
@@ -1598,9 +1547,15 @@ function avatarep_threads()
 			$user = $db->fetch_array($query);			
 			$avatarep = avatarep_format_avatar($user);
 		}
-        $search = "/uploads";
+		$search = "/uploads";
 		$replace = "./uploads";
-        $avatarep = str_replace($replace, $search, $avatarep);		
+		$avatarep = str_replace($replace, $search, $avatarep);
+		$avatar_thread = $avatarep;
+		if($thread['firstpost'] == $post['pid'])
+		{
+			$post['avatarep_title'] = $lang->sprintf($lang->avatarep_user_alt_thread_contributor, $user['username']);							
+			$avatarep_thread = "<img src=\"".htmlspecialchars_uni($avatarep)."\" alt=\"".$post['avatarep_title']."\" />";
+		}
 	}	
 }
 
@@ -1628,7 +1583,8 @@ function avatarep_search()
 	
 	if($mybb->settings['avatarep_temas'] == 1 && $mybb->settings['avatarep_guests'] == 1 && $post['uid'] == 0 && $post['username'] != "")
 	{
-		$avatarep_avatar['avatarep'] = "<img src='images/default_avatar.png' class='avatarep_img' alt='{$post['username']} Avatar' />";
+		$avatarep_avatar['avatarep_alt'] = $lang->sprintf($lang->avatarep_user_alt, htmlspecialchars_uni($post['username']));		
+		$avatarep_avatar['avatarep'] = "<img src='images/default_avatar.png' class='avatarep_img' alt='{$avatarep_avatar['avatarep_alt']}' />";
 	}
 	else if($mybb->settings['avatarep_temas'] == 1 && $mybb->settings['avatarep_guests'] == 0 && $post['uid'] == 0 && $post['username'] != "")
 	{
@@ -1636,7 +1592,8 @@ function avatarep_search()
 	}
 	if($mybb->settings['avatarep_temas'] == 1 && $mybb->settings['avatarep_guests'] == 1 && $thread['uid'] == 0 && $thread['username'] != "")
 	{
-		$avatarep_avatar['avatarep'] = "<img src='images/default_avatar.png' class='avatarep_img' alt='{$thread['threadusername']} Avatar' />";
+		$avatarep_avatar['avatarep_alt'] = $lang->sprintf($lang->avatarep_user_alt, htmlspecialchars_uni($thread['threadusername']));		
+		$avatarep_avatar['avatarep'] = "<img src='images/default_avatar.png' class='avatarep_img' alt='{$avatarep_avatar['avatarep_alt']}' />";
 	}
 	else if($mybb->settings['avatarep_temas'] == 1 && $mybb->settings['avatarep_guests'] == 0 && $thread['uid'] == 0 && $thread['username'] != "")
 	{
@@ -1644,7 +1601,8 @@ function avatarep_search()
 	}
 	if($mybb->settings['avatarep_temas2'] == 1 && $mybb->settings['avatarep_guests'] == 1 && $thread['lastposteruid'] == 0 && $thread['lastposter'] != "")
 	{
-		$avatarep_lastpost['avatarep'] = "<img src='images/default_avatar.png' class='avatarep_img' alt='{$thread['lastposter']} Avatar' />";
+		$avatarep_avatar['avatarep_alt'] = $lang->sprintf($lang->avatarep_user_alt, htmlspecialchars_uni($thread['lastposter']));		
+		$avatarep_lastpost['avatarep'] = "<img src='images/default_avatar.png' class='avatarep_img' alt='{$avatarep_avatar['avatarep_alt']}' />";
 	}
 	else if($mybb->settings['avatarep_temas2'] == 1 && $mybb->settings['avatarep_guests'] == 0 && $thread['lastposteruid'] == 0 && $thread['lastposter'] != "")
 	{
@@ -1718,15 +1676,18 @@ function avatarep_search()
 
 	if($mybb->settings['avatarep_format'] == 1 && $post['uid'] > 0)
 	{
-		$post['profilelink'] = "<a href=\"". $avatarep_avatar['profilelink'] . "\" title=\"".$avatarep_avatar['username']."\">".format_name($avatarep_avatar['username'], $avatarep_avatar['usergroup'], $avatarep_avatar['displaygroup'])."</a>";		
+		$avatarep_avatar['avatarep_title_first'] = $lang->sprintf($lang->avatarep_user_alt_thread_first, $avatarep_avatar['username']);									
+		$post['profilelink'] = "<a href=\"". $avatarep_avatar['profilelink'] . "\" title=\"".$avatarep_avatar['avatarep_title_first']."\">".format_name($avatarep_avatar['username'], $avatarep_avatar['usergroup'], $avatarep_avatar['displaygroup'])."</a>";		
 	}
 	if($mybb->settings['avatarep_format'] == 1 && $thread['uid'] > 0)
 	{	
-		$thread['profilelink'] = "<a href=\"". $avatarep_avatar['profilelink'] . "\" title=\"".$avatarep_avatar['username']."\">".format_name($avatarep_avatar['username'], $avatarep_avatar['usergroup'], $avatarep_avatar['displaygroup'])."</a>";
+		$avatarep_avatar['avatarep_title_first'] = $lang->sprintf($lang->avatarep_user_alt_thread_first, $avatarep_avatar['username']);									
+		$thread['profilelink'] = "<a href=\"". $avatarep_avatar['profilelink'] . "\" title=\"".$avatarep_avatar['avatarep_title_first']."\">".format_name($avatarep_avatar['username'], $avatarep_avatar['usergroup'], $avatarep_avatar['displaygroup'])."</a>";
 	}
 	if($mybb->settings['avatarep_format'] == 1 && $thread['lastposteruid'] > 0)
 	{
-		$lastposterlink = "<a href=\"". $avatarep_lastpost['profilelink'] . "\" title=\"".$avatarep_lastpost['username']."\">".format_name($avatarep_lastpost['username'], $avatarep_lastpost['usergroup'], $avatarep_lastpost['displaygroup'])."</a>";
+		$avatarep_avatar['avatarep_title_last'] = $lang->sprintf($lang->avatarep_user_alt_thread_last, $avatarep_lastpost['username']);											
+		$lastposterlink = "<a href=\"". $avatarep_lastpost['profilelink'] . "\" title=\"".$avatarep_avatar['avatarep_title_last']."\">".format_name($avatarep_lastpost['username'], $avatarep_lastpost['usergroup'], $avatarep_lastpost['displaygroup'])."</a>";
 	}
 	$uid = intval($avatarep_avatar['uid']);		
 	$uid2 = intval($avatarep_lastpost['uid']);	
@@ -1734,13 +1695,13 @@ function avatarep_search()
 	if($myid == ""){$myid = (int)$post['pid'];}
 	if($mybb->settings['avatarep_menu'] == '1')
 	{
-		$lang->avatarep_user_no_avatar = htmlspecialchars_uni($lang->avatarep_user_no_avatar);
-		
+		$lang->avatarep_user_no_avatar = htmlspecialchars_uni($lang->avatarep_user_no_avatar);		
 		if(function_exists("google_seo_url_profile"))
 		{
 			if($mybb->settings['avatarep_menu_events'] == 2)
 			{
-				$avatarep_avatar['avatarep'] = "<a href=\"". $avatarep_avatar['profilelink'] . "?action=avatarep_popup\" id=\"tal_member{$myid}\" title=\"".$avatarep_avatar['username']."\">".$avatarep_avatar['avatarep']."</a>
+				$avatarep_avatar['avatarep_title_first'] = $lang->sprintf($lang->avatarep_user_alt_thread_first, $avatarep_avatar['username']);															
+				$avatarep_avatar['avatarep'] = "<a href=\"". $avatarep_avatar['profilelink'] . "?action=avatarep_popup\" id=\"tal_member{$myid}\" title=\"".$avatarep_avatar['avatarep_title_first']."\">".$avatarep_avatar['avatarep']."</a>
 				<div class=\"modal_avatar\" id=\"tal_mod{$myid}\"></div>				
 					<script type=\"text/javascript\">
 					$(document).on(\"ready\", function(){
@@ -1796,8 +1757,9 @@ function avatarep_search()
 						});
 					});
 				</script>";
-		
-				$avatarep_lastpost['avatarep'] = "<a href=\"". $avatarep_lastpost['profilelink'] . "?action=avatarep_popup\" id=\"tao_member{$myid}\" title=\"".$avatarep_lastpost['username']."\">".$avatarep_lastpost['avatarep']."</a>
+
+				$avatarep_avatar['avatarep_title_last'] = $lang->sprintf($lang->avatarep_user_alt_thread_last, $avatarep_lastpost['username']);																			
+				$avatarep_lastpost['avatarep'] = "<a href=\"". $avatarep_lastpost['profilelink'] . "?action=avatarep_popup\" id=\"tao_member{$myid}\" title=\"".$avatarep_avatar['avatarep_title_last']."\">".$avatarep_lastpost['avatarep']."</a>
 					<div class=\"modal_avatar\" id=\"tao_mod{$myid}\"></div>				
 						<script type=\"text/javascript\">
 						$(document).on(\"ready\", function(){
@@ -1856,15 +1818,18 @@ function avatarep_search()
 			}	
 			else
 			{
-				$avatarep_avatar['avatarep'] = "<a href=\"javascript:void(0)\" id=\"tal_member{$thread['tid']}\" title=\"".$avatarep_avatar['username']."\" {$avatar_events}=\"MyBB.popupWindow('". $avatarep_avatar['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$avatarep_avatar['avatarep']."</a>";  			
-				$avatarep_lastpost['avatarep'] = "<a href=\"javascript:void(0)\" id=\"tao_member{$thread['tid']}\" title=\"".$avatarep_lastpost['username']."\" {$avatar_events}=\"MyBB.popupWindow('". $avatarep_lastpost['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$avatarep_lastpost['avatarep']."</a>";				
+				$avatarep_avatar['avatarep_title_first'] = $lang->sprintf($lang->avatarep_user_alt_thread_first, $avatarep_avatar['username']);																						
+				$avatarep_avatar['avatarep'] = "<a href=\"javascript:void(0)\" id=\"tal_member{$thread['tid']}\" title=\"".$avatarep_avatar['avatarep_title_first']."\" {$avatar_events}=\"MyBB.popupWindow('". $avatarep_avatar['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$avatarep_avatar['avatarep']."</a>";  			
+				$avatarep_avatar['avatarep_title_last'] = $lang->sprintf($lang->avatarep_user_alt_thread_last, $avatarep_lastpost['username']);				
+				$avatarep_lastpost['avatarep'] = "<a href=\"javascript:void(0)\" id=\"tao_member{$thread['tid']}\" title=\"".$avatarep_avatar['avatarep_title_last']."\" {$avatar_events}=\"MyBB.popupWindow('". $avatarep_lastpost['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$avatarep_lastpost['avatarep']."</a>";				
 			}
 		}
 		else
 		{
 			if($mybb->settings['avatarep_menu_events'] == 2)
 			{
-				$avatarep_avatar['avatarep'] = "<a href=\"member.php?uid={$uid}&amp;action=avatarep_popup\" id=\"tal_member{$uid}\" title=\"".$avatarep_avatar['username']."\">".$avatarep_avatar['avatarep']."</a>
+				$avatarep_avatar['avatarep_title_first'] = $lang->sprintf($lang->avatarep_user_alt_thread_first, $avatarep_avatar['username']);																										
+				$avatarep_avatar['avatarep'] = "<a href=\"member.php?uid={$uid}&amp;action=avatarep_popup\" id=\"tal_member{$uid}\" title=\"".$avatarep_avatar['avatarep_title_first']."\">".$avatarep_avatar['avatarep']."</a>
 				<div class=\"modal_avatar\" id=\"tal_mod{$myid}\"></div>				
 					<script type=\"text/javascript\">
 					$(document).on(\"ready\", function(){
@@ -1920,8 +1885,9 @@ function avatarep_search()
 						});
 					});
 				</script>";
-				
-				$avatarep_lastpost['avatarep'] = "<a href=\"member.php?uid={$uid2}&amp;action=avatarep_popup\" id=\"tao_member{$myid}\" title=\"".$avatarep_lastpost['username']."\">".$avatarep_lastpost['avatarep']."</a>
+
+				$avatarep_avatar['avatarep_title_last'] = $lang->sprintf($lang->avatarep_user_alt_thread_last, $avatarep_lastpost['username']);								
+				$avatarep_lastpost['avatarep'] = "<a href=\"member.php?uid={$uid2}&amp;action=avatarep_popup\" id=\"tao_member{$myid}\" title=\"".$avatarep_avatar['avatarep_title_last']."\">".$avatarep_lastpost['avatarep']."</a>
 				<div class=\"modal_avatar\" id=\"tao_mod{$myid}\"></div>				
 					<script type=\"text/javascript\">
 					$(document).on(\"ready\", function(){
@@ -1980,8 +1946,10 @@ function avatarep_search()
 			}
 			else
 			{
-				$avatarep_avatar['avatarep'] = "<a href=\"javascript:void(0)\" id=\"tal_member{$thread['tid']}\" title=\"".$avatarep_avatar['username']."\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$avatarep_avatar['avatarep']."</a>";			
-				$avatarep_lastpost['avatarep'] = "<a href=\"javascript:void(0)\" id=\"tao_member{$thread['tid']}\" title=\"".$avatarep_lastpost['username']."\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid2}&amp;action=avatarep_popup', null, true); return false;\">".$avatarep_lastpost['avatarep']."</a>";				
+				$avatarep_avatar['avatarep_title_first'] = $lang->sprintf($lang->avatarep_user_alt_thread_first, $avatarep_avatar['username']);												
+				$avatarep_avatar['avatarep'] = "<a href=\"javascript:void(0)\" id=\"tal_member{$thread['tid']}\" title=\"".$avatarep_avatar['avatarep_title_first']."\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$avatarep_avatar['avatarep']."</a>";			
+				$avatarep_avatar['avatarep_title_last'] = $lang->sprintf($lang->avatarep_user_alt_thread_last, $avatarep_lastpost['username']);								
+				$avatarep_lastpost['avatarep'] = "<a href=\"javascript:void(0)\" id=\"tao_member{$thread['tid']}\" title=\"".$avatarep_avatar['avatarep_title_last']."\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid2}&amp;action=avatarep_popup', null, true); return false;\">".$avatarep_lastpost['avatarep']."</a>";				
 			}
 		}
 		if($mybb->settings['avatarep_guests'] == 1 && $uid == 0)
@@ -1995,14 +1963,16 @@ function avatarep_search()
 		}
 		if($mybb->settings['avatarep_guests'] == 1 && $uid2 == 0)
 		{
-			$lang->avatarep_user_alt = $lang->sprintf($lang->avatarep_user_alt, htmlspecialchars_uni($thread['lastposter']));			
-			$avatarep_lastpost['avatarep'] = "<img src='images/default_avatar.png' class='avatarep_img' alt='{$lang->avatarep_user_alt}' />";
+			$avatarep_avatar['avatarep_alt_guest'] = $lang->sprintf($lang->avatarep_user_alt, htmlspecialchars_uni($thread['lastposter']));			
+			$avatarep_lastpost['avatarep'] = "<img src='images/default_avatar.png' class='avatarep_img' alt='{$avatarep_avatar['avatarep_alt_guest']}' />";
 		}		
 	}
 	else
 	{
-		$avatarep_avatar['avatarep'] = "<a href=\"". $avatarep_avatar['profilelink'] . "\" id=\"tal_member{$thread['tid']}\" title=\"".$avatarep_avatar['username']."\">".$avatarep_avatar['avatarep']."</a>";		
-		$avatarep_lastpost['avatarep'] = 	"<a href=\"". $avatarep_lastpost['profilelink'] . "\" id=\"tao_member{$thread['tid']}\" title=\"".$avatarep_lastpost['username']."\">".$avatarep_lastpost['avatarep']."</a>";	
+		$avatarep_avatar['avatarep_title_first'] = $lang->sprintf($lang->avatarep_user_alt_thread_first, $avatarep_avatar['username']);		
+		$avatarep_avatar['avatarep'] = "<a href=\"". $avatarep_avatar['profilelink'] . "\" id=\"tal_member{$thread['tid']}\" title=\"".$avatarep_avatar['avatarep_title_first']."\">".$avatarep_avatar['avatarep']."</a>";		
+		$avatarep_avatar['avatarep_title_last'] = $lang->sprintf($lang->avatarep_user_alt_thread_last, $avatarep_lastpost['username']);				
+		$avatarep_lastpost['avatarep'] = 	"<a href=\"". $avatarep_lastpost['profilelink'] . "\" id=\"tao_member{$thread['tid']}\" title=\"".$avatarep_avatar['avatarep_title_last']."\">".$avatarep_lastpost['avatarep']."</a>";	
 	}
 	$avatarep_avatar['avatarep'] = '<div class="avatarep_fda">' . $avatarep_avatar['avatarep'] . '</div>';
 	$avatarep_lastpost['avatarep'] = '<div class="avatarep_fda">' . $avatarep_lastpost['avatarep'] . '</div>';
@@ -2399,35 +2369,36 @@ function avatarep_private_end()
 			}else{
 				$user['avatar'] = htmlspecialchars_uni($user['avatar']);
 			}
-			$user['avatar'] = "<img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']}\" style=\"display: inline-block;\" /><br />";			
+			$lang->avatarep_user_alt = $lang->sprintf($lang->avatarep_user_alt, htmlspecialchars_uni($user['username']));			
+			$user['avatar'] = "<img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$lang->avatarep_user_alt}\" style=\"display: block;\" />";			
 			if($mybb->settings['avatarep_menu'] == 1)
 			{
 				if(function_exists("google_seo_url_profile"))
 				{
 					if($mybb->settings['avatarep_menu_events'] == 2)
 					{
-						$user['avatar'] = "=\"". $user['profilelink'] . "?action=avatarep_popup\" class=\"pm_member{$uid}\">".$user['avatar']."</a>";						
+						$user['avatar'] = "=\"". $user['profilelink'] . "?action=avatarep_popup\" class=\"pm_member{$uid}\" title=\"".$user['username']."\">".$user['avatar']."</a>";						
 					}
 					else
 					{
-						$user['avatar'] = "<a href=\"javascript:void(0)\" id=\"pm_member{$myid}\" {$avatar_events}=\"MyBB.popupWindow('". $user['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";						
+						$user['avatar'] = "<a href=\"javascript:void(0)\" id=\"pm_member{$myid}\" title=\"".$user['username']."\" {$avatar_events}=\"MyBB.popupWindow('". $user['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";						
 					}				
 				}
 				else
 				{
 					if($mybb->settings['avatarep_menu_events'] == 2)
 					{
-						$user['avatar'] = "=\"member.php?uid={$uid}&amp;action=avatarep_popup\" class=\"pm_member{$uid}\">".$user['avatar']."</a>";
+						$user['avatar'] = "=\"member.php?uid={$uid}&amp;action=avatarep_popup\" class=\"pm_member{$uid}\" title=\"".$user['username']."\">".$user['avatar']."</a>";
 					}
 					else
 					{
-						$user['avatar'] = "<a href=\"javascript:void(0)\" id=\"pm_member{$myid}\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";						
+						$user['avatar'] = "<a href=\"javascript:void(0)\" id=\"pm_member{$myid}\" title=\"".$user['username']."\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";						
 					}
 				}			
 			}
 			else
 			{
-				$user['avatar'] = 	"<a href=\"". $user['profilelink'] . "\" id=\"pm_member{$myid}\">".$user['avatar']."</a>";
+				$user['avatar'] = 	"<a href=\"". $user['profilelink'] . "\" id=\"pm_member{$myid}\" title=\"".$user['username']."\">".$user['avatar']."</a>";
 			}			
 			$replace[] = $user['avatar'];
 		}
@@ -2705,16 +2676,19 @@ function avatarep_portal_lt()
 			}
 			$find[] = "<avatarep[{$user['uid']}]['avatar']>";
 			if(empty($user['avatar']) && $user['uid'] > 0){
-				$user['avatar'] = "images/default_avatar.png";
-				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']} Avatar\" style=\"display: inline-block;\" /><br />";
-			}else if(empty($user['avatar']) && $user['uid'] == 0 && $mybb->settings['avatarep_guests'] == 1){
+				$lang->avatarep_user_alt = $lang->sprintf($lang->avatarep_user_alt, htmlspecialchars_uni($user['username']));										
 				$user['avatar'] = "images/default_avatar.png";				
-				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']} Avatar\" style=\"display: inline-block;\" /><br />";							
+				$user['avatar'] = "<img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$lang->avatarep_user_alt}\" style=\"display: block;\" />";
+			}else if(empty($user['avatar']) && $user['uid'] == 0 && $mybb->settings['avatarep_guests'] == 1){
+				$lang->avatarep_user_alt = $lang->sprintf($lang->avatarep_user_alt, htmlspecialchars_uni($user['username']));			
+				$user['avatar'] = "images/default_avatar.png";				
+				$user['avatar'] = "<img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$lang->avatarep_user_alt}\" style=\"display: block;\" />";							
 			}else if(empty($user['avatar']) && $user['uid'] == 0 && $mybb->settings['avatarep_guests'] == 0){
 				$user['avatar'] = "";								
 			}else{
+				$lang->avatarep_user_alt = $lang->sprintf($lang->avatarep_user_alt, htmlspecialchars_uni($user['username']));				
 				$user['avatar'] = htmlspecialchars_uni($user['avatar']);
-				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']} Avatar\" style=\"display: inline-block;\" /><br />";							
+				$user['avatar'] = "<img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$lang->avatarep_user_alt}\" style=\"display: block;\" />";							
 			}
 			if($mybb->settings['avatarep_menu'] == 1)
 			{
@@ -2722,28 +2696,33 @@ function avatarep_portal_lt()
 				{
 					if($mybb->settings['avatarep_menu_events'] == 2)
 					{
-						$user['avatar'] = "=\"{$user['profilelink']}?action=avatarep_popup\" class=\"plt_member{$uid}\" title=\"".$user['username']."\">".$user['avatar']."</a>";					
+						$lang->avatarep_user_alt_thread_first = $lang->sprintf($lang->avatarep_user_alt_thread_first, htmlspecialchars_uni($user['username']));						
+						$user['avatar'] = "=\"{$user['profilelink']}?action=avatarep_popup\" class=\"plt_member{$uid}\" title=\"".$lang->avatarep_user_alt_thread_first."\">".$user['avatar']."</a>";					
 					}
 					else
 					{
-						$user['avatar'] = "<a href=\"javascript:void(0)\" class=\"plt_member{$myid}\" title=\"".$user['username']."\" {$avatar_events}=\"MyBB.popupWindow('". $user['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
+						$lang->avatarep_user_alt_thread_first = $lang->sprintf($lang->avatarep_user_alt_thread_first, htmlspecialchars_uni($user['username']));						
+						$user['avatar'] = "<a href=\"javascript:void(0)\" class=\"plt_member{$myid}\" title=\"".$lang->avatarep_user_alt_thread_first."\" {$avatar_events}=\"MyBB.popupWindow('". $user['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
 					}
 				}
 				else					
 				{
 					if($mybb->settings['avatarep_menu_events'] == 2)
 					{
-						$user['avatar'] = "=\"member.php?uid={$uid}&amp;action=avatarep_popup\" class=\"plt_member{$uid}\" title=\"".$user['username']."\">".$user['avatar']."</a>";
+						$lang->avatarep_user_alt_thread_first = $lang->sprintf($lang->avatarep_user_alt_thread_first, htmlspecialchars_uni($user['username']));																			
+						$user['avatar'] = "=\"member.php?uid={$uid}&amp;action=avatarep_popup\" class=\"plt_member{$uid}\" title=\"".$lang->avatarep_user_alt_thread_first."\">".$user['avatar']."</a>";
 					}
 					else
 					{
-						$user['avatar'] = "<a href=\"javascript:void(0)\" class=\"plt_member{$myid}\" title=\"".$user['username']."\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
+						$lang->avatarep_user_alt_thread_first = $lang->sprintf($lang->avatarep_user_alt_thread_first, htmlspecialchars_uni($user['username']));													
+						$user['avatar'] = "<a href=\"javascript:void(0)\" class=\"plt_member{$myid}\" title=\"".$lang->avatarep_user_alt_thread_first."\" {$avatar_events}=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
 					}
 				}	
 			}
 			else
 			{
-				$user['avatar'] = 	"<a href=\"". $user['profilelink'] . "\" class=\"plt_member{$myid}\" title=\"".$user['username']."\">".$user['avatar']."</a>";
+				$lang->avatarep_user_alt_thread_first = $lang->sprintf($lang->avatarep_user_alt_thread_first, htmlspecialchars_uni($user['username']));							
+				$user['avatar'] = 	"<a href=\"". $user['profilelink'] . "\" class=\"plt_member{$myid}\" title=\"".$lang->avatarep_user_alt_thread_first."\">".$user['avatar']."</a>";
 			}		
 			$replace[] = $user['avatar'];		
 		}
@@ -3001,17 +2980,18 @@ function avatarep_portal_sb()
 				$replace[] = ">".format_name($user['userusername'],$user['usergroup'],$user['displaygroup'])."<";	
 			}
 			$find[] = "<avatarep[{$user['uid']}]['avatar']>";
+			$lang->avatarep_user_alt = $lang->sprintf($lang->avatarep_user_alt, htmlspecialchars_uni($user['username']));			
 			if(empty($user['avatar']) && $user['uid'] > 0){
 				$user['avatar'] = "images/default_avatar.png";
-				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']} Avatar\" alt=\"{$user['username']}\" style=\"display: inline-block;\" /><br />";							
+				$user['avatar'] = "<img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$lang->avatarep_user_alt}\" style=\"display: block;\" />";							
 			}else if(empty($user['avatar']) && $user['uid'] == 0 && $mybb->settings['avatarep_guests'] == 1){
 				$user['avatar'] = "images/default_avatar.png";				
-				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']} Avatar\" alt=\"{$user['username']}\" style=\"display: inline-block;\" /><br />";							
+				$user['avatar'] = "<img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$lang->avatarep_user_alt}\" style=\"display: block;\" />";							
 			}else if(empty($user['avatar']) && $user['uid'] == 0 && $mybb->settings['avatarep_guests'] == 0){
 				$user['avatar'] = "";								
 			}else{
 				$user['avatar'] = htmlspecialchars_uni($user['avatar']);
-				$user['avatar'] = "<br /><img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$user['username']} Avatar\" style=\"display: inline-block;\" /><br />";							
+				$user['avatar'] = "<img class=\"avatarep_img\" src=\"{$user['avatar']}\" alt=\"{$lang->avatarep_user_alt}\" style=\"display: block;\" />";							
 			}
 			if($mybb->settings['avatarep_menu'] == 1)
 			{
@@ -3030,7 +3010,7 @@ function avatarep_portal_sb()
 				{
 					if($mybb->settings['avatarep_menu_events'] == 2)
 					{
-						$user['avatar'] = "=\"member.php?uid={$uid}&amp;action=avatarep_popup\" title=\"".$user['username']."\" class=\"plt_member{$uid}\">".$user['avatar']."</a>";
+						$user['avatar'] = "=\"member.php?uid={$uid}&amp;action=avatarep_popup\" class=\"plt_member{$uid}\" title=\"".$user['username']."\">".$user['avatar']."</a>";
 					}
 					else
 					{
