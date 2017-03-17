@@ -182,7 +182,7 @@ function avatarep_activate() {
         'title' =>  $db->escape_string($lang->avatarep_menu),
         'description' => $db->escape_string($lang->avatarep_menu_descrip),
         'optionscode' => 'yesno',
-        'value' => '1',
+        'value' => '0',
         'disporder' => 80,
         'gid' => $group['gid']
     );
@@ -212,7 +212,7 @@ function avatarep_activate() {
         'title' =>  $db->escape_string($lang->avatarep_format),
         'description' => $db->escape_string($lang->avatarep_format_descrip),
         'optionscode' => 'yesno',
-        'value' => '1',
+        'value' => '0',
         'disporder' => 110,
         'gid' => $group['gid']
     );
@@ -359,93 +359,6 @@ function avatarep_activate() {
 		);
 	$db->insert_query("templates", $templatearray);
 
-	// Añadir el css para la tipsy
-	$avatarep_css = '.modal_avatar{display: none;width: auto;height: auto;background: #f0f0f0;border: none;border-radius: 10px;position: absolute;z-index: 99999;}
-.tavatar {padding: 0px 10px;text-align: center;}
-.tavatar img {height: 80px;width: 80px;padding: 8px;}
-.avatarep_online {border: 1px solid #008000;box-shadow: 1px 1px 4px 2px rgba(14, 252, 14, 0.8);border-radius: 5px;opacity: 0.8;}
-.avatarep_offline{border: 1px solid #FFA500;box-shadow: 1px 1px 4px 2px rgba(252, 165, 14, 0.8);border-radius: 5px;opacity: 0.8;}
-.hr {background-color:#089;}
-.trow_profile{vertical-align: top;padding-left: 9px;width:340px;color:#424242;}
-.trow_profile a{color: #051517;}
-.trow_profile a:hover{color: #e09c09;}
-.trow_uprofile{min-height:175px;line-height:1.2;}
-.trow_uname{font-size:15px;}
-.trow_memprofile{font-size:11px;font-weight:bold;}
-.trow_status{font-size: 11px;}
-.avatarep_img{padding: 3px;border: 1px solid #D8DFEA;width: 44px;height: 44px;border-radius: 50%;opacity: 0.9;margin: 0px 5px 0px 2px;}';
-
-	$stylesheet = array(
-		"name"			=> "avatarep.css",
-		"tid"			=> 1,
-		"attachedto"	=> '',		
-		"stylesheet"	=> $db->escape_string($avatarep_css),
-		"cachefile"		=> "avatarep.css",
-		"lastmodified"	=> TIME_NOW
-	);
-
-	$sid = $db->insert_query("themestylesheets", $stylesheet);
-	
-	//Archivo requerido para cambios en estilos y plantillas.
-	require_once MYBB_ADMIN_DIR.'/inc/functions_themes.php';
-	cache_stylesheet($stylesheet['tid'], $stylesheet['cachefile'], $avatarep_css);
-	update_theme_stylesheet_list(1, false, true);
-	
-		/* Variables de imágen válidas, las normales son las que traen ya todo el código preformateado con la imágen y todo incluido...
-
-		Lista de los foros:
-		$forum['avatar'] - Ruta de la imagen
-		$forum['avatarep'] - Código preformateado
-			
-		Anuncios:
-		$anno_avatar['avatar'] - Ruta de la imagen
-		$anno_avatar['avatarep'] - Código preformateado
-
-		Temas:
-		$avatarep_avatar['avatar'] - creador del tema (Ruta de la imagen)
-		$avatarep_lastpost['avatar'] - ultimo envío (Ruta de la imagen)
-		$avatarep_avatar['avatar'] - creador del tema (Código preformateado)
-		$avatarep_lastpost['avatar'] - ultimo envío (Código preformateado)
-
-		Foros:
-
-		$forum['avatarep_lastpost']['avatar'] - Ruta de la imagen
-		$forum['avatarep_lastpost']['avatarep'] - Código preformateado
-		
-		Ventana desplegable (Menú al dar clic en el avatar):
-		$memprofile['avatar'] - Ruta de la imagen
-		$memprofile['avatarep'] - Código preformateado
-		
-		Mostrar Tema:
-		$avatarep['avatar'] - plugin SEO
-		
-		Mensajería Privada:
-		<avatarep[{$tofromuid}]['avatar']>
-		<avatarep[{$readmessage['toid']}]['avatar']>
-		<avatarep[{$unreadmessage['toid']}]['avatar']>
-		
-		Portal:
-		<avatarep[{$thread['lastposteruid']}]['avatar']>				
-		*/
-		
-    //Archivo requerido para reemplazo de templates
-    require_once '../inc/adminfunctions_templates.php';
-	
-    // Reemplazos que vamos a hacer en las plantillas 1.- Platilla 2.- Contenido a Reemplazar 3.- Contenido que reemplaza lo anterior
-	find_replace_templatesets("forumbit_depth2_forum_lastpost", '#'.preg_quote('{$lastpost_profilelink}').'#', '{$forum[\'avatarep\']}{$lastpost_profilelink}');
-    find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$thread[\'profilelink\']}').'#', '{$avatarep_avatar[\'avatarep\']}{$thread[\'profilelink\']}');
-    find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$lastposterlink}').'#', '{$avatarep_lastpost[\'avatarep\']}{$lastposterlink}');	   
-	find_replace_templatesets("forumdisplay_announcements_announcement", '#'.preg_quote('{$announcement[\'profilelink\']}').'#', '{$anno_avatar[\'avatarep\']}{$announcement[\'profilelink\']}');	
-    find_replace_templatesets("search_results_threads_thread", '#'.preg_quote('{$thread[\'profilelink\']}').'#', '{$avatarep_avatar[\'avatarep\']}{$thread[\'profilelink\']}');
-    find_replace_templatesets("search_results_threads_thread", '#'.preg_quote('{$lastposterlink}').'#', '{$avatarep_lastpost[\'avatarep\']}{$lastposterlink}');
-    find_replace_templatesets("search_results_posts_post", '#'.preg_quote('{$post[\'profilelink\']}').'#', '{$avatarep_avatar[\'avatarep\']}{$post[\'profilelink\']}');
-    find_replace_templatesets("private_messagebit", '#'.preg_quote('{$tofromusername}').'#', '<avatareplt_start[{$message[\'pmid\']}]><avatarep[{$tofromuid}][\'avatar\']><avatareplt_end[{$message[\'pmid\']}]>{$tofromusername}');
-    find_replace_templatesets("private_tracking_readmessage", '#'.preg_quote('{$readmessage[\'profilelink\']}').'#', '<avatareplt_start[{$readmessage[\'pmid\']}]><avatarep[{$readmessage[\'toid\']}][\'avatar\']><avatareplt_end[{$readmessage[\'pmid\']}]>{$readmessage[\'profilelink\']}');
-    find_replace_templatesets("private_tracking_unreadmessage", '#'.preg_quote('{$unreadmessage[\'profilelink\']}').'#', '<avatareplt_start[{$unreadmessage[\'pmid\']}]><avatarep[{$unreadmessage[\'toid\']}][\'avatar\']><avatareplt_end[{$unreadmessage[\'pmid\']}]>{$unreadmessage[\'profilelink\']}');
-	find_replace_templatesets("portal_latestthreads_thread", '#'.preg_quote('{$lastposterlink}').'#', '<avatareplt_start[{$thread[\'tid\']}]><avatarep[{$thread[\'lastposteruid\']}][\'avatar\']><avatareplt_end[{$thread[\'tid\']}]>{$lastposterlink}');
-
-	//Se actualiza la info de las plantillas
-	$cache->update_forums();
 	rebuild_settings();
 }
 
@@ -457,46 +370,6 @@ function avatarep_deactivate() {
 	$db->delete_query("settinggroups", "name='avatarep'");
 	$db->delete_query('datacache', "title = 'anno_cache'");
 	$db->delete_query("templates", "title IN('avatarep_popup', 'avatarep_popup_error', 'avatarep_popup_hover', 'avatarep_popup_error_hover')");
-	
-    //Eliminamos la hoja de estilo creada...
-   	$db->delete_query('themestylesheets', "name='avatarep.css'");
-	$query = $db->simple_select('themes', 'tid');
-	while($theme = $db->fetch_array($query))
-	{
-		require_once MYBB_ADMIN_DIR.'inc/functions_themes.php';
-		update_theme_stylesheet_list($theme['tid']);
-	}
-
-    //Archivo requerido para reemplazo de templates
- 	require_once '../inc/adminfunctions_templates.php';
-	
-    //Reemplazos que vamos a hacer en las plantillas 1.- Platilla 2.- Contenido a Reemplazar 3.- Contenido que reemplaza lo anterior
-	find_replace_templatesets("headerinclude", '#'.preg_quote('<script type="text/javascript" src="{$mybb->settings[\'bburl\']}/images/avatarep/avatarep.js"></script>').'#', '', 0);
-    find_replace_templatesets("forumbit_depth2_forum_lastpost", '#'.preg_quote('{$forum[\'avatarep\']}').'#', '', 0);	
-    find_replace_templatesets("forumbit_depth2_forum_lastpost", '#'.preg_quote('{$forum[\'lastposter\']}').'#', '{$lastpost_profilelink}');
-    find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$avatarep_avatar[\'avatarep\']}').'#', '',0);
-    find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$thread[\'owner\']}').'#', '{$thread[\'profilelink\']}');
-    find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$avatarep_lastpost[\'avatarep\']}').'#', '',0);
-    find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$thread[\'lastposter\']}').'#', '{$lastposterlink}');	
-    find_replace_templatesets("forumdisplay_announcements_announcement", '#'.preg_quote('{$anno_avatar[\'avatarep\']}').'#', '',0);
-    find_replace_templatesets("search_results_threads_thread", '#'.preg_quote('{$avatarep_avatar[\'avatarep\']}').'#', '',0);
-    find_replace_templatesets("search_results_threads_thread", '#'.preg_quote('{$avatarep_lastpost[\'avatarep\']}').'#', '',0);
-    find_replace_templatesets("search_results_posts_post", '#'.preg_quote('{$avatarep_avatar[\'avatarep\']}').'#', '',0);
-	find_replace_templatesets("private_messagebit", '#'.preg_quote('<avatareplt_start[{$message[\'pmid\']}]>').'#', '',0);
-    find_replace_templatesets("private_tracking_readmessage", '#'.preg_quote('<avatareplt_start[{$readmessage[\'pmid\']}]>').'#', '',0);
-    find_replace_templatesets("private_tracking_unreadmessage", '#'.preg_quote('<avatareplt_start[{$unreadmessage[\'pmid\']}]>').'#', '',0);
-	find_replace_templatesets("portal_latestthreads_thread", '#'.preg_quote('<avatareplt_start[{$thread[\'tid\']}]>').'#', '',0);		
-	find_replace_templatesets("private_messagebit", '#'.preg_quote('<avatareplt_end[{$message[\'pmid\']}]>').'#', '',0);
-    find_replace_templatesets("private_tracking_readmessage", '#'.preg_quote('<avatareplt_end[{$readmessage[\'pmid\']}]>').'#', '',0);
-    find_replace_templatesets("private_tracking_unreadmessage", '#'.preg_quote('<avatareplt_end[{$unreadmessage[\'pmid\']}]>').'#', '',0);
-	find_replace_templatesets("portal_latestthreads_thread", '#'.preg_quote('<avatareplt_end[{$thread[\'tid\']}]>').'#', '',0);	
-    find_replace_templatesets("private_messagebit", '#'.preg_quote('<avatarep[{$tofromuid}][\'avatar\']>').'#', '',0);
-    find_replace_templatesets("private_tracking_readmessage", '#'.preg_quote('<avatarep[{$readmessage[\'toid\']}][\'avatar\']>').'#', '',0);
-    find_replace_templatesets("private_tracking_unreadmessage", '#'.preg_quote('<avatarep[{$unreadmessage[\'toid\']}][\'avatar\']>').'#', '',0);
-	find_replace_templatesets("portal_latestthreads_thread", '#'.preg_quote('<avatarep[{$thread[\'lastposteruid\']}][\'avatar\']>').'#', '',0);	
-	
-    //Se actualiza la info de las plantillas
-    $cache->update_forums();
     rebuild_settings();
 }
 
