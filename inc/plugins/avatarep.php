@@ -1977,11 +1977,12 @@ function avatarep_style_output(&$content){
 
 function avatarep_private_end()
 {
-	global $db, $messagelist, $mybb, $unreadmessages, $readmessages, $avatar_events;
+	global $lang, $db, $messagelist, $mybb, $unreadmessages, $readmessages, $avatar_events;
 	if($mybb->settings['avatarep_active'] == 0)
     {
         return false;
     }
+	$lang->load('avatarep',false,true);
 	if($mybb->settings['avatarep_menu'] == 1){	
 		if($mybb->settings['avatarep_menu_events'] == 2)
 		{
@@ -2300,11 +2301,12 @@ function avatarep_portal()
 
 function avatarep_portal_lt()
 {
-	global $db, $mybb, $latestthreads, $avatar_events;
+	global $lang, $db, $mybb, $latestthreads, $avatar_events;
 	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_portal'] == 0)
     {
         return false;
     }
+	$lang->load('avatarep',false,true);
 	if($mybb->settings['avatarep_menu'] == 1){	
 		if($mybb->settings['avatarep_menu_events'] == 2)
 		{
@@ -2605,11 +2607,12 @@ function avatarep_portal_lt()
 
 function avatarep_portal_sb()
 {
-	global $db, $mybb, $sblatestthreads, $avatar_events;
+	global $lang, $db, $mybb, $sblatestthreads, $avatar_events;
 	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_portal'] == 0)
     {
         return false;
     }
+	$lang->load('avatarep',false,true);
 	if($mybb->settings['avatarep_menu'] == 1){	
 		if($mybb->settings['avatarep_menu_events'] == 2)
 		{
@@ -2912,8 +2915,8 @@ function avatarep_popup()
 	
     if($mybb->input['action'] == "avatarep_popup"){
 
-	$lang->load("member");
-	$lang->load("avatarep");
+	$lang->load("member",false,true);
+	$lang->load("avatarep",false,true);
 	$uid = intval($mybb->input['uid']);
 	
     if($mybb->usergroup['canviewprofiles'] == 0)
