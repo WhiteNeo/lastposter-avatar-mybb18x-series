@@ -2078,7 +2078,7 @@ function avatarep_modals_hover($myid, $name)
 {
 	global $mybb, $lang;
     //Revisar que la opcion este activa
-    if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_menu'] == 0)
+    if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_menu'] == 0 && $mybb->settings['avatarep_menu_events'] == 2)
     {
 		return false;	
 	}
@@ -2130,17 +2130,34 @@ function avatarep_modals_hover($myid, $name)
 			}
 		else
 		{
-			$(\"div#{$name}_mod{$myid}\").fadeIn(\"slow\")
+			$(\"div#{$name}_mod{$myid}\").fadeIn(\"slow\");
 		}						
 		}).on(\"mouseleave\", function(){
 			if(myTimer)
 			clearTimeout(myTimer);				
-			$(\"div#{$name}_mod{$myid}\").fadeOut(\"fast\")
+			$(\"div#{$name}_mod{$myid}\").fadeOut(\"fast\");
 			$(this).stop();
 		});
 	});
 </script>
-<!-- Last post avatar v2.9.x end-->";	
+<!-- Last post avatar v2.9.x end-->";
+	return $avatarep_hover;
+}
+
+function avatarep_hover_extends($id, $name)
+{
+	global $mybb, $lang;
+    //Revisar que la opcion este activa
+    if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_menu'] == 0 && $mybb->settings['avatarep_menu_events'] == 2)
+    {
+		return false;	
+	}
+	$lang->load("avatarep", false, true);
+	$timeloader = 1000;
+	$avatarep_script = '<script type="text/javascript">var lpamyid = "'.$id.'";var lpaname = "'.$name.'"; var lpatimer="600";</script><script type="text/javascript" src="'.$mybb->settings['bburl'].'/jscripts/avatarep.js?ver=292"></script>';
+	$avatarep_hover = "<div class=\"modal_avatar\" id=\"{$name}mod{$id}\"></div>
+{$avatarep_script}
+<!-- Last post avatar v2.9.x extends-->";
 	return $avatarep_hover;
 }
 
