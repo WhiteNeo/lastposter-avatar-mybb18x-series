@@ -249,6 +249,25 @@ Change all content to this:
 </tr>
 ```
 
+For plugin extensions you may use this code:
+
+avatarep_hover_extends($id, $name)
+
+This function at the end of links with the id of items and name for items:
+
+Sample extends mentionme:
+
+$id = (int)$user['id'];
+$name = "mention_";
+
+That in the plugin part of mention calls.
+
+Video of referral:
+
+https://mega.nz/#!nh5kFaDa!xIU47jseVelDkBwnkDswfwVJEFflUgkAJtg6IOnT0M8
+
+This is a proof of concept and is not ready at all to use it until test have pased by.
+
 And done it !!!!
 
 This actual guide is only for latest releaded version, if you have lesser versions you have to follow previous guidances. And it's a reference only with default theme, you have to customie it as the latest sended information on mybb official siteif you have a customized theme.
