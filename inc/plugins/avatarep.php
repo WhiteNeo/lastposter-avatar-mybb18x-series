@@ -376,7 +376,7 @@ function avatarep_activate() {
 .trow_status{font-size: 11px;}
 .avatarep_img_contributor{padding: 1px;border: 1px solid #D8DFEA;width: 22px;height: 22px;border-radius: 50%;opacity: 0.9;margin: 0px 5px 0px 2px;}
 .avatarep_img{padding: 3px;border: 1px solid #D8DFEA;width: 44px;height: 44px;border-radius: 50%;opacity: 0.9;margin: 0px 5px 0px 2px;}
-.avatarep_fd{float:left;}';
+.avatarep_fd{float:left;margin: 0px -5px}';
 
 	$stylesheet = array(
 		"name"			=> "avatarep.css",
@@ -436,7 +436,7 @@ function avatarep_activate() {
 	
     // Reemplazos que vamos a hacer en las plantillas 1.- Platilla 2.- Contenido a Reemplazar 3.- Contenido que reemplaza lo anterior
 	//find_replace_templatesets("forumbit_depth2_forum_lastpost", '#'.preg_quote('{$lastpost_profilelink}').'#', '{$forum[\'avatarep\']}{$lastpost_profilelink}');
-	find_replace_templatesets("headerinclude",'#'.preg_quote('{$stylesheets}').'#', '{$stylesheets}{$avatarep_script}');		
+	find_replace_templatesets("showthread",'#'.preg_quote('{$headerinclude}').'#', '{$headerinclude}{$avatarep_script}');		
     find_replace_templatesets("forumbit_depth2_forum_lastpost", '#^(.*)$#s', '{$forum[\'avatarep\']}' . "\r\n\\1");	
     find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$thread[\'profilelink\']}').'#', '{$avatarep_avatar[\'avatarep\']}{$thread[\'profilelink\']}');
     find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$lastposterlink}').'#', '{$avatarep_lastpost[\'avatarep\']}{$lastposterlink}');	   
@@ -458,7 +458,7 @@ function avatarep_deactivate() {
     //Variables que vamos a utilizar
 	global $mybb, $cache, $db;
     // Borrar el grupo de opciones
-	$db->delete_query("settings", "name IN ('avatarep_active','avatarep_foros','avatarep_temas','avatarep_temas2','avatarep_anuncios','avatarep_portal','avatarep_busqueda','avatarep_menu','avatarep_menu_events','avatarep_guests','avatarep_format','avatarep_version',)");
+	$db->delete_query("settings", "name IN ('avatarep_active','avatarep_foros','avatarep_temas','avatarep_temas2','avatarep_anuncios','avatarep_portal','avatarep_busqueda','avatarep_menu','avatarep_menu_events','avatarep_guests','avatarep_format','avatarep_version')");
 	$db->delete_query("settinggroups", "name='avatarep'");
 	$db->delete_query('datacache', "title = 'anno_cache'");
 	$db->delete_query("templates", "title IN('avatarep_popup', 'avatarep_popup_error', 'avatarep_popup_hover', 'avatarep_popup_error_hover')");
@@ -477,13 +477,10 @@ function avatarep_deactivate() {
 	
     //Reemplazos que vamos a hacer en las plantillas 1.- Platilla 2.- Contenido a Reemplazar 3.- Contenido que reemplaza lo anterior
 	find_replace_templatesets("headerinclude", '#'.preg_quote('<script type="text/javascript" src="{$mybb->settings[\'bburl\']}/images/avatarep/avatarep.js"></script>').'#', '', 0);
-	find_replace_templatesets("headerinclude", '#'.preg_quote('{$avatarep_script}').'#', '', 0);
+	find_replace_templatesets("showthread", '#'.preg_quote('{$avatarep_script}').'#', '', 0);
     find_replace_templatesets("forumbit_depth2_forum_lastpost", '#'.preg_quote('{$forum[\'avatarep\']}').'#', '', 0);	
-    find_replace_templatesets("forumbit_depth2_forum_lastpost", '#'.preg_quote('{$forum[\'lastposter\']}').'#', '{$lastpost_profilelink}');
     find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$avatarep_avatar[\'avatarep\']}').'#', '',0);
-    find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$thread[\'owner\']}').'#', '{$thread[\'profilelink\']}');
     find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$avatarep_lastpost[\'avatarep\']}').'#', '',0);
-    find_replace_templatesets("forumdisplay_thread", '#'.preg_quote('{$thread[\'lastposter\']}').'#', '{$lastposterlink}');	
     find_replace_templatesets("forumdisplay_announcements_announcement", '#'.preg_quote('{$anno_avatar[\'avatarep\']}').'#', '',0);
     find_replace_templatesets("search_results_threads_thread", '#'.preg_quote('{$avatarep_avatar[\'avatarep\']}').'#', '',0);
     find_replace_templatesets("search_results_threads_thread", '#'.preg_quote('{$avatarep_lastpost[\'avatarep\']}').'#', '',0);
@@ -2298,19 +2295,21 @@ function avatarep_hover_extends($id, $name)
 
 function avatarep_popup()
 {
-    global $lang, $mybb, $templates, $avatarep_popup, $db;
+    global $lang, $mybb, $templates, $avatarep_popup, $db, $avatarep_script;
 
 	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_menu'] == 0)
     {
         return false;
     }
-	
+	if($mybb->settings['avatarep_menu_events'] == 2 && THIS_SCRIPT == "showthread.php")
+	{
+		$avatarep_script = "<script type=\"text/javascript\" src=\"{$mybb->asset_url}/jscripts/avatarep.js?ver=292\"></script>";
+	}
     if($mybb->input['action'] == "avatarep_popup"){
 
 	$lang->load("member", false, true);
 	$lang->load("avatarep", false, true);
 	$uid = intval($mybb->input['uid']);
-	$avatarep_script = 	"<script type=\"text/javascript\" src=\"{\$mybb->asset_url}/jscripts/avatarep.js?ver=292\"></script>";
 
     if($mybb->usergroup['canviewprofiles'] == 0)
     {
