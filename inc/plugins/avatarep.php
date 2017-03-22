@@ -182,7 +182,7 @@ function avatarep_activate() {
         'title' =>  $db->escape_string($lang->avatarep_menu),
         'description' => $db->escape_string($lang->avatarep_menu_descrip),
         'optionscode' => 'yesno',
-        'value' => '0',
+        'value' => '1',
         'disporder' => 80,
         'gid' => $group['gid']
     );
@@ -192,7 +192,7 @@ function avatarep_activate() {
         'title' =>  $db->escape_string($lang->avatarep_menu_events),
         'description' => $db->escape_string($lang->avatarep_menu_events_descrip),
         'optionscode' => 'select \n1=On Click \n2=Mouse Over',
-        'value' => '2',
+        'value' => '1',
         'disporder' => 90,
         'gid' => $group['gid']
     );
@@ -212,7 +212,7 @@ function avatarep_activate() {
         'title' =>  $db->escape_string($lang->avatarep_format),
         'description' => $db->escape_string($lang->avatarep_format_descrip),
         'optionscode' => 'yesno',
-        'value' => '0',
+        'value' => '1',
         'disporder' => 110,
         'gid' => $group['gid']
     );
@@ -358,6 +358,7 @@ function avatarep_activate() {
 		'dateline' => TIME_NOW
 		);
 	$db->insert_query("templates", $templatearray);
+
 	rebuild_settings();
 }
 
@@ -365,10 +366,11 @@ function avatarep_deactivate() {
     //Variables que vamos a utilizar
 	global $mybb, $cache, $db;
     // Borrar el grupo de opciones
-	$db->delete_query("settings", "name IN ('avatarep_active','avatarep_foros','avatarep_temas','avatarep_temas2','avatarep_anuncios','avatarep_portal','avatarep_busqueda','avatarep_menu','avatarep_menu_events','avatarep_guests','avatarep_format','avatarep_version',)");
+	$db->delete_query("settings", "name IN ('avatarep_active','avatarep_foros','avatarep_temas','avatarep_temas2','avatarep_anuncios','avatarep_portal','avatarep_busqueda','avatarep_menu','avatarep_menu_events','avatarep_guests','avatarep_format','avatarep_version')");
 	$db->delete_query("settinggroups", "name='avatarep'");
 	$db->delete_query('datacache', "title = 'anno_cache'");
-	$db->delete_query("templates", "title IN('avatarep_popup', 'avatarep_popup_error', 'avatarep_popup_hover', 'avatarep_popup_error_hover')");	
+	$db->delete_query("templates", "title IN('avatarep_popup', 'avatarep_popup_error', 'avatarep_popup_hover', 'avatarep_popup_error_hover')");
+	
     rebuild_settings();
 }
 
@@ -386,7 +388,8 @@ function avatarep_format_avatar($user)
 				$avatar = $mybb->settings['bburl'] . "/" . $user['avatar'];
 			}
 			else if($user['avatartype'] == "gallery"){
-					$avatar = $mybb->settings['bburl'] . "/" . $user['avatar'];
+				//UPDATE `miforo_users` set avatar = REPLACE(avatar, './uploads/', 'uploads/');
+				$avatar = $mybb->settings['bburl'] . "/" . $user['avatar'];
 			}
 			else if($user['avatartype'] == "remote"){
 				$avatar = $user['avatar'];
@@ -2093,7 +2096,7 @@ function avatarep_modals_hover($myid, $name)
 			e.preventDefault();	
 			return false;
 		});
-		$(\"a#{$name}_member{$myid}\").on(\"mouseenter\", function(){
+		$(\"a#{$name}_member{$myid}\").on(\"mouseover\", function(){
 		var Nava = '{$myid}';
 		var ID_href = $(this).attr(\"href\");
 		var Data = \"id=\" + ID_href;
@@ -2132,7 +2135,7 @@ function avatarep_modals_hover($myid, $name)
 		{
 			$(\"div#{$name}_mod{$myid}\").fadeIn(\"slow\");
 		}						
-		}).on(\"mouseleave\", function(){
+		}).on(\"mouseout\", function(){
 			if(myTimer)
 			clearTimeout(myTimer);				
 			$(\"div#{$name}_mod{$myid}\").fadeOut(\"fast\");
@@ -2153,29 +2156,32 @@ function avatarep_hover_extends($id, $name)
 		return false;	
 	}
 	$lang->load("avatarep", false, true);
-	$timeloader = 1000;
-	$avatarep_script = '<script type="text/javascript">var lpamyid = "'.$id.'";var lpaname = "'.$name.'"; var lpatimer="600";</script><script type="text/javascript" src="'.$mybb->settings['bburl'].'/jscripts/avatarep.js?ver=292"></script>';
-	$avatarep_hover = "<div class=\"modal_avatar\" id=\"{$name}mod{$id}\"></div>
-{$avatarep_script}
+	$timeloader = 500;
+	$avatar_script = '<script type="text/javascript">var lpaname="'.$name.'";var lpatimer="'.$timeloader.'";</script>';
+	$avatar_hover = "<div class=\"modal_avatar\" id=\"{$name}mod{$id}\"></div>
+{$avatar_script}
 <!-- Last post avatar v2.9.x extends-->";
-	return $avatarep_hover;
+	return $avatar_hover;
 }
 
 function avatarep_popup()
 {
-    global $lang, $mybb, $templates, $avatarep_popup, $db;
+    global $lang, $mybb, $templates, $avatarep_popup, $db, $avatarep_script;
 
 	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_menu'] == 0)
     {
         return false;
     }
-	
+	if($mybb->settings['avatarep_menu_events'] == 2 && THIS_SCRIPT == "showthread.php")
+	{
+		$avatarep_script = "<script type=\"text/javascript\" src=\"{$mybb->asset_url}/jscripts/avatarep.js?ver=292\"></script>";
+	}
     if($mybb->input['action'] == "avatarep_popup"){
 
 	$lang->load("member", false, true);
 	$lang->load("avatarep", false, true);
 	$uid = intval($mybb->input['uid']);
-	
+
     if($mybb->usergroup['canviewprofiles'] == 0)
     {
 		if($mybb->settings['avatarep_menu_events'] == 2)
@@ -2263,5 +2269,4 @@ function avatarep_popup()
 		exit;
 	}
 }
-
 ?>
