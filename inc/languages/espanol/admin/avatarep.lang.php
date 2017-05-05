@@ -28,6 +28,9 @@ $l['avatarep_thread_owner_descrip'] = "Muestra el avatar del creador del Tema";
 $l['avatarep_thread_lastposter'] = "Mostrar Avatar en Temas";
 $l['avatarep_thread_lastposter_descrip'] = "Muestra el avatar del ultimo que contesto al mensaje";
 
+$l['avatarep_thread_contributor'] = "Mostrar Avatar del Contribuyente en Temas";
+$l['avatarep_thread_contributor_descrip'] = "Muestra el avatar del creador del tema en la lista de temas, o si has respondido el tuyo";
+
 $l['avatarep_thread_announcements'] = "Mostrar Avatar en Anuncios";
 $l['avatarep_thread_announcements_descrip'] = "Muestra el avatar del usuario que creo los anuncios";
 
@@ -48,4 +51,12 @@ $l['avatarep_guests_descrip'] = "Muestra el avatar predeterminado a usuarios inv
 
 $l['avatarep_format'] = "Nombres de usuario formateados";
 $l['avatarep_format_descrip'] = "Muestra los nombres de usuario con códigos html configurados en los grupos de usuario";
-?>
+
+$l['avatarep_private'] = "Avatar en mensajes privados";
+$l['avatarep_private_descrip'] = "Mostrar avatar en mensajes privados";
+
+$l['avatarep_latest_threads'] = "Avatar en últimos tema";
+$l['avatarep_latest_threads_descrip'] = "Muestra el avatar de los últimos temas en el Portal y en el índice si existe el plugin SideBox";
+
+$l['avatarep_thread_lastposter_mark'] = "Marcar mis temas respondidos";
+$l['avatarep_thread_lastposter_mark_descrip'] = "Mostrar el avatar del usuario en los temas creados, encima del avatar del creador, para saber a que temas he respondido, (requiere consultas adicionales).";

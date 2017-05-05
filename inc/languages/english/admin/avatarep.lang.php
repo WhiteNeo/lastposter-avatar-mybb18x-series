@@ -48,4 +48,15 @@ $l['avatarep_guests_descrip'] = "Shows default avatar for guests";
 
 $l['avatarep_format'] = "Display formatted usernames";
 $l['avatarep_format_descrip'] = "Shows format names for every usergroup with html code configured";
-?>
+
+$l['avatarep_private'] = "Avatar in Private Messages";
+$l['avatarep_private_descrip'] = "Shows avatar in Private Messages";
+
+$l['avatarep_latest_threads'] = "Avatar in Latest Threads";
+$l['avatarep_latest_threads_descrip'] = "Shows avatar in Portal and SideBoxes plugin for latest threads";
+
+$l['avatarep_thread_lastposter_mark'] = "Mark replied threads";
+$l['avatarep_thread_lastposter_mark_descrip'] = "Show avatar hover thread owner when you have replied to a thread, (requires addittional queries).";
+
+$l['avatarep_thread_contributor'] = "Show Avatar Contributor";
+$l['avatarep_thread_contributor_descrip'] = "Shows avatar of thread owner in showthread, but yours if you've replied to that thread.";
