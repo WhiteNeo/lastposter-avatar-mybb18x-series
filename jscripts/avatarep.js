@@ -1,13 +1,20 @@
+/**
+*@ Autor: Dark Neo
+*@ Fecha: 2013-12-12
+*@ Version: 2.9.3
+*@ Contacto: neogeoman@gmail.com
+*/
 $(document).on("ready", function(){
 	var NavaT = 0;						
 	var myTimer;
-	$('a[id^="'+lpaname+'"]').on('click', function (e) {
+	$('a[class^="'+lpaname+'"]').on('click', function (e) {
 		e.preventDefault();	
 		return false;
 	});
-	$('a[id^="'+lpaname+'"]').on('mouseover', function(){
+	$('a[class^="'+lpaname+'"]').on('mouseover', function(){
 	var Nava = $(this).attr('id');
-	Nava = Nava.substr(8);
+	var Navan = lpaname.length;
+	Nava = Nava.substr(Navan);
 	var ID_href = $(this).attr("href");
 	var Data = "id=" + ID_href;
 	var lpamyid = Nava;
@@ -24,10 +31,7 @@ $(document).on("ready", function(){
 				beforeSend:function()
 				{
 					$("div#"+lpaname+"mod"+lpamyid).css({
-						"display": "block",
-						"margin-top": "0px",
-						"margin-left": "0px",
-						"position": "absolute",
+						"display": "inline-block",
 						"width": 320														
 					});						
 					$("div#"+lpaname+"mod"+lpamyid).fadeIn("fast");										
@@ -35,7 +39,6 @@ $(document).on("ready", function(){
 				},									
 				success:function(res){	
 					NavaT = lpamyid;
-					$("div#"+lpaname+"mod"+lpamyid+" div.modal_avatar").css("display","inline-block");
 					$("div#"+lpaname+"mod"+lpamyid).html(res);
 				}
 			});	
@@ -44,12 +47,15 @@ $(document).on("ready", function(){
 	}
 	else
 	{
+		$(this).stop();
+		$("div#"+lpaname+"mod"+lpamyid).css("display","inline-block");		
 		$("div#"+lpaname+"mod"+lpamyid).fadeIn("slow");
 	}						
 	});
-	$('a[id^="mention_"]').on("mouseout", function(){
+	$('a[class^="'+lpaname+'"]').on("mouseout", function(){
 		var Nava = $(this).attr('id');
-		Nava = Nava.substr(8);
+		var Navan = lpaname.length;
+		Nava = Nava.substr(Navan);
 		var lpamyid = Nava;		
 		if(myTimer)
 		clearTimeout(myTimer);				
