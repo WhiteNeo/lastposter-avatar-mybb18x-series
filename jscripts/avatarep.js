@@ -1,7 +1,7 @@
 /**
 *@ Autor: Dark Neo
 *@ Fecha: 2013-12-12
-*@ Version: 2.9.3
+*@ Version: 2.9.5
 *@ Contacto: neogeoman@gmail.com
 */
 $(document).on("ready", function(){
@@ -12,15 +12,14 @@ $(document).on("ready", function(){
 		return false;
 	});
 	$('a[class^="'+lpaname+'"]').on('mouseover', function(){
-	var Nava = $(this).attr('id');
+	var Nava = $(this).attr('class');
 	var Navan = lpaname.length;
 	Nava = Nava.substr(Navan);
 	var ID_href = $(this).attr("href");
 	var Data = "id=" + ID_href;
 	var lpamyid = Nava;
+	$(this).append('<div id="'+lpaname+'mod'+lpamyid+'" class="modal_avatar"></div>');	
 	console.log(NavaT);
-	if(Nava != NavaT)
-	{
 		myTimer = setTimeout( function()
 		{			
 			$.ajax({
@@ -43,23 +42,16 @@ $(document).on("ready", function(){
 				}
 			});	
 		return false;
-		}, lpatimer);
-	}
-	else
-	{
-		$(this).stop();
-		$("div#"+lpaname+"mod"+lpamyid).css("display","inline-block");		
-		$("div#"+lpaname+"mod"+lpamyid).fadeIn("slow");
-	}						
+		}, lpatimer);				
 	});
 	$('a[class^="'+lpaname+'"]').on("mouseout", function(){
-		var Nava = $(this).attr('id');
+		var Nava = $(this).attr('class');
 		var Navan = lpaname.length;
 		Nava = Nava.substr(Navan);
 		var lpamyid = Nava;		
 		if(myTimer)
 		clearTimeout(myTimer);				
-		$("div#"+lpaname+"mod"+lpamyid).fadeOut("fast");
+		$("div#"+lpaname+"mod"+lpamyid).fadeOut("fast").remove();
 		$(this).stop();
 	});
 });
