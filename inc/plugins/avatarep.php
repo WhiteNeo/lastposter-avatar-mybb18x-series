@@ -1006,8 +1006,11 @@ function avatarep_thread() {
 		{
 			$avatarep_avatar['thread_last_title'] = $lang->sprintf($lang->avatarep_user_alt_thread_last, htmlspecialchars_uni($avatarep_lastpost['username']));						
 			$avatarep_lastpost['avatarep'] = 	"<a href=\"". $avatarep_lastpost['profilelink'] . "\" id=\"tao_member{$thread['tid']}\" title=\"".$avatarep_avatar['thread_last_title']."\">".$avatarep_lastpost['avatarep']."</a>";
-		}
-		$mybb->user['avatar'] = htmlspecialchars_uni($mybb->user['avatar']);
+		}		
+	    	if(empty($mybb->user['avatar']))
+		$mybb->user['avatar'] = "images/default_avatar.png";
+	    	else
+		$mybb->user['avatar'] = htmlspecialchars_uni($mybb->user['avatar']);	
 		$mybb->user['username'] = htmlspecialchars_uni($mybb->user['username']);
 		if($mybb->settings['avatarep_temas2_mark'] == 1)
 		{
@@ -1015,11 +1018,7 @@ function avatarep_thread() {
 			{
 				$thread['avatarep'] = '<div class="avatarep_fdl_mine"><img src="' . $mybb->user['avatar'] . '" alt="' . $mybb->user['username'] . '" class="avatarep_fdl_img" /></div>';			
 				$avatarep_lastpost['avatarep'] = '<div class="avatarep_fdl_mine">' . $avatarep_lastpost['avatarep'] . '</div>';
-			}		
-			/*else if(!$mybb->user['uid'])
-			{
-				$thread['avatarep'] = '<div class="avatarep_fdl_mine"><img src="' . $avatarep_lastpost['avatar'] . '" alt="' . $avatarep_lastpost['username'] . '" class="avatarep_fdl_img" /></div>';			
-			}*/
+			}
 			else if($thread['lastposteruid'] != $mybb->user['uid'] && $thread['uid'] != $mybb->user['uid'] && $mybb->user['uid'])
 			{
 				$tid = (int)$thread['tid'];
