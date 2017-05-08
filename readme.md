@@ -1,6 +1,6 @@
 Steps to follow:
 
-    1.- Download this new 2.9.2 version for MyBB 1.8.10 and lesser versions of mybb (You have to deactivate old version of plugin before upload new files and then upload and activate to make it works fine).
+    1.- Download this new 2.9.5 version for MyBB 1.8.11 and lesser versions of mybb (You have to deactivate old version of plugin before upload new files and then upload and activate to make it works fine).
     2.- Enable plugin.
     3.- Go to styles and templates and verify avatarep.css exists and got content.
     4.- Make changes on style and templates to set visual customization.
@@ -28,9 +28,20 @@ KNOWN ISSUES:
 .trow_uname{font-size:15px;}
 .trow_memprofile{font-size:11px;font-weight:bold;}
 .trow_status{font-size: 11px;}
-.avatarep_img_contributor{padding: 1px;border: 1px solid #D8DFEA;width: 22px;height: 22px;border-radius: 50%;opacity: 0.9;margin: 0px 5px 0px 2px;}
+.avatarep_img_contributor{padding: 2px;border: 1px solid #D8DFEA;width: 30px;height: 30px;border-radius: 50%;opacity: 0.9;	margin: 2px 5px 0px 2px;float: left;}
 .avatarep_img{padding: 3px;border: 1px solid #D8DFEA;width: 44px;height: 44px;border-radius: 50%;opacity: 0.9;margin: 0px 5px 0px 2px;}
-.avatarep_fd{float:left;}
+.avatarep_fd{float:left;margin: 0px -5px;width:60px;height:60px}
+.avatarep_fda,.avatarep_fdl,.avatarep_fdan,.avatarep_fda_mine,.avatarep_fdl_mine{float:left}
+.avatarep_fda,.avatarep_fda_mine{margin-right:15px}
+.avatarep_fdl_img{width: 30px;height: 30px;border-radius: 50px;position: absolute;margin-left: -35px;margin-top: 25px;border: 1px solid #424242;padding: 2px;}
+@media screen and (max-width: 450px){
+.avatarep_img_contributor{padding: 2px;border: 1px solid #D8DFEA;width: 30px;height: 30px;border-radius: 50%;opacity: 0.9;	margin: 2px 5px 0px 2px;float: left;}
+.avatarep_img{padding: 2px;border: 1px solid #D8DFEA;width: 30px;height: 30px;border-radius: 50%;opacity: 0.9;margin: 0px 5px 0px 2px;}
+.avatarep_fd{float:left;margin: 0px -5px;width:40px;height:40px}
+.avatarep_fda,.avatarep_fdl,.avatarep_fdan,.avatarep_fda_mine,.avatarep_fdl_mine{float:left}
+.avatarep_fda,.avatarep_fda_mine{margin-right:15px}
+.avatarep_fdl_img{width: 20px;height: 20px;border-radius: 50px;position: absolute;margin-left: -35px;margin-top: 25px;border: 1px solid #424242;padding: 2px;}
+}
 ```
 
 Save and refresh cache on your explorer.
@@ -39,215 +50,96 @@ Save and refresh cache on your explorer.
 
 Template changes:
 
-forumbit_depth2_forum_lastpost:
+forumbit_depth1_forum_lastpost
+forumbit_depth2_forum_lastpost
  
-Change all content to this:
+Review that you have this var:
  
 ```HTML
-<div style="float:left;">{$forum['avatarep']}</div>
-<div>
-<span class="smalltext">
-	<a href="{$lastpost_link}" title="{$full_lastpost_subject}">{$lastpost_subject}</a> 
-	<br />
-	{$lastpost_date}
-	<br />
-	{$lang->by} {$lastpost_profilelink}
-</span>
-</div>
+<avatarep_uid_[{$lastpost_data['lastposteruid']}]>
 ```
-
-
-forumbit_depth2_forum:
- 
-Change all content to this:
-
-```HTML
-<tr>
-<td class="{$bgcolor}" align="center" width="5%"><span class="forum_status forum_{$lightbulb['folder']} ajax_mark_read" title="{$lightbulb['altonoff']}" id="mark_read_{$forum['fid']}"></span></td>
-<td class="{$bgcolor}" width="50%">
-<strong><a href="{$forum_url}">{$forum['name']}</a></strong>{$forum_viewers_text}<div class="smalltext">{$forum['description']}{$modlist}{$subforums}</div>
-</td>
-<td width="10%" class="{$bgcolor}" align="center" style="white-space: nowrap">{$threads}{$unapproved['unapproved_threads']}</td>
-<td width="10%" class="{$bgcolor}" align="center" style="white-space: nowrap">{$posts}{$unapproved['unapproved_posts']}</td>
-<td width="25%" class="{$bgcolor}" align="left" style="white-space: nowrap">{$lastpost}</td>
-</tr>
-```
-
 forumdisplay_thread
  
-Change all content to this:
+Review that you have this two vars:
  
 ```HTML
-
-<tr class="inline_row">
-	<td align="center" class="{$bgcolor}{$thread_type_class}" width="2%"><span class="thread_status {$folder}" title="{$folder_label}">&nbsp;</span></td>
-	<td align="center" class="{$bgcolor}{$thread_type_class}" width="2%">{$icon}</td>
-	<td class="{$bgcolor}{$thread_type_class}">
-		{$attachment_count}
-		<div>
-<div style="float:left;">{$avatarep_avatar['avatarep']}</div>
-<div>
-          <span>{$prefix} {$gotounread}{$thread['threadprefix']}<span class="{$inline_edit_class} {$new_class}" id="tid_{$inline_edit_tid}"><a href="{$thread['threadlink']}">{$thread['subject']}</a></span></span>
-			<div class="author smalltext">Iniciado por: {$thread['profilelink']} {$thread['multipage']}</div>
-		</div>
-</div>
-	</td>
-	<td align="center" class="{$bgcolor}{$thread_type_class}"><a href="javascript:MyBB.whoPosted({$thread['tid']});">{$thread['replies']}</a>{$unapproved_posts}</td>
-	<td align="center" class="{$bgcolor}{$thread_type_class}">{$thread['views']}</td>
-	{$rating}
-	<td class="{$bgcolor}{$thread_type_class}" style="white-space: nowrap; text-align: right;">
-<div style="float:left;">
-{$avatarep_lastpost['avatarep']}</div>
-<div>
-		<span class="lastpost smalltext">{$lastpostdate}<br />
-		<a href="{$thread['lastpostlink']}">{$lang->lastpost}</a>:<br />{$lastposterlink}</span>
-</div>
-	</td>
-{$modbit}
-</tr>
-
+<avatarep_uid_[{$thread['uid\]}]>
+<avatarep_uid_[{$thread['lastposteruid']}]>
 ```
 
 forumdisplay_announcements_announcement
  
-Change all content to this:
-
+Review that you have this var:
+ 
 ```HTML
-<tr>
-<td align="center" class="{$bgcolor}" width="2%"><span class="thread_status {$folder}">&nbsp;</span></td>
-<td align="center" class="{$bgcolor}" width="2%">{$anno_avatar['avatarep']}</td>
-<td class="{$bgcolor} forumdisplay_announcement">
-            <a href="{$announcement['announcementlink']}"{$new_class}>{$announcement['subject']}</a>
-            <div class="author smalltext">{$announcement['profilelink']}</div>
-</td>
-<td align="center" class="{$bgcolor} forumdisplay_announcement">-</td>
-<td align="center" class="{$bgcolor} forumdisplay_announcement">-</td>
-{$rating}
-<td class="{$bgcolor} forumdisplay_announcement" style="white-space: nowrap; text-align: right"><span class="smalltext">{$postdate}</span></td>
-{$modann}
-</tr>
+<avatarep_uid_[{$announcement['uid']}]>
 ```
 
 search_results_posts_post
-Change all content to this:
 
+Review that you have this var:
+ 
 ```HTML
-<tr class="inline_row">
-            <td align="center" class="{$bgcolor}" width="2%"><span class="thread_status {$folder}">&nbsp;</span>{$icon}&nbsp;</td>
-            <td align="center" class="{$bgcolor}" width="2%">{$avatarep_avatar['avatarep']}</td>
-            <td class="{$bgcolor}">
-                        <span class="smalltext">
-                                   {$lang->post_thread} <a href="{$thread_url}{$highlight}">{$post['thread_subject']}</a><br />
-                                   {$lang->post_subject} <a href="{$post_url}{$highlight}#pid{$post['pid']}">{$post['subject']}</a>
-                        </span><br />
-                        <table width="100%"><tr><td><span class="smalltext"><em>{$prev}</em></span></td></tr></table>
-            </td>
-            <td align="center" class="{$bgcolor}">{$post['profilelink']}</td>
-            <td class="{$bgcolor}" >{$post['forumlink']}</td>
-            <td align="center" class="{$bgcolor}"><a href="javascript:MyBB.whoPosted({$post['tid']});">{$post['thread_replies']}</a></td>
-            <td align="center" class="{$bgcolor}">{$post['thread_views']}</td>
-            <td class="{$bgcolor}" style="white-space: nowrap; text-align: center;"><span class="smalltext">{$posted}</span></td>
-            {$inline_mod_checkbox}
-</tr>
+<avatarep_uid_[{$post['uid']}]>
 ```
  
-
 search_results_threads_thread 
-Change all content to this:
 
+Review that you have this two vars:
+ 
 ```HTML
-<tr class="inline_row">
-            <td align="center" class="{$bgcolor}" width="2%"><span class="thread_status {$folder}" title="{$folder_label}">&nbsp;</span></td>
-            <td align="center" class="{$bgcolor}" width="2%">{$avatarep_avatar['avatarep']}</td>
-            <td class="{$bgcolor}">
-                        {$attachment_count}
-                        <div>
-                                   <span>{$icon}{$prefix} {$gotounread}{$thread['threadprefix']}<a href="{$thread_link}{$highlight}" class="{$inline_edit_class} {$new_class}" id="tid_{$inline_edit_tid}">{$thread['subject']}</a>{$thread['multipage']}</span>
-                                   <div class="author smalltext">{$thread['profilelink']}</div>
-                        </div>
-            </td>
-            <td class="{$bgcolor}">{$thread['forumlink']}</td>
-            <td align="center" class="{$bgcolor}"><a href="javascript:MyBB.whoPosted({$thread['tid']});">{$thread['replies']}</a></td>
-            <td align="center" class="{$bgcolor}">{$thread['views']}</td>
-            <td class="{$bgcolor}" style="white-space: nowrap">
-<div style="float:left;">{$avatarep_lastpost['avatarep']}</div>
-<div>
-                                                                       <span class="smalltext">
-                                                                                  {$lastpostdate}<br />
-                                                                                  <a href="{$thread['lastpostlink']}">{$lang->lastpost}</a>: {$lastposterlink}
-                                                                       </span>
-</div>
-            </td>
-            {$inline_mod_checkbox}
-</tr>
+<avatarep_uid_[{$thread['uid\]}]>
+<avatarep_uid_[{$thread['lastposteruid']}]>
 ```
 
-For new 2.8.8 versions and better.
-
 portal_latestthreads_thread 
-Change all content to this:
 
+Review that you have this var:
+ 
 ```HTML
-
-<tr>
-<td class="{$altbg}">
-<div style="float:left;"><avatareplt_start[{$thread['tid']}]><avatarep[{$thread['lastposteruid']}]['avatar']><avatareplt_end[{$thread['tid']}]></div>
-<div>
-<strong><a href="{$mybb->settings['bburl']}/{$thread['threadlink']}">{$thread['subject']}</a></strong>
-<span class="smalltext"><br />
-<a href="{$thread['lastpostlink']}"><img src="images/jump.png" alt="{$lang->latest_threads_lastpost}" /></a>{$lang->by} {$lastposterlink}<br />
-{$lastpostdate}<br />
-{$lang->forum} <a href="{$thread['forumlink']}">{$thread['forumname']}</a><br />
-<strong>&raquo; </strong>{$lang->latest_threads_replies} {$thread['replies']}<br />
-<strong>&raquo; </strong>{$lang->latest_threads_views} {$thread['views']}
-</span>
-</div>
-</td>
-</tr>
-
+<avatarep_uid_[{$thread['lastposteruid']}]>
 ```
 
 private_messagebit
-Change all content to this:
 
+Review that you have this var:
+ 
 ```HTML
-
-<tr>
-	<td align="center" class="trow1" width="1%"><img src="{$theme['imgdir']}/{$msgstatus}.png" alt="{$msgalt}" title="{$msgalt}" /></td>
-	<td align="center" class="trow2" width="1%">{$icon}</td>
-	<td class="trow1" width="35%"><a class="{$msgstatus}" href="private.php?action=read&amp;pmid={$message['pmid']}">{$message['subject']}</a>{$denyreceipt}</td>
-	<td align="center" class="trow2"><avatareplt_start[{$message['pmid']}]><avatarep[{$tofromuid}]['avatar']><avatareplt_end[{$message['pmid']}]>{$tofromusername}</td>
-	<td class="trow1" align="right" style="white-space: nowrap"><span class="smalltext">{$senddate}</span></td>
-	<td class="trow2" align="center"><input type="checkbox" class="checkbox" name="check[{$message['pmid']}]" value="1" /></td>
-</tr>
-
+<avatarep_uid_[{$tofromuid}]>
 ```
-
 private_tracking_readmessage
-Change all content to this:
 
+Review that you have this var:
+ 
 ```HTML
-<tr>
-	<td align="center" class="trow1" width="1%"><img src="{$theme['imgdir']}/old_pm.png" alt="" /></td>
-	<td class="trow2">{$readmessage['subject']}</td>
-	<td class="trow1" align="center"><avatareplt_start[{$readmessage['pmid']}]><avatarep[{$readmessage['toid']}]['avatar']><avatareplt_end[{$readmessage['pmid']}]>{$readmessage['profilelink']}</td>
-	<td class="trow2" align="right"><span class="smalltext">{$readdate}</span></td>
-	<td class="trow1"><input type="checkbox" class="checkbox" name="readcheck[{$readmessage['pmid']}]" value="1" /></td>
-</tr>
+<avatarep_uid_[{$readmessage['toid']}]>
 ```
 
 private_tracking_unreadmessage
-Change all content to this:
+
+Review that you have this var:
+ 
+```HTML
+<avatarep_uid_[{$unreadmessage['toid']}]>
+```
+showthread
+
+Review that you have this var:
 
 ```HTML
-<tr>
-	<td align="center" class="trow1" width="1%"><img src="{$theme['imgdir']}/new_pm.png" alt="" /></td>
-	<td class="trow2">{$unreadmessage['subject']}</td>
-	<td class="trow1" align="center"><avatareplt_start[{$unreadmessage['pmid']}]><avatarep[{$unreadmessage['toid']}]['avatar']><avatareplt_end[{$unreadmessage['pmid']}]>{$unreadmessage['profilelink']}</td>
-	<td class="trow2" align="right"><span class="smalltext">{$senddate}</span></td>
-	<td class="trow1"><input type="checkbox" class="checkbox" name="unreadcheck[{$unreadmessage['pmid']}]" value="1" /></td>
-</tr>
+{$avatarep_thread}
 ```
+
+headerinclude
+
+Review that you have this var:
+
+```HTML
+{$avatarep_script}
+```
+
+You can set anywhere you like vars in templates mentioned above...
+
 
 For plugin extensions you may use this code:
 
@@ -266,14 +158,9 @@ Video of referral:
 
 https://mega.nz/#!nh5kFaDa!xIU47jseVelDkBwnkDswfwVJEFflUgkAJtg6IOnT0M8
 
-This is a proof of concept and is not ready at all to use it until test have pased by.
+Instructions to integrate into MentionMe plugin:
+
+https://github.com/WhiteNeo/lastposter-avatar-mybb18x-series/issues/4
+
 
 And done it !!!!
-
-This actual guide is only for latest releaded version, if you have lesser versions you have to follow previous guidances. And it's a reference only with default theme, you have to customie it as the latest sended information on mybb official siteif you have a customized theme.
-
-Sample of this guide on spanish only for 2.8.5 versions or lesser.
-
-http://soportemybb.es/Tema-Estilizar-plugin-avatar-en-temas-y-foros-2-8-3?pid=10157#pid10157
-
-There you can get pdf guide with images for an entire customization on default theme to make more beauty your forums....
