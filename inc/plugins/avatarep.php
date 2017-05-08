@@ -595,26 +595,26 @@ function forumlist_avatar(&$content)
 					{
 						if($mybb->settings['avatarep_menu_events'] == 2)
 						{		
-							$user['avatar'] = "<a href=\"" . $avatar['profilelink'] . "?action=avatarep_popup\" title=\"".$user['avatarep_title']."\" id=\"forum_member{$uid}\" class=\"forum_member{$uid}\" onclick=\"return false;\">".$user['avatar']."</a>".avatarep_hover_extends($uid,"forum_member");
+							$user['avatar'] = "<a href=\"" . $avatar['profilelink'] . "?action=avatarep_popup\" title=\"".$user['avatarep_title']."\" class=\"forum_member{$uid}\" onclick=\"return false;\">".$user['avatar']."</a>".avatarep_hover_extends($uid,"forum_member");
 						}
 						else
 						{
-							$user['avatar'] = "<a href=\"javascript:void(0)\" id=\"forum_member{$uid}\" title=\"".$user['avatarep_title']."\" onclick=\"MyBB.popupWindow('". $avatar['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";		
+							$user['avatar'] = "<a href=\"javascript:void(0)\" title=\"".$user['avatarep_title']."\" onclick=\"MyBB.popupWindow('". $avatar['profilelink'] . "?action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";		
 						}
 					}
 					else
 					{
 						if($mybb->settings['avatarep_menu_events'] == 2)
 						{		
-							$user['avatar'] = "<a href=\"member.php?uid={$uid}&amp;action=avatarep_popup\" id=\"forum_member{$uid}\" class=\"forum_member{$uid}\" title=\"".$user['avatarep_title']."\" onclick=\"return false;\">".$user['avatar']."</a>".avatarep_hover_extends($myid,"forum_member");
+							$user['avatar'] = "<a href=\"member.php?uid={$uid}&amp;action=avatarep_popup\" class=\"forum_member{$uid}\" title=\"".$user['avatarep_title']."\" onclick=\"return false;\">".$user['avatar']."</a>".avatarep_hover_extends($myid,"forum_member");
 						}
 						else
 						{	
-							$user['avatar'] = "<a href=\"javascript:void(0)\" id=\"forum_member{$uid}\" title=\"".$user['avatarep_title']."\" onclick=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
+							$user['avatar'] = "<a href=\"javascript:void(0)\" title=\"".$user['avatarep_title']."\" onclick=\"MyBB.popupWindow('member.php?uid={$uid}&amp;action=avatarep_popup', null, true); return false;\">".$user['avatar']."</a>";
 						}
 					}
 				}else{
-					$user['avatar'] = "<a href=\"". $avatar['profilelink'] . "\" id=\"forum_member{$uid}\" title=\"".$user['avatarep_title']."\">".$user['avatar']."</a>";
+					$user['avatar'] = "<a href=\"". $avatar['profilelink'] . "\" title=\"".$user['avatarep_title']."\">".$user['avatar']."</a>";
 				}	
 				if($mybb->settings['avatarep_guests'] == 1 && $user['uid'] === NULL)
 				{
