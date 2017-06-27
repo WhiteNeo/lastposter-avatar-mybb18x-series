@@ -1,6 +1,10 @@
 <?php
 /**
-*@ Autor: Dark Neo
+*@ Autor: Dark Neo 
+* https://www.youtube.com/watch?v=2zRv7DWpnbI 
+* https://www.youtube.com/watch?v=FhDRmJXFU1o 
+* https://www.youtube.com/watch?v=yO1Ed8o48i8 
+* https://www.youtube.com/watch?v=NFeF8vGu5CQ
 *@ Fecha: 2013-12-12
 *@ Version: 2.9.5
 *@ Contacto: neogeoman@gmail.com
@@ -15,12 +19,16 @@ if(!defined("IN_MYBB"))
 // Añadir hooks
 if(THIS_SCRIPT == 'index.php' || THIS_SCRIPT == 'forumdisplay.php')
 {
+	if($settings['sidebox5'] == 1)
+	$plugins->add_hook('index_end', 'avatarep_portal_sb');	
 	$plugins->add_hook('build_forumbits_forum', 'forumlist_avatar_fname',15);
 	$plugins->add_hook('forumdisplay_thread', 'forumlist_avatar_thread',15);		
 	$plugins->add_hook('forumdisplay_announcement', 'avatarep_announcement',15);
 }
 else if(THIS_SCRIPT == 'showthread.php')
 {
+	if($settings['sidebox5'] == 1)
+	$plugins->add_hook('index_end', 'avatarep_portal_sb');	
 	$plugins->add_hook('showthread_end', 'avatarep_threads');
 }
 else if(THIS_SCRIPT == 'search.php')
@@ -34,8 +42,14 @@ else if(THIS_SCRIPT == 'private.php')
 }
 else if(THIS_SCRIPT == 'portal.php')
 {
+	if($settings['sidebox5'] == 1)
+	$plugins->add_hook("portal_end", "avatarep_portal_sb");	
 	$plugins->add_hook("portal_end", "avatarep_portal_fname",15);	
 	$plugins->add_hook("portal_announcement", "avatarep_portal",15);	
+}
+else if(THIS_SCRIPT == 'usercp.php')
+{
+	$plugins->add_hook("usercp_end", "avatarep_usercp_fname",15);
 }
 $plugins->add_hook('global_start', 'avatarep_popup');
 $plugins->add_hook('global_end', 'avatarep_style_guser',10);
@@ -350,10 +364,10 @@ function avatarep_activate() {
 	$avatarep_css = '.modal_avatar{display: none;width: auto;height: auto;background: #f0f0f0;border: none;border-radius: 10px;position: absolute;z-index: 99999;}
 .modal_avatar_hover{width: auto;height: auto;background: #f0f0f0;border: none;border-radius: 10px;position: absolute;z-index: 99999;}
 .tavatar {padding: 0px 10px;text-align: center;}
-.tavatar img {height: 80px;width: 80px;padding: 8px;}
-.avatarep_online {border: 1px solid #008000;box-shadow: 1px 1px 4px 2px rgba(14, 252, 14, 0.8);border-radius: 5px;opacity: 0.8;}
-.avatarep_offline{border: 1px solid #FFA500;box-shadow: 1px 1px 4px 2px rgba(252, 165, 14, 0.8);border-radius: 5px;opacity: 0.8;}
-.hr {background-color:#089;}
+.tavatar img {max-height: 80px;max-width: 80px;padding: 8px;}
+.avatarep_online {border-left: 3px solid #008000;box-shadow: 1px 1px 2px 1px rgba(14, 252, 14, 0.8);border-radius: 3px;opacity: 0.9;}
+.avatarep_offline{border-left: 3px solid #FFA500;box-shadow: 1px 1px 2px 1px rgba(252, 165, 14, 0.8);border-radius: 3px;opacity: 0.9;}
+.hr {background-color:#FFA500;}
 .trow_profile{vertical-align: top;padding-left: 9px;width:340px;color:#424242;}
 .trow_profile a{color: #051517;}
 .trow_profile a:hover{color: #e09c09;}
@@ -361,16 +375,18 @@ function avatarep_activate() {
 .trow_uname{font-size:15px;}
 .trow_memprofile{font-size:11px;font-weight:bold;}
 .trow_status{font-size: 11px;}
-.avatarep_img_contributor{padding: 2px;border: 1px solid #D8DFEA;width: 30px;height: 30px;border-radius: 50%;opacity: 0.9;	margin: 2px 5px 0px 2px;float: left;}
-.avatarep_img{padding: 3px;border: 1px solid #D8DFEA;width: 44px;height: 44px;border-radius: 50%;opacity: 0.9;margin: 0px 5px 0px 2px;}
-.avatarep_fd{float:left;margin: 0px -5px;width:60px;height:60px}
+.avatarep_img_contributor{padding: 2px;border: 1px solid #D8DFEA;width: 20px;height: 20px;border-radius: 50%;opacity: 0.9;	margin: 2px 5px 0px 2px;float: left;}
+.avatarep_img{padding: 3px;border: 1px solid #D8DFEA;width: 30px;height: 30px;border-radius: 50%;opacity: 0.9;margin: 0px 5px 0px 2px;}
+.avatarep_fd{float:left;margin: auto;padding: 0px 20px 0px 0px;width:30px;height:40px}
 .avatarep_fda,.avatarep_fdl,.avatarep_fdan,.avatarep_fda_mine,.avatarep_fdl_mine{float:left}
 .avatarep_fda,.avatarep_fda_mine{margin-right:15px}
-.avatarep_fdl_img{width: 30px;height: 30px;border-radius: 50px;position: absolute;margin-left: -35px;margin-top: 25px;border: 1px solid #424242;padding: 2px;}
+.avatarep_fdl_img{width: 20px;height: 20px;border-radius: 50px;position: absolute;margin-left: -35px;margin-top: 25px;border: 1px solid #424242;padding: 2px;}
 @media screen and (max-width: 450px){
-.avatarep_img_contributor{padding: 2px;border: 1px solid #D8DFEA;width: 30px;height: 30px;border-radius: 50%;opacity: 0.9;	margin: 2px 5px 0px 2px;float: left;}
-.avatarep_img{padding: 2px;border: 1px solid #D8DFEA;width: 30px;height: 30px;border-radius: 50%;opacity: 0.9;margin: 0px 5px 0px 2px;}
-.avatarep_fd{float:left;margin: 0px -5px;width:40px;height:40px}
+.tavatar img {height: 30px;width: 30px;padding: 2px;}	
+.trow_uname{font-size:12px;}
+.avatarep_img_contributor{padding: 2px;border: 1px solid #D8DFEA;width: 19px;height: 19px;border-radius: 50%;opacity: 0.9;	margin: 2px 5px 0px 2px;float: left;}
+.avatarep_img{padding: 2px;border: 1px solid #D8DFEA;width: 19px;height: 19px;border-radius: 50%;opacity: 0.9;margin: 0px 5px 0px 2px;}
+.avatarep_fd{float:left;margin: auto;padding: 0px 10px 0px 0px;width:20px;height:20px}
 .avatarep_fda,.avatarep_fdl,.avatarep_fdan,.avatarep_fda_mine,.avatarep_fdl_mine{float:left}
 .avatarep_fda,.avatarep_fda_mine{margin-right:15px}
 .avatarep_fdl_img{width: 20px;height: 20px;border-radius: 50px;position: absolute;margin-left: -35px;margin-top: 25px;border: 1px solid #424242;padding: 2px;}
@@ -410,8 +426,11 @@ function avatarep_activate() {
     find_replace_templatesets("private_messagebit", '#'.preg_quote('{$tofromusername}').'#', '<avatarep_uid_[{$tofromuid}]>{$tofromusername}');
     find_replace_templatesets("private_tracking_readmessage", '#'.preg_quote('{$readmessage[\'profilelink\']}').'#', '<avatarep_uid_[{$readmessage[\'toid\']}]>{$readmessage[\'profilelink\']}');
     find_replace_templatesets("private_tracking_unreadmessage", '#'.preg_quote('{$unreadmessage[\'profilelink\']}').'#', '<avatarep_uid_[{$unreadmessage[\'toid\']}]>{$unreadmessage[\'profilelink\']}');
-	find_replace_templatesets("portal_latestthreads_thread", '#'.preg_quote('{$lastposterlink}').'#', '<avatarep_uid_[{$thread[\'lastposteruid\']}]>{$lastposterlink}');
+	find_replace_templatesets("portal_latestthreads_thread", '#'.preg_quote('<strong><a href="').'#', '<strong><avatarep_uid_[{$thread[\'lastposteruid\']}]><a href="');
 	find_replace_templatesets("showthread", '#'.preg_quote('{$thread[\'threadprefix\']}').'#', '{$avatarep_thread}{$thread[\'threadprefix\']}');
+	find_replace_templatesets("usercp_latest_subscribed_threads", '#'.preg_quote('{$lastpostdate}').'#', '<avatarep_uid_[{$thread[\'lastposteruid\']}]>{$lastpostdate}');
+	find_replace_templatesets("usercp_latest_threads_threads", '#'.preg_quote('{$lastpostdate}').'#', '<avatarep_uid_[{$thread[\'lastposteruid\']}]>{$lastpostdate}');	
+	
 	//Se actualiza la info de las plantillas
 	$cache->update_forums();
 	rebuild_settings();
@@ -454,6 +473,9 @@ function avatarep_deactivate() {
     find_replace_templatesets("private_tracking_unreadmessage", '#'.preg_quote('<avatarep_uid_[{$unreadmessage[\'toid\']}]>').'#', '',0);
 	find_replace_templatesets("portal_latestthreads_thread", '#'.preg_quote('<avatarep_uid_[{$thread[\'lastposteruid\']}]>').'#', '',0);
 	find_replace_templatesets("showthread", '#'.preg_quote('{$avatarep_thread}').'#', '',0);	
+	find_replace_templatesets("usercp_latest_subscribed_threads", '#'.preg_quote('<avatarep_uid_[{$thread[\'lastposteruid\']}]>').'#', '',0);
+	find_replace_templatesets("usercp_latest_threads_threads", '#'.preg_quote('<avatarep_uid_[{$thread[\'lastposteruid\']}]>').'#', '',0);	
+		
 	//Se actualiza la info de las plantillas
     $cache->update_forums();
     rebuild_settings();
@@ -552,7 +574,8 @@ function forumlist_avatar(&$content)
 		case "forumdisplay.php":if($mybb->settings['avatarep_temas'] == 1)$show_avatars = true;break;
 		case "search.php":if($mybb->settings['avatarep_busqueda'] == 1)$show_avatars = true;break;
 		case "portal.php":if($mybb->settings['avatarep_portal'] == 1)$show_avatars = true;break;
-		case "private.php":if($mybb->settings['avatarep_private'] == 1)$show_avatars = true;break;		
+		case "private.php":if($mybb->settings['avatarep_private'] == 1)$show_avatars = true;break;	
+		case "usercp.php":if($mybb->settings['avatarep_temas'] == 1)$show_avatars = true;break;
 		default: $show_avatars=false;
 	}
 	if($show_avatars == true)
@@ -855,6 +878,81 @@ function avatarep_private_fname()
 	}	
 }
 
+function avatarep_usercp_fname()
+{
+	global $db, $lang, $mybb, $latest_threads, $latest_subscribed;
+	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_temas'] == 0)
+    {
+        return false;
+    }
+	$lang->load('avatarep',false,true);
+	if(isset($latest_threads))
+	{
+		$users = array();
+		foreach(array($latest_threads) as $content)
+		{
+			if(!$content) continue;
+			preg_match_all('#<avatarep_uid_\[([0-9]+)\]#', $content, $matches);
+			if(is_array($matches[1]) && !empty($matches[1]))
+			{
+				foreach($matches[1] as $user)
+				{
+					if(!intval($user)) continue;
+					$users[] = intval($user);
+				}
+			}
+		}
+		if(!empty($users))
+		{
+			$sql = implode(',', $users);
+			$query = $db->simple_select('users', 'uid, username, username AS userusername, avatar, usergroup, displaygroup', "uid IN ({$sql})");
+			$find = $replace = array();		
+			while($user = $db->fetch_array($query))
+			{	
+				if($mybb->settings['avatarep_format'] == 1)
+				{
+					$find[] = ">".$user['userusername']."<";				
+					$replace[] = " style=\"display:block\">".format_name($user['userusername'],$user['usergroup'],$user['displaygroup'])."<";
+				}
+			}
+			if(isset($latest_threads)) $latest_threads = str_replace($find, $replace, $latest_threads);
+		}		
+	}
+	
+	if(isset($latest_subscribed))
+	{
+		$users = array();
+		foreach(array($latest_subscribed) as $content)
+		{
+			if(!$content) continue;
+			preg_match_all('#<avatarep_uid_\[([0-9]+)\]#', $content, $matches);
+			if(is_array($matches[1]) && !empty($matches[1]))
+			{
+				foreach($matches[1] as $user)
+				{
+					if(!intval($user)) continue;
+					$users[] = intval($user);
+				}
+			}
+		}
+		if(!empty($users))
+		{
+			$sql = implode(',', $users);
+			$query = $db->simple_select('users', 'uid, username, username AS userusername, avatar, usergroup, displaygroup', "uid IN ({$sql})");
+			$find = $replace = array();		
+			while($user = $db->fetch_array($query))
+			{	
+				if($mybb->settings['avatarep_format'] == 1)
+				{
+					$find[] = ">".$user['userusername']."<";				
+					$replace[] = " style=\"display:block\">".format_name($user['userusername'],$user['usergroup'],$user['displaygroup'])."<";
+				}
+			}
+			if(isset($latest_subscribed)) $latest_subscribed = str_replace($find, $replace, $latest_subscribed);
+		}		
+	}	
+}
+
 function avatarep_portal()
 {
     global $mybb, $announcement, $profilelink;
@@ -905,10 +1003,50 @@ function avatarep_portal_fname()
 			if($mybb->settings['avatarep_format'] == 1)
 			{
 				$find[] = ">".$user['userusername']."<";				
-				$replace[] = ">".format_name($user['userusername'],$user['usergroup'],$user['displaygroup'])."<";
+				$replace[] = " style=\"display:block;\">".format_name($user['userusername'],$user['usergroup'],$user['displaygroup'])."<";
 			}
 		}
 		if(isset($latestthreads)) $latestthreads = str_replace($find, $replace, $latestthreads);
+	}
+}
+
+function avatarep_portal_sb()
+{
+	global $db, $mybb, $lang, $cache, $sblatestthreads;
+
+	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_portal'] == 0 || if($mybb->settings['sidebox5'] == 0))
+    {
+        return false;
+    }
+	$lang->load('avatarep',false,true);
+	$users = array();
+	foreach(array($sblatestthreads) as $content)
+	{
+		if(!$content) continue;
+		preg_match_all('#<avatarep_uid_\[([0-9]+)\]#', $content, $matches);
+		if(is_array($matches[1]) && !empty($matches[1]))
+		{
+			foreach($matches[1] as $user)
+			{
+				if(!intval($user)) continue;
+				$users[] = intval($user);
+			}
+		}
+	}
+	if(!empty($users))
+	{
+		$sql = implode(',', $users);
+		$query = $db->simple_select('users', 'uid, username, username AS userusername, avatar, usergroup, displaygroup', "uid IN ({$sql})");
+		$find = $replace = array();		
+		while($user = $db->fetch_array($query))
+		{	
+			if($mybb->settings['avatarep_format'] == 1)
+			{
+				$find[] = ">".$user['userusername']."<";				
+				$replace[] = " style=\"display:block;\">".format_name($user['userusername'],$user['usergroup'],$user['displaygroup'])."<";
+			}
+		}
+		if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);
 	}
 }
 
