@@ -572,6 +572,7 @@ function forumlist_avatar(&$content)
 	{		
 		case "index.php":if($mybb->settings['avatarep_foros'] == 1)$show_avatars = true;break;		
 		case "forumdisplay.php":if($mybb->settings['avatarep_temas'] == 1)$show_avatars = true;break;
+		case "showthread.php":if($mybb->settings['avatarep_temas'] == 1)$show_avatars = true;break;
 		case "search.php":if($mybb->settings['avatarep_busqueda'] == 1)$show_avatars = true;break;
 		case "portal.php":if($mybb->settings['avatarep_portal'] == 1)$show_avatars = true;break;
 		case "private.php":if($mybb->settings['avatarep_private'] == 1)$show_avatars = true;break;	
