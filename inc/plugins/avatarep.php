@@ -597,7 +597,6 @@ function forumlist_avatar(&$content)
 				}
 			}		
 		}		
-		//var_dump($avatars);
 		if(!empty($avatars))
 		{
 			$users = array();
@@ -983,7 +982,6 @@ function avatarep_portal_fname()
     {
         return false;
     }
-	//var_dump($latestthreads);
 	$lang->load('avatarep',false,true);
 	$users = array();
 	foreach(array($latestthreads) as $content)
