@@ -1018,7 +1018,7 @@ function avatarep_portal_sb()
 {
 	global $db, $mybb, $lang, $cache, $sblatestthreads;
 
-	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['sidebox5'] == 0 || && $mybb->settings['avatarep_latest_threads'] == 0)
+	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['sidebox5'] == 0 || $mybb->settings['avatarep_latest_threads'] == 0)
     {
         return false;
     }
