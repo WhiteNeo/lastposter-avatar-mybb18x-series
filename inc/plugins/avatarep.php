@@ -31,7 +31,7 @@ if(THIS_SCRIPT == 'index.php' || THIS_SCRIPT == 'forumdisplay.php')
 else if(THIS_SCRIPT == 'showthread.php')
 {
 	if($settings['sidebox5'] == 1)
-	$plugins->add_hook('showthread_end', 'avatarep_portal_sbavatarep_portal_sb');	
+	$plugins->add_hook('showthread_end', 'avatarep_portal_sb');	
 	$plugins->add_hook('showthread_end', 'avatarep_threads');
 }
 else if(THIS_SCRIPT == 'search.php')
@@ -574,8 +574,8 @@ function forumlist_avatar(&$content)
 	switch(THIS_SCRIPT)
 	{		
 		case "index.php":if($mybb->settings['avatarep_foros'] == 1)$show_avatars = true;break;		
-		case "forumdisplay.php":if($mybb->settings['avatarep_temas'] == 1)$show_avatars = true;break;
-		case "showthread.php":if($mybb->settings['avatarep_temas'] == 1)$show_avatars = true;break;
+		case "forumdisplay.php":if($mybb->settings['sidebox5'] == 1 && $mybb->settings['avatarep_latest_threads'] == 1)$show_avatars = true;break;
+		case "showthread.php":if($mybb->settings['sidebox5'] == 1 && $mybb->settings['avatarep_latest_threads'] == 1)$show_avatars = true;break;
 		case "search.php":if($mybb->settings['avatarep_busqueda'] == 1)$show_avatars = true;break;
 		case "portal.php":if($mybb->settings['avatarep_portal'] == 1)$show_avatars = true;break;
 		case "private.php":if($mybb->settings['avatarep_private'] == 1)$show_avatars = true;break;	
@@ -1018,7 +1018,7 @@ function avatarep_portal_sb()
 {
 	global $db, $mybb, $lang, $cache, $sblatestthreads;
 
-	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['sidebox5'] == 0)
+	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['sidebox5'] == 0 || && $mybb->settings['avatarep_latest_threads'] == 0)
     {
         return false;
     }
