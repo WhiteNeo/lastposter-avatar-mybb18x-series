@@ -1,6 +1,6 @@
 <?php
 /**
-*@ Autor: Dark Neo 
+*@ Autor: Dark Neo
 * https://www.youtube.com/watch?v=2zRv7DWpnbI 
 * https://www.youtube.com/watch?v=FhDRmJXFU1o 
 * https://www.youtube.com/watch?v=yO1Ed8o48i8 
@@ -20,7 +20,10 @@ if(!defined("IN_MYBB"))
 if(THIS_SCRIPT == 'index.php' || THIS_SCRIPT == 'forumdisplay.php')
 {
 	if($settings['sidebox5'] == 1)
-	$plugins->add_hook('index_end', 'avatarep_portal_sb');	
+	{
+		$plugins->add_hook('index_end', 'avatarep_portal_sb');	
+		$plugins->add_hook('forumdisplay_end', 'avatarep_portal_sb');		
+	}
 	$plugins->add_hook('build_forumbits_forum', 'forumlist_avatar_fname',15);
 	$plugins->add_hook('forumdisplay_thread', 'forumlist_avatar_thread',15);		
 	$plugins->add_hook('forumdisplay_announcement', 'avatarep_announcement',15);
@@ -28,7 +31,7 @@ if(THIS_SCRIPT == 'index.php' || THIS_SCRIPT == 'forumdisplay.php')
 else if(THIS_SCRIPT == 'showthread.php')
 {
 	if($settings['sidebox5'] == 1)
-	$plugins->add_hook('index_end', 'avatarep_portal_sb');	
+	$plugins->add_hook('showthread_end', 'avatarep_portal_sbavatarep_portal_sb');	
 	$plugins->add_hook('showthread_end', 'avatarep_threads');
 }
 else if(THIS_SCRIPT == 'search.php')
@@ -243,7 +246,7 @@ function avatarep_activate() {
         'title' =>  "Version",
         'description' => "Plugin version of last poster avatar on threadlist and forumlist",
         'optionscode' => 'text',
-        'value' => 294,
+        'value' => 295,
         'disporder' => 140,
         'gid' => 0
     );
@@ -975,7 +978,7 @@ function avatarep_portal_fname()
 {
 	global $db, $mybb, $lang, $cache, $latestthreads;
 
-		if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_portal'] == 0)
+	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_portal'] == 0)
     {
         return false;
     }
@@ -1044,7 +1047,7 @@ function avatarep_portal_sb()
 			if($mybb->settings['avatarep_format'] == 1)
 			{
 				$find[] = ">".$user['userusername']."<";				
-				$replace[] = " style=\"display:block;\">".format_name($user['userusername'],$user['usergroup'],$user['displaygroup'])."<";
+				$replace[] = ">".format_name($user['userusername'],$user['usergroup'],$user['displaygroup'])."<";
 			}
 		}
 		if(isset($sblatestthreads)) $sblatestthreads = str_replace($find, $replace, $sblatestthreads);
@@ -1058,7 +1061,7 @@ function avatarep_threads()
     $lang->load("avatarep", false, true);        
 	 
     //Revisar si la opcion esta activa
-    if($mybb->settings['avatarep_active'] == 0)
+    if($mybb->settings['avatarep_active'] == 0 && $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_temas'] == 0)
     {
         return false;
     }
