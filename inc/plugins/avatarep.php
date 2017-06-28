@@ -19,7 +19,7 @@ if(!defined("IN_MYBB"))
 // Añadir hooks
 if(THIS_SCRIPT == 'index.php' || THIS_SCRIPT == 'forumdisplay.php')
 {
-	if($settings['sidebox5'] == 1)
+	if($settings['sidebox5'] == 0 || $settings['sidebox5'] == 1)
 	{
 		$plugins->add_hook('index_end', 'avatarep_portal_sb');	
 		$plugins->add_hook('forumdisplay_end', 'avatarep_portal_sb');		
@@ -31,7 +31,7 @@ if(THIS_SCRIPT == 'index.php' || THIS_SCRIPT == 'forumdisplay.php')
 }
 else if(THIS_SCRIPT == 'showthread.php')
 {
-	if($settings['sidebox5'] == 1)		
+	if($settings['sidebox5'] == 0 || $settings['sidebox5'] == 1)
 	$plugins->add_hook('showthread_end', 'avatarep_portal_sb');		
 	$plugins->add_hook('showthread_end', 'avatarep_threads');
 }
@@ -46,7 +46,7 @@ else if(THIS_SCRIPT == 'private.php')
 }
 else if(THIS_SCRIPT == 'portal.php')
 {
-	if($settings['sidebox5'] == 1)
+	if($settings['sidebox5'] == 0 || $settings['sidebox5'] == 1)
 	$plugins->add_hook("portal_end", "avatarep_portal_sb");	
 	$plugins->add_hook("portal_end", "avatarep_portal_fname",15);	
 	$plugins->add_hook("portal_announcement", "avatarep_portal",15);	
@@ -983,7 +983,7 @@ function avatarep_portal_fname()
     {
         return false;
     }
-	var_dump($latestthreads);
+	//var_dump($latestthreads);
 	$lang->load('avatarep',false,true);
 	$users = array();
 	foreach(array($latestthreads) as $content)
@@ -1020,7 +1020,7 @@ function avatarep_portal_sb()
 {
 	global $db, $mybb, $lang, $cache, $sblatestthreads;
 
-	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['sidebox5'] == 0 || $mybb->settings['avatarep_latest_threads'] == 0)
+	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_latest_threads'] == 0)
     {
         return false;
     }
