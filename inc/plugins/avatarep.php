@@ -78,10 +78,10 @@ function avatarep_info()
 	}
 	return array(
         "name"			=> $db->escape_string($lang->avatarep_name),
-    	"description"	=> $db->escape_string($lang->avatarep_descrip) . " developers " . $avatarep_config_link,
-		"website"		=> "http://www.mybb.com",
-		"author"		=> "Dark Neo",
-		"authorsite"	=> "http://soportemybb.es",
+    	"description"	=> $db->escape_string($lang->avatarep_descrip) . $avatarep_config_link,
+		"website"		=> "https://community.mybb.com/mods.php?action=view&pid=74",
+		"author"		=> "Whiteneo",
+		"authorsite"	=> "https://soportemybb.es",
 		"version"		=> "2.9.5",
 		"codename" 		=> "last_poster_avatar",
 		"compatibility" => "18*"
@@ -862,17 +862,19 @@ function avatarep_announcement()
 
 function avatarep_private_fname()
 {
-	global $mybb, $cache, $tofromid, $tofromusername;
+	global $mybb, $cache, $message, $tofromusername;
 	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_private'] == 0)
     {
         return false;
     }
+	$tofromuid = (int)$message['toid'];
+	$tofromusername = htmlspecialchars_uni($message['tousername']);
 	if($mybb->settings['avatarep_format'] == 1)
 	{
-		if($tofromid>0)
+		if($tofromuid>0)
 		{
-			$cache->cache['users'][$tofromid] = $tofromusername;
-			$tofromusername = "#{$tofromusername}{$tofromid}#";
+			$cache->cache['users'][$tofromuid] = $tofromusername;
+			$tofromusername = "#{$tofromusername}{$tofromuid}#";
 		}
 		else
 		{		
@@ -880,6 +882,7 @@ function avatarep_private_fname()
 			$tofromusername = "#{$tofromusername}#";
 		}
 	}	
+	$tofromusername = build_profile_link($tofromusername, $tofromuid);
 }
 
 function avatarep_usercp_fname()
