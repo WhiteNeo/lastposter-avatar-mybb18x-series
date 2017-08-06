@@ -1,12 +1,12 @@
 <?php
 /**
-*@ Autor: Dark Neo
+*@ Autor: Whiteneo
 * https://www.youtube.com/watch?v=2zRv7DWpnbI 
 * https://www.youtube.com/watch?v=FhDRmJXFU1o 
 * https://www.youtube.com/watch?v=yO1Ed8o48i8 
 * https://www.youtube.com/watch?v=NFeF8vGu5CQ
 *@ Fecha: 2013-12-12
-*@ Version: 2.9.5
+*@ Version: 2.9.x
 *@ Contacto: neogeoman@gmail.com
 */
 
@@ -82,7 +82,7 @@ function avatarep_info()
 		"website"		=> "https://community.mybb.com/mods.php?action=view&pid=74",
 		"author"		=> "Whiteneo",
 		"authorsite"	=> "https://soportemybb.es",
-		"version"		=> "2.9.5",
+		"version"		=> "2.9.6",
 		"codename" 		=> "last_poster_avatar",
 		"compatibility" => "18*"
 	);
@@ -515,7 +515,7 @@ function avatarep_format_avatar($user)
 
 		return array(
 			'avatar' => $avatar,
-			'avatarep' => '<img src="' . $avatar . '" class="avatarep_img" alt="'.htmlspecialchars_uni($user['userusername']).'" />',
+			'avatarep' => '<img src="' . $avatar . '" class="avatarep_img" alt="'.htmlspecialchars_uni($user['userusername']).'" onerror="this.src=\'images/default_avatar.png\'" />',
 			'username' => htmlspecialchars_uni($user['userusername']),
 			'profilelink' => get_profile_link($user['uid']),
 			'uid' => (int)$user['uid'],
@@ -611,7 +611,7 @@ function forumlist_avatar(&$content)
 			{	
 				$avatar = avatarep_format_avatar($user);
 				if(!empty($user['avatar']))
-					$user['avatar'] = "<img src=\"{$user['avatar']}\" alt=\"{$user['username']}\" class=\"avatarep_img\" />";
+					$user['avatar'] = "<img src=\"{$user['avatar']}\" alt=\"{$user['username']}\" class=\"avatarep_img\" onerror=\"this.src='images/default_avatar.png'\" />";
 				else
 					$user['avatar'] = "<img src=\"images/default_avatar.png\" alt=\"{$user['username']}\" class=\"avatarep_img\" />";
 				$uid = (int)$user['uid'];
@@ -700,7 +700,7 @@ function forumlist_avatar_thread()
 			$mybb->user['avatar'] = htmlspecialchars_uni($mybb->user['avatar']);
 		if($thread['lastposteruid'] == $mybb->user['uid'] || $thread['uid'] == $mybb->user['uid'])
 		{
-			$thread['avatarep'] = '<div class="avatarep_fdl_mine"><img src="' . $mybb->user['avatar'] . '" alt="' . $mybb->user['username'] . '" class="avatarep_fdl_img" /></div>';			
+			$thread['avatarep'] = '<div class="avatarep_fdl_mine"><img src="' . $mybb->user['avatar'] . '" alt="' . $mybb->user['username'] . '" class="avatarep_fdl_img" onerror="this.src=\'images/default_avatar.png\'" /></div>';			
 		}
 		else if($thread['lastposteruid'] != $mybb->user['uid'] && $thread['uid'] != $mybb->user['uid'] && $mybb->user['uid'])
 		{
@@ -712,7 +712,7 @@ function forumlist_avatar_thread()
 			$is_avatar = $db->num_rows($query);
 			if($is_avatar >= 1)
 			{
-				$thread['avatarep'] = '<div class="avatarep_fdl_mine"><img src="' . $mybb->user['avatar'] . '" alt="' . $mybb->user['username'] . '" class="avatarep_fdl_img" /></div>';			
+				$thread['avatarep'] = '<div class="avatarep_fdl_mine"><img src="' . $mybb->user['avatar'] . '" alt="' . $mybb->user['username'] . '" class="avatarep_fdl_img" onerror="this.src=\'images/default_avatar.png\'" /></div>';			
 			}
 		}
 		else
@@ -1092,7 +1092,7 @@ function avatarep_threads()
 			$is_avatar = $db->num_rows($query);
 			if($is_avatar >= 1)
 			{
-				$avatarep_thread = '<img src="' . $mybb->user['avatar'] . '" alt="' . $mybb->user['username'] . '" class="avatarep_img_contributor" />';			
+				$avatarep_thread = '<img src="' . $mybb->user['avatar'] . '" alt="' . $mybb->user['username'] . '" class="avatarep_img_contributor" onerror="this.src=\'images/default_avatar.png\'" />';			
 			}
 			else
 			{
@@ -1105,7 +1105,7 @@ function avatarep_threads()
 				else
 					$avatar_thread = htmlspecialchars_uni($avatar_thread);
 				$post['avatarep_title'] = $lang->sprintf($lang->avatarep_user_alt_thread_contributor, $avatarep['username']);
-				$avatarep_thread = "<img src=\"".$avatarep['avatar']."\" alt=\"".$post['avatarep_title']."\" class=\"avatarep_img_contributor\" />";				
+				$avatarep_thread = "<img src=\"".$avatarep['avatar']."\" alt=\"".$post['avatarep_title']."\" class=\"avatarep_img_contributor\" onerror=\"this.src='images/default_avatar.png'\" />";				
 			}			
 		}
 		else
@@ -1115,7 +1115,7 @@ function avatarep_threads()
 			$avatarep['avatar'] = str_replace($replace, $search, $avatarep['avatar']);
 			$avatar_thread = $avatarep['avatar'];
 			$post['avatarep_title'] = $lang->sprintf($lang->avatarep_user_alt_thread_contributor, $avatarep['username']);
-			$avatarep_thread = "<img src=\"".htmlspecialchars_uni($avatarep['avatar'])."\" class=\"avatarep_img_contributor\" alt=\"".$post['avatarep_title']."\" />";			
+			$avatarep_thread = "<img src=\"".htmlspecialchars_uni($avatarep['avatar'])."\" class=\"avatarep_img_contributor\" alt=\"".$post['avatarep_title']."\" onerror=\"this.src='images/default_avatar.png'\" />";			
 		}	
 	}	
 }
@@ -1332,7 +1332,7 @@ function avatarep_popup()
 				$avatarep = str_replace($search, $replace, $avatarep);		
 			}
 			$memprofile['avatartype'] = htmlspecialchars_uni($memprofile['avatartype']);
-			$avatarep = "<img src=\"" . $avatarep . "\" alt=\"".$lang->avatarep_user_alt."\" type=\"".$memprofile['avatartype']."\" />";
+			$avatarep = "<img src=\"" . $avatarep . "\" alt=\"".$lang->avatarep_user_alt."\" type=\"".$memprofile['avatartype']."\" onerror=\"this.src='images/default_avatar.png'\" />";
 		}
 		$memprofile['avatar'] = $status_start . $avatarep . $status_end;
 		if($mybb->settings['avatarep_format'] == 1)
