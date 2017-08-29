@@ -82,7 +82,7 @@ function avatarep_info()
 		"website"		=> "https://community.mybb.com/mods.php?action=view&pid=74",
 		"author"		=> "Whiteneo",
 		"authorsite"	=> "https://soportemybb.es",
-		"version"		=> "2.9.6",
+		"version"		=> "2.9.7",
 		"codename" 		=> "last_poster_avatar",
 		"compatibility" => "18*"
 	);
