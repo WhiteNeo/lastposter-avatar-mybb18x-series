@@ -82,7 +82,7 @@ function avatarep_info()
 		"website"		=> "https://community.mybb.com/mods.php?action=view&pid=74",
 		"author"		=> "Whiteneo",
 		"authorsite"	=> "https://soportemybb.es",
-		"version"		=> "2.9.7",
+		"version"		=> "2.9.8",
 		"codename" 		=> "last_poster_avatar",
 		"compatibility" => "18*"
 	);
@@ -247,7 +247,7 @@ function avatarep_activate() {
         'title' =>  "Version",
         'description' => "Plugin version of last poster avatar on threadlist and forumlist",
         'optionscode' => 'text',
-        'value' => 295,
+        'value' => 298,
         'disporder' => 140,
         'gid' => 0
     );
@@ -261,34 +261,32 @@ function avatarep_activate() {
 	$templatearray = array(
 		'title' => 'avatarep_popup_hover',
 		'template' => $db->escape_string('<div class="modal_avatar_hover">
-<table>
-	<tr>
-		<td class="tavatar">
+	<div class="thead">
+	<span class="avatarep_tavatar">
+			{$memprofile[\'avatar\']}
+	</span>
+	<span class="avatarep_usern">
 			<a href="member.php?action=profile&amp;uid={$uid}">
-				<span class="trow_uname">{$formattedname}</span>
+				<span>{$formattedname}</span>
 			</a>
-			<br />
-			<span class="trow_memprofile">
-				{$usertitle}<br />
-			</span>
 			<span>
-				{$memprofile[\'avatar\']}
+				{$usertitle}
 			</span>
-		</td>
-		<td align="left" valign="middle">
-			<div>
-				<span class="trow_status">
-					{$lang->postbit_status} {$online_status}<br />					
-					{$lang->registration_date} {$memregdate}<br />
-					{$lang->reputation} {$memprofile[\'reputation\']}<br />
-					{$lang->total_threads} {$memprofile[\'threadnum\']}<br />					
-					{$lang->total_posts} {$memprofile[\'postnum\']}<br />
-					{$lang->lastvisit} {$memlastvisitdate} {$memlastvisittime}<br />	
-				</span>
-			</div>
-		</td>
-	</tr>
-</table>
+	</span>
+	</div>
+	<div class="trow2">
+		<div class="avatarep_uprofile">
+			<span class="avatarep_data">
+				<span class="avatarep_data_item">{$lang->registration_date} {$memregdate}</span>
+				<span class="avatarep_data_item">{$lang->reputation} {$memprofile[\'reputation\']}</span>
+				<span class="avatarep_data_item">{$lang->total_threads} {$memprofile[\'threadnum\']}</span>
+				<span class="avatarep_data_item">{$lang->total_posts} {$memprofile[\'postnum\']}</span>
+				<span class="avatarep_data_item">{$lang->lastvisit} {$memlastvisitdate} {$memlastvisittime}</span>
+				<span class="avatarep_data_item">{$lang->warning_level} <a href="{$warning_link}">{$warning_level} %</a></span>
+				<span style="float:right;">{$lang->postbit_status} {$online_status}</span>	
+			</span>
+		</div>
+	</div>
 </div>'),
 		'sid' => '-1',
 		'version' => '1803',
@@ -300,7 +298,7 @@ function avatarep_activate() {
 		'title' => 'avatarep_popup_error_hover',
 		'template' => $db->escape_string('<div class="modal_avatar_hover">
 	<div class="thead"><img src="images/error.png" alt="Avatarep Error" />{$lang->avatarep_user_error}</div>
-	<div class="trow"><br />{$lang->avatarep_user_error_text}<br />&nbsp;</div>
+	<div class="trow1" style="padding: 10px;text-align:center;">{$lang->avatarep_user_error_text}</div>
 </div>'),
 		'sid' => '-1',
 		'version' => '1803',
@@ -311,41 +309,38 @@ function avatarep_activate() {
 		$templatearray = array(
 		'title' => 'avatarep_popup',
 		'template' => $db->escape_string('<div class="modal">
-<table>
-	<tr>
-		<td class="tavatar">
+	<div class="thead">
+	<span class="avatarep_tavatar">
+			{$memprofile[\'avatar\']}
+	</span>
+	<span class="avatarep_usern">
 			<a href="member.php?action=profile&amp;uid={$uid}">
-				<span class="trow_uname">{$formattedname}</span>
+				<span class="avatarep_uname">{$formattedname}</span>
 			</a>
-			<br />
-			<span class="trow_memprofile">
-				{$usertitle}<br />
+			<span class="avatarep_usert">
+				{$usertitle}
 			</span>
-			<span>
-				{$memprofile[\'avatar\']}
+	</span>
+	</div>
+	<div class="trow2 avatarep_divisor">
+		<div class="avatarep_uprofile">
+			<span class="avatarep_memprofile">
+				<a href="member.php?action=profile&amp;uid={$uid}">{$lang->avatarep_user_profile}</a>
+				<a href="private.php?action=send&amp;uid={$memprofile[\'uid\']}">{$lang->avatarep_user_sendpm}</a>
+				<a href="search.php?action=finduserthreads&amp;uid={$uid}">{$lang->find_threads}</a>
+				<a href="search.php?action=finduser&amp;uid={$uid}">{$lang->find_posts}</a>
 			</span>
-		</td>
-		<td class="trow_profile">
-			<div class="trow_uprofile">
-				<span class="trow_memprofile">
-					<a href="member.php?action=profile&amp;uid={$uid}">{$lang->avatarep_user_profile}</a>&nbsp;&nbsp;&nbsp;
-					<a href="private.php?action=send&amp;uid={$memprofile[\'uid\']}">{$lang->avatarep_user_sendpm}</a>
-				</span>
-				<hr class="hr" />
-				<span class="trow_status">
-					{$lang->postbit_status} {$online_status}<br />					
-					{$lang->registration_date} {$memregdate}<br />
-					{$lang->reputation} {$memprofile[\'reputation\']}<br />
-					{$lang->total_threads} {$memprofile[\'threadnum\']}<br />					
-					{$lang->total_posts} {$memprofile[\'postnum\']}<br />
-					{$lang->lastvisit} {$memlastvisitdate} {$memlastvisittime}<br />	
-					{$lang->warning_level} <a href="{$warning_link}">{$warning_level} %</a><br /><hr>
-					(<a href="search.php?action=finduserthreads&amp;uid={$uid}">{$lang->find_threads}</a> &mdash; <a href="search.php?action=finduser&amp;uid={$uid}">{$lang->find_posts}</a>)
-				</span>
+			<span class="avatarep_data">
+				<span class="avatarep_data_item">{$lang->registration_date} {$memregdate}</span>
+				<span class="avatarep_data_item">{$lang->reputation} {$memprofile[\'reputation\']}</span>
+				<span class="avatarep_data_item">{$lang->total_threads} {$memprofile[\'threadnum\']}</span>
+				<span class="avatarep_data_item">{$lang->total_posts} {$memprofile[\'postnum\']}</span>
+				<span class="avatarep_data_item">{$lang->lastvisit} {$memlastvisitdate} {$memlastvisittime}</span>
+				<span class="avatarep_data_item">{$lang->warning_level} <a href="{$warning_link}">{$warning_level} %</a></span>
+				<span style="float:right;">{$lang->postbit_status} {$online_status}</span>	
+			</span>
 		</div>
-		</td>
-	</tr>
-</table>
+	</div>
 </div>'),
 		'sid' => '-1',
 		'version' => '1803',
@@ -357,7 +352,7 @@ function avatarep_activate() {
 		'title' => 'avatarep_popup_error',
 		'template' => $db->escape_string('<div class="modal">
 	<div class="thead"><img src="images/error.png" alt="Avatarep Error" />{$lang->avatarep_user_error}</div>
-	<div class="trow"><br />{$lang->avatarep_user_error_text}<br />&nbsp;</div>
+	<div class="trow1" style="padding: 10px;text-align:center;">{$lang->avatarep_user_error_text}</div>
 </div>'),
 		'sid' => '-1',
 		'version' => '1803',
@@ -365,29 +360,38 @@ function avatarep_activate() {
 		);
 	$db->insert_query("templates", $templatearray);
 	// Añadir el css para la tipsy
-	$avatarep_css = '.modal_avatar{display: none;width: auto;height: auto;background: #f0f0f0;border: none;border-radius: 10px;position: absolute;z-index: 99999;}
-.modal_avatar_hover{width: auto;height: auto;background: #f0f0f0;border: none;border-radius: 10px;position: absolute;z-index: 99999;}
-.tavatar {padding: 0px 10px;text-align: center;}
-.tavatar img {max-height: 80px;max-width: 80px;padding: 8px;}
-.avatarep_online {border-left: 3px solid #008000;box-shadow: 1px 1px 2px 1px rgba(14, 252, 14, 0.8);border-radius: 3px;opacity: 0.9;}
-.avatarep_offline{border-left: 3px solid #FFA500;box-shadow: 1px 1px 2px 1px rgba(252, 165, 14, 0.8);border-radius: 3px;opacity: 0.9;}
-.hr {background-color:#FFA500;}
-.trow_profile{vertical-align: top;padding-left: 9px;width:340px;color:#424242;}
-.trow_profile a{color: #051517;}
-.trow_profile a:hover{color: #e09c09;}
-.trow_uprofile{min-height:175px;line-height:1.2;}
-.trow_uname{font-size:15px;}
-.trow_memprofile{font-size:11px;font-weight:bold;}
-.trow_status{font-size: 11px;}
+	$avatarep_css = '.modal_avatar{display: none;width: auto;height: auto;position: absolute;z-index: 99999;}
+.modal_avatar_hover{width: 220px;height: auto;position: absolute;z-index: 99999;}
+.avatarep_tavatar {padding: 0px 5px;}
+.avatarep_tavatar img {height: 80px;width: 80px;padding: 5px;border-radius: 50%;}
+.avatarep_usern{float: right;right: 10px;position: absolute;margin-top: -60px;font-size: 15px;background: #f5fdff;padding: 10px;opacity: 0.5;color: #424242;border-radius:2px;}
+.avatarep_online {background: #008000;box-shadow: 1px 1px 2px 1px rgba(14, 252, 14, 0.8);border-radius: 50%;height: 90px;width: 90px;margin-left: 10px;opacity: 0.9;}
+.avatarep_offline{background: #FFA500;box-shadow: 1px 1px 2px 1px rgba(252, 165, 14, 0.8);border-radius: 50%;height: 90px;width: 90px;margin-left: 10px;opacity: 0.9;}
+.avatarep_divisor{margin-top: -60px;}
+.avatarep_profile{vertical-align: top;padding-left: 9px;width:340px;color:#424242;}
+.avatarep_profile a{color: #051517;}
+.avatarep_profile a:hover{color: #e09c09;}
+.avatarep_uprofile{line-height:1.5;margin-top: 40px;padding: 10px;}
+.avatarep_uname{font-size:15px;}
+.avatarep_memprofile{font-size:11px;font-weight:bold;}
+.avatarep_memprofile a{display: inline-block;padding: 0px 10px 15px 10px;}
+.avatarep_data{font-size: 11px;}
+.avatarep_data_item{display:block;}
+.avatarep_status{display:block;}
 .avatarep_img_contributor{padding: 2px;border: 1px solid #D8DFEA;width: 20px;height: 20px;border-radius: 50%;opacity: 0.9;	margin: 2px 5px 0px 2px;float: left;}
 .avatarep_img{padding: 3px;border: 1px solid #D8DFEA;width: 30px;height: 30px;border-radius: 50%;opacity: 0.9;margin: 0px 5px 0px 2px;}
-.avatarep_fd{float:left;margin: auto;padding: 0px 20px 0px 0px;width:30px;height:40px}
+.avatarep_fd{float:left;margin: auto;padding: 0px 20px 0px 0px;width:20px;height:40px}
 .avatarep_fda,.avatarep_fdl,.avatarep_fdan,.avatarep_fda_mine,.avatarep_fdl_mine{float:left}
 .avatarep_fda,.avatarep_fda_mine{margin-right:15px}
 .avatarep_fdl_img{width: 20px;height: 20px;border-radius: 50px;position: absolute;margin-left: -35px;margin-top: 25px;border: 1px solid #424242;padding: 2px;}
 @media screen and (max-width: 450px){
-.tavatar img {height: 30px;width: 30px;padding: 2px;}	
-.trow_uname{font-size:12px;}
+.avatarep_memprofile a{display: block;padding: 2px;}
+.avatarep_online, .avatarep_offline{height: 35px;width: 35px;}	
+.avatarep_tavatar img {height: 30px;width: 30px;padding: 2px;}	
+.avatarep_divisor{margin-top: -28px;}
+.avatarep_uname{font-size:12px;}
+.avatarep_uprofile{margin-top: 0px;padding: 5px;}
+.avatarep_usern{float: right;right: 3px;position: absolute;margin-top: -30px;font-size: 12px;background: #f5fdff;padding: 5px;opacity: 0.5;color: #424242;border-radius:2px;}
 .avatarep_img_contributor{padding: 2px;border: 1px solid #D8DFEA;width: 19px;height: 19px;border-radius: 50%;opacity: 0.9;	margin: 2px 5px 0px 2px;float: left;}
 .avatarep_img{padding: 2px;border: 1px solid #D8DFEA;width: 19px;height: 19px;border-radius: 50%;opacity: 0.9;margin: 0px 5px 0px 2px;}
 .avatarep_fd{float:left;margin: auto;padding: 0px 10px 0px 0px;width:20px;height:20px}
@@ -1190,7 +1194,7 @@ function avatarep_style_output(&$content){
         {
 			$username = format_name($avatarep['username'], $avatarep['usergroup'], $avatarep['displaygroup']);
 			$format = "#{$avatarep['username']}{$avatarep['uid']}#";
-			if(is_array($cache->cache['groups']))
+			if(is_array($cache->cache['groups']) && !empty($cache->cache['mods']))
 			{
 				$compare = explode(",", $cache->cache['mods']);
 				if(in_array($avatarep['uid'], $compare))
