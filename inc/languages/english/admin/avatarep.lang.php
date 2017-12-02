@@ -60,3 +60,6 @@ $l['avatarep_thread_lastposter_mark_descrip'] = "Show avatar hover thread owner 
 
 $l['avatarep_thread_contributor'] = "Show Avatar Contributor";
 $l['avatarep_thread_contributor_descrip'] = "Shows avatar of thread owner in showthread, but yours if you've replied to that thread.";
+
+$l['avatarep_onerror'] = "Shows white or broken avatars as default";
+$l['avatarep_private_descrip'] = "If some error ocurrs when avatar is loading like img was removed or broken, then default avatar appears (This brokes w3c validation due onerror img tag js function is not validated there)";
