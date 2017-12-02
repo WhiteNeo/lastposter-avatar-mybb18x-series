@@ -60,3 +60,6 @@ $l['avatarep_latest_threads_descrip'] = "Muestra el avatar de los últimos temas
 
 $l['avatarep_thread_lastposter_mark'] = "Marcar mis temas respondidos";
 $l['avatarep_thread_lastposter_mark_descrip'] = "Mostrar el avatar del usuario en los temas creados, encima del avatar del creador, para saber a que temas he respondido, (requiere consultas adicionales).";
+
+$l['avatarep_onerror'] = "Mostrar avatares rotos o sin avatar como el avatar por defecto";
+$l['avatarep_private_descrip'] = "Si algún error ocurre en la carga de los avatares, como la imágen ya no está disponible, o no carga correctamente o simplemente no responde el servidor donde se aloja, entonces cargamos el avatar por defecto (Esto rompe la validación de la w3c debido a que la función onerror de la etiqueta img no es validada, pero existe. Si no desea esto deshabilite esta opción).";
