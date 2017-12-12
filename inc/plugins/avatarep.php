@@ -898,8 +898,8 @@ function avatarep_private_fname()
     {
         return false;
     }
-	$tofromuid = (int)$message['toid'];
-	$tofromusername = htmlspecialchars_uni($message['tousername']);
+	$tofromuid = (int)$message['fromid'];
+	$tofromusername = htmlspecialchars_uni($message['fromusername']);
 	if($mybb->settings['avatarep_format'] == 1)
 	{
 		if($tofromuid>0)
