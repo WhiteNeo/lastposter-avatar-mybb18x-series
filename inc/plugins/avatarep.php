@@ -898,8 +898,21 @@ function avatarep_private_fname()
     {
         return false;
     }
-	$tofromuid = (int)$message['fromid'];
-	$tofromusername = htmlspecialchars_uni($message['fromusername']);
+	if($mybb->input['fid'] == 2)
+	{
+		$tofromuid = (int)$message['toid'];
+		$tofromusername = htmlspecialchars_uni($message['tousername']);		
+	}
+	else if($mybb->input['fid'] == 3)
+	{
+		$tofromuid = (int)$message['toid'];
+		$tofromusername = htmlspecialchars_uni($message['tousername']);		
+	}	
+	else
+	{
+		$tofromuid = (int)$message['fromid'];
+		$tofromusername = htmlspecialchars_uni($message['fromusername']);
+	}
 	if($mybb->settings['avatarep_format'] == 1)
 	{
 		if($tofromuid>0)
