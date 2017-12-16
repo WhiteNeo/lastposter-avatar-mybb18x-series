@@ -17,44 +17,24 @@ if(!defined("IN_MYBB"))
 }
 
 // Añadir hooks
-if(THIS_SCRIPT == 'index.php' || THIS_SCRIPT == 'forumdisplay.php')
+if($settings['sidebox5'] == 0 || $settings['sidebox5'] == 1)
 {
-	if($settings['sidebox5'] == 0 || $settings['sidebox5'] == 1)
-	{
-		$plugins->add_hook('index_end', 'avatarep_portal_sb');	
-		$plugins->add_hook('forumdisplay_end', 'avatarep_portal_sb');		
-	}
-	$plugins->add_hook('build_forumbits_forum', 'forumlist_avatar_fname',15);
-	$plugins->add_hook('forumdisplay_thread', 'forumlist_avatar_thread',15);		
-	$plugins->add_hook('forumdisplay_announcement', 'avatarep_announcement',15);
-	$plugins->add_hook("index_end", "avatarep_portal_fname",15);	
-}
-else if(THIS_SCRIPT == 'showthread.php')
-{
-	if($settings['sidebox5'] == 0 || $settings['sidebox5'] == 1)
+	$plugins->add_hook('index_end', 'avatarep_portal_sb');	
+	$plugins->add_hook('forumdisplay_end', 'avatarep_portal_sb');		
 	$plugins->add_hook('showthread_end', 'avatarep_portal_sb');		
-	$plugins->add_hook('showthread_end', 'avatarep_threads');
+	$plugins->add_hook("portal_end", "avatarep_portal_sb");		
 }
-else if(THIS_SCRIPT == 'search.php')
-{
-	$plugins->add_hook('search_results_thread', 'forumlist_avatar_search',15);
-	$plugins->add_hook('search_results_post', 'forumlist_avatar_search',15);
-}
-else if(THIS_SCRIPT == 'private.php')
-{
-	$plugins->add_hook("private_message", "avatarep_private_fname",15);
-}
-else if(THIS_SCRIPT == 'portal.php')
-{
-	if($settings['sidebox5'] == 0 || $settings['sidebox5'] == 1)
-	$plugins->add_hook("portal_end", "avatarep_portal_sb");	
-	$plugins->add_hook("portal_end", "avatarep_portal_fname",15);	
-	$plugins->add_hook("portal_announcement", "avatarep_portal",15);	
-}
-else if(THIS_SCRIPT == 'usercp.php')
-{
-	$plugins->add_hook("usercp_end", "avatarep_usercp_fname",15);
-}
+$plugins->add_hook('build_forumbits_forum', 'forumlist_avatar_fname',15);
+$plugins->add_hook('forumdisplay_thread', 'forumlist_avatar_thread',15);		
+$plugins->add_hook('forumdisplay_announcement', 'avatarep_announcement',15);
+$plugins->add_hook("index_end", "avatarep_portal_fname",15);	
+$plugins->add_hook('showthread_end', 'avatarep_threads');
+$plugins->add_hook('search_results_thread', 'forumlist_avatar_search',15);
+$plugins->add_hook('search_results_post', 'forumlist_avatar_search',15);
+$plugins->add_hook("private_message", "avatarep_private_fname",15);
+$plugins->add_hook("portal_end", "avatarep_portal_fname",15);	
+$plugins->add_hook("portal_announcement", "avatarep_portal",15);	
+$plugins->add_hook("usercp_end", "avatarep_usercp_fname",15);
 $plugins->add_hook('global_start', 'avatarep_popup');
 $plugins->add_hook('global_end', 'avatarep_style_guser',10);
 $plugins->add_hook('pre_output_page', 'avatarep_style_output',10);
