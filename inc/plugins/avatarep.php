@@ -282,9 +282,6 @@ function avatarep_activate() {
 			<a href="member.php?action=profile&amp;uid={$uid}">
 				<span class="avatarep_uname">{$formattedname}</span>
 			</a>
-			<span class="avatarep_usert">
-				{$usertitle}
-			</span>
 		</span>
 	</div>
 	<div class="trow2 avatarep_divisor_hov">
@@ -423,7 +420,7 @@ function avatarep_activate() {
 	$stylesheet = array(
 		"name"			=> "avatarep.css",
 		"tid"			=> 1,
-		"attachedto"	=> "",		
+		"attachedto"	=> 0,		
 		"stylesheet"	=> $db->escape_string($avatarep_css),
 		"cachefile"		=> "avatarep.css",
 		"lastmodified"	=> TIME_NOW
@@ -1239,7 +1236,7 @@ function avatarep_style_output(&$content){
 		$cache->cache['groups'] = array_unique($cache->cache['groups']);
 	}
 	
-    if (sizeof($cache->cache['users']))
+    if (isset($cache->cache['users']))
     {	
         $result = $db->simple_select('users', 'uid, username, usergroup, displaygroup', 'uid IN (' . implode(',', array_keys($cache->cache['users'])) . ')');
         while ($avatarep = $db->fetch_array($result))
@@ -1275,7 +1272,7 @@ function avatarep_style_output(&$content){
 		}
 	}
 	
-	if (sizeof($cache->cache['guests']))
+	if (isset($cache->cache['guests']))
     {
         foreach ($cache->cache['guests'] as $username)
         {
@@ -1284,8 +1281,8 @@ function avatarep_style_output(&$content){
             $content = str_replace($format, $username, $content);
         }
     }
-        
-    if (sizeof($cache->cache['groups']))
+    
+    if (isset($cache->cache['groups']))
     {
         foreach ($cache->cache['usergroups'] as $gid => $gdata)
         {
