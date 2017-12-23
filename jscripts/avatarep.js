@@ -7,8 +7,8 @@
 $(document).on("ready", function(){
 	var NavaT = 0;						
 	var myTimer;
-	if (!lpaname)
-		var lpaname = "";
+	if (typeof lpaname === 'undefined')
+		return false;
 	$('a[class^="'+lpaname+'"]').on('click', function (e) {
 		e.preventDefault();	
 		return false;
