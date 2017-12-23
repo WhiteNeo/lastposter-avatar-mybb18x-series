@@ -16,29 +16,52 @@ if(!defined("IN_MYBB"))
 	die("Direct initialization of this file is not allowed.<br /><br />Please make sure IN_MYBB is defined.");
 }
 
-// Añadir hooks
-if($settings['sidebox5'] == 0 || $settings['sidebox5'] == 1)
+if(defined("THIS_SCRIPT"))
 {
-	$plugins->add_hook('index_end', 'avatarep_portal_sb');	
-	$plugins->add_hook('forumdisplay_end', 'avatarep_portal_sb');		
-	$plugins->add_hook('showthread_end', 'avatarep_portal_sb');		
-	$plugins->add_hook("portal_end", "avatarep_portal_sb");		
+	// Añadir hooks
+	if(THIS_SCRIPT == 'index.php' || THIS_SCRIPT == 'forumdisplay.php')
+	{
+		if($settings['sidebox5'] == 0 || $settings['sidebox5'] == 1)
+		{
+			$plugins->add_hook('index_end', 'avatarep_portal_sb');	
+			$plugins->add_hook('forumdisplay_end', 'avatarep_portal_sb');		
+		}
+		$plugins->add_hook('build_forumbits_forum', 'forumlist_avatar_fname',15);
+		$plugins->add_hook('forumdisplay_thread', 'forumlist_avatar_thread',15);		
+		$plugins->add_hook('forumdisplay_announcement', 'avatarep_announcement',15);
+		$plugins->add_hook("index_end", "avatarep_portal_fname",15);	
+	}
+	else if(THIS_SCRIPT == 'showthread.php')
+	{
+		if($settings['sidebox5'] == 0 || $settings['sidebox5'] == 1)
+		$plugins->add_hook('showthread_end', 'avatarep_portal_sb');		
+		$plugins->add_hook('showthread_end', 'avatarep_threads');
+	}
+	else if(THIS_SCRIPT == 'search.php')
+	{
+		$plugins->add_hook('search_results_thread', 'forumlist_avatar_search',15);
+		$plugins->add_hook('search_results_post', 'forumlist_avatar_search',15);
+	}
+	else if(THIS_SCRIPT == 'private.php')
+	{
+		$plugins->add_hook("private_message", "avatarep_private_fname",15);
+	}
+	else if(THIS_SCRIPT == 'portal.php')
+	{
+		if($settings['sidebox5'] == 0 || $settings['sidebox5'] == 1)
+		$plugins->add_hook("portal_end", "avatarep_portal_sb");	
+		$plugins->add_hook("portal_end", "avatarep_portal_fname",15);	
+		$plugins->add_hook("portal_announcement", "avatarep_portal",15);	
+	}
+	else if(THIS_SCRIPT == 'usercp.php')
+	{
+		$plugins->add_hook("usercp_end", "avatarep_usercp_fname",15);
+	}
+	$plugins->add_hook('global_start', 'avatarep_popup');
+	$plugins->add_hook('global_end', 'avatarep_style_guser',10);
+	$plugins->add_hook('pre_output_page', 'avatarep_style_output',10);
+	$plugins->add_hook('pre_output_page', 'forumlist_avatar',15);
 }
-$plugins->add_hook('build_forumbits_forum', 'forumlist_avatar_fname',15);
-$plugins->add_hook('forumdisplay_thread', 'forumlist_avatar_thread',15);		
-$plugins->add_hook('forumdisplay_announcement', 'avatarep_announcement',15);
-$plugins->add_hook("index_end", "avatarep_portal_fname",15);	
-$plugins->add_hook('showthread_end', 'avatarep_threads');
-$plugins->add_hook('search_results_thread', 'forumlist_avatar_search',15);
-$plugins->add_hook('search_results_post', 'forumlist_avatar_search',15);
-$plugins->add_hook("private_message", "avatarep_private_fname",15);
-$plugins->add_hook("portal_end", "avatarep_portal_fname",15);	
-$plugins->add_hook("portal_announcement", "avatarep_portal",15);	
-$plugins->add_hook("usercp_end", "avatarep_usercp_fname",15);
-$plugins->add_hook('global_start', 'avatarep_popup');
-$plugins->add_hook('global_end', 'avatarep_style_guser',10);
-$plugins->add_hook('pre_output_page', 'avatarep_style_output',10);
-$plugins->add_hook('pre_output_page', 'forumlist_avatar',15);
 
 // Informacion del plugin
 function avatarep_info()
@@ -252,26 +275,20 @@ function avatarep_activate() {
 		'title' => 'avatarep_popup_hover',
 		'template' => $db->escape_string('<div class="modal_avatar_hover">
 	<div class="thead">
-	<span class="avatarep_tavatar">
-			{$memprofile[\'avatar\']}
-	</span>
-	<span class="avatarep_usern">
+		<span class="avatarep_tavatar_hov">
+				{$memprofile[\'avatar\']}
+		</span>
+		<span class="avatarep_usern_hov">
 			<a href="member.php?action=profile&amp;uid={$uid}">
 				<span class="avatarep_uname">{$formattedname}</span>
 			</a>
 			<span class="avatarep_usert">
 				{$usertitle}
 			</span>
-	</span>
+		</span>
 	</div>
-	<div class="trow2 avatarep_divisor">
-		<div class="avatarep_uprofile">
-			<span class="avatarep_memprofile">
-				<a href="member.php?action=profile&amp;uid={$uid}">{$lang->avatarep_user_profile}</a>
-				<a href="private.php?action=send&amp;uid={$memprofile[\'uid\']}">{$lang->avatarep_user_sendpm}</a>
-				<a href="search.php?action=finduserthreads&amp;uid={$uid}">{$lang->find_threads}</a>
-				<a href="search.php?action=finduser&amp;uid={$uid}">{$lang->find_posts}</a>
-			</span>
+	<div class="trow2 avatarep_divisor_hov">
+		<div class="avatarep_uprofile_hov">
 			<span class="avatarep_data">
 				<span class="avatarep_data_item">{$lang->registration_date} {$memregdate}</span>
 				<span class="avatarep_data_item">{$lang->reputation} {$memprofile[\'reputation\']}</span>
@@ -357,18 +374,25 @@ function avatarep_activate() {
 	$db->insert_query("templates", $templatearray);
 	// Añadir el css para la tipsy
 	$avatarep_css = '.modal_avatar{display: none;width: auto;height: auto;position: absolute;z-index: 99999;}
-.modal_avatar_hover{width: 220px;height: auto;position: absolute;z-index: 99999;}
+.modal_avatar_hover{width: 220px;height: auto;position: absolute;z-index: 99999;text-align: left;}
 .avatarep_tavatar {padding: 0px 5px;}
 .avatarep_tavatar img {height: 80px;width: 80px;padding: 5px;border-radius: 50%;}
+.avatarep_tavatar_hov {padding: 0px 5px;}
+.avatarep_tavatar_hov img {height: 40px;width: 40px;padding: 3px;border-radius: 50%;}
 .avatarep_usern{float: right;right: 10px;position: absolute;margin-top: -60px;font-size: 15px;background: #f5fdff;padding: 10px;opacity: 0.5;color: #424242;border-radius:2px;}
-.avatarep_online {background: #008000;box-shadow: 1px 1px 2px 1px rgba(14, 252, 14, 0.8);border-radius: 50%;height: 90px;width: 90px;margin-left: 10px;opacity: 0.9;}
-.avatarep_offline{background: #FFA500;box-shadow: 1px 1px 2px 1px rgba(252, 165, 14, 0.8);border-radius: 50%;height: 90px;width: 90px;margin-left: 10px;opacity: 0.9;}
+.avatarep_usern_hov{float: right;right: 15px;position: absolute;margin-top: -50px;font-size: 13px;background: #f5fdff;padding: 10px;opacity: 0.8;border-radius: 2px;}
+.avatarep_online_ext1,.avatarep_online_ext{background: #008000;box-shadow: 1px 1px 2px 1px rgba(14, 252, 14, 0.8);border-radius: 50%;height: 90px;width: 90px;margin-left: 10px;opacity: 0.9;}
+.avatarep_offline_ext1,.avatarep_offline_ext{background: #FFA500;box-shadow: 1px 1px 2px 1px rgba(252, 165, 14, 0.8);border-radius: 50%;height: 90px;width: 90px;margin-left: 10px;opacity: 0.9;}
+.avatarep_online_ext2{background: #008000;box-shadow: 1px 1px 2px 1px rgba(14, 252, 14, 0.8);border-radius: 50%;height: 45px;width: 45px;margin-left: 10px;opacity: 0.9;}
+.avatarep_offline_ext2{background: #FFA500;box-shadow: 1px 1px 2px 1px rgba(252, 165, 14, 0.8);border-radius: 50%;height: 45px;width: 45px;margin-left: 10px;opacity: 0.9;}
 .avatarep_divisor{margin-top: -60px;}
+.avatarep_divisor_hov{margin-top: -50px;}
 .avatarep_profile{vertical-align: top;padding-left: 9px;width:340px;color:#424242;}
 .avatarep_profile a{color: #051517;}
 .avatarep_profile a:hover{color: #e09c09;}
 .avatarep_uprofile{line-height:1.5;margin-top: 40px;padding: 10px;}
-.avatarep_uname{font-size:15px;}
+.avatarep_uprofile_hov{line-height: 1.5;margin-top: 16px;padding: 11px;}
+.avatarep_uname{font-size:15px;color:#025f7e;}
 .avatarep_memprofile{font-size:11px;font-weight:bold;}
 .avatarep_memprofile a{display: inline-block;padding: 0px 10px 15px 10px;}
 .avatarep_data{font-size: 11px;}
@@ -1328,17 +1352,22 @@ function avatarep_popup()
 		$timesearch = TIME_NOW - $mybb->settings['wolcutoffmins']*60;
 		$query = $db->simple_select("sessions", "location,nopermission", "uid='{$uid}' AND time>'{$timesearch}'", array('order_by' => 'time', 'order_dir' => 'DESC', 'limit' => 1));
 		$session = $db->fetch_array($query);
-		
+		if($mybb->settings['avatarep_menu_events'] == 2)
+			$extra_avat = "_ext2";
+		else if($mybb->settings['avatarep_menu_events'] == 1)
+			$extra_avat = "_ext1";
+		else
+			$extra_avat = "_ext";
 		if(($memprofile['invisible'] != 1 || $mybb->usergroup['canviewwolinvis'] == 1 || $memprofile['uid'] == $mybb->user['uid']) && !empty($session))
 		{
-			$status_start = "<div class=\"avatarep_online\">";
+			$status_start = "<div class=\"avatarep_online{$extra_avat}\">";
 			$status_end = "</div>";
 			eval("\$online_status = \"".$templates->get("member_profile_online")."\";");
 		}
 		// User is offline
 		else
 		{
-			$status_start = "<div class=\"avatarep_offline\">";
+			$status_start = "<div class=\"avatarep_offline{$extra_avat}\">";
 			$status_end = "</div>";		
 			eval("\$online_status = \"".$templates->get("member_profile_offline")."\";");
 		}
