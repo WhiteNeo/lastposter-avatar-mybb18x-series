@@ -423,7 +423,7 @@ function avatarep_activate() {
 	$stylesheet = array(
 		"name"			=> "avatarep.css",
 		"tid"			=> 1,
-		"attachedto"	=> 0,		
+		"attachedto"	=> "",		
 		"stylesheet"	=> $db->escape_string($avatarep_css),
 		"cachefile"		=> "avatarep.css",
 		"lastmodified"	=> TIME_NOW
