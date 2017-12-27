@@ -204,6 +204,16 @@ function avatarep_activate() {
         'disporder' => 90,
         'gid' => $group['gid']
     );
+
+	$avatarep_config[] = array(
+        'name' => 'avatarep_usercp',
+        'title' =>  $db->escape_string($lang->avatarep_usercp),
+        'description' => $db->escape_string($lang->avatarep_usercp_descrip),
+        'optionscode' => 'yesno',
+        'value' => '1',
+        'disporder' => 100,
+        'gid' => $group['gid']
+    );
 	
 	$avatarep_config[] = array(
         'name' => 'avatarep_menu',
@@ -211,7 +221,7 @@ function avatarep_activate() {
         'description' => $db->escape_string($lang->avatarep_menu_descrip),
         'optionscode' => 'yesno',
         'value' => '1',
-        'disporder' => 100,
+        'disporder' => 110,
         'gid' => $group['gid']
     );
 
@@ -221,7 +231,7 @@ function avatarep_activate() {
         'description' => $db->escape_string($lang->avatarep_menu_events_descrip),
         'optionscode' => 'select \n1=On Click \n2=Mouse Over',
         'value' => '1',
-        'disporder' => 110,
+        'disporder' => 120,
         'gid' => $group['gid']
     );
 
@@ -231,7 +241,7 @@ function avatarep_activate() {
         'description' => $db->escape_string($lang->avatarep_guests_descrip),
         'optionscode' => 'yesno',
         'value' => '1',
-        'disporder' => 120,
+        'disporder' => 130,
         'gid' => $group['gid']
     );	
 	
@@ -241,7 +251,7 @@ function avatarep_activate() {
         'description' => $db->escape_string($lang->avatarep_format_descrip),
         'optionscode' => 'yesno',
         'value' => '1',
-        'disporder' => 130,
+        'disporder' => 140,
         'gid' => $group['gid']
     );
 
@@ -251,7 +261,7 @@ function avatarep_activate() {
         'description' => $db->escape_string($lang->avatarep_onerror_descrip),
         'optionscode' => 'yesno',
         'value' => '1',
-        'disporder' => 140,
+        'disporder' => 150,
         'gid' => $group['gid']
     );
 	
@@ -261,7 +271,7 @@ function avatarep_activate() {
         'description' => "Plugin version of last poster avatar on threadlist and forumlist",
         'optionscode' => 'text',
         'value' => 298,
-        'disporder' => 150,
+        'disporder' => 160,
         'gid' => 0
     );
     
@@ -599,12 +609,12 @@ function forumlist_avatar(&$content)
 	switch(THIS_SCRIPT)
 	{		
 		case "index.php":if($mybb->settings['avatarep_foros'] == 1)$show_avatars = true;break;		
-		case "forumdisplay.php":if($mybb->settings['avatarep_latest_threads'] == 1)$show_avatars = true;break;
-		case "showthread.php":if($mybb->settings['avatarep_latest_threads'] == 1)$show_avatars = true;break;
+		case "forumdisplay.php":if($mybb->settings['avatarep_temas'] == 1)$show_avatars = true;break;
+		case "showthread.php":if($mybb->settings['avatarep_temas'] == 1)$show_avatars = true;break;
 		case "search.php":if($mybb->settings['avatarep_busqueda'] == 1)$show_avatars = true;break;
 		case "portal.php":if($mybb->settings['avatarep_portal'] == 1)$show_avatars = true;break;
 		case "private.php":if($mybb->settings['avatarep_private'] == 1)$show_avatars = true;break;	
-		case "usercp.php":if($mybb->settings['avatarep_temas'] == 1)$show_avatars = true;break;
+		case "usercp.php":if($mybb->settings['avatarep_usercp'] == 1)$show_avatars = true;break;
 		default: $show_avatars=false;
 	}
 	if($show_avatars == true)
@@ -715,7 +725,7 @@ function forumlist_avatar_thread()
     $lang->load("avatarep", false, true);
     $avbr = "<br />";
     //Revisar que la opcion este activa
-    if($mybb->settings['avatarep_active'] == 0  || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_temas'] == 0)
+    if($mybb->settings['avatarep_active'] == 0)
     {
 		return false;	
 	}
@@ -1109,7 +1119,7 @@ function avatarep_threads()
     $lang->load("avatarep", false, true);        
 	 
     //Revisar si la opcion esta activa
-    if($mybb->settings['avatarep_active'] == 0 && $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_temas'] == 0)
+    if($mybb->settings['avatarep_active'] == 0)
     {
         return false;
     }
@@ -1166,9 +1176,6 @@ function avatarep_threads()
 			$search = "/uploads";
 			$replace = "./uploads";
 			$avatarep['avatar'] = str_replace($replace, $search, $avatarep['avatar']);
-			$avatar_thread = $avatarep['avatar'];
-			$post['avatarep_title'] = $lang->sprintf($lang->avatarep_user_alt_thread_contributor, $avatarep['username']);
-			$avatarep_thread = "<img src=\"".htmlspecialchars_uni($avatarep['avatar'])."\" class=\"avatarep_img_contributor\" alt=\"".$post['avatarep_title']."\"{$onerror} />";			
 		}	
 	}	
 }
