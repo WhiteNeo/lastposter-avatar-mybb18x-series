@@ -79,6 +79,10 @@ function avatarep_info()
 	{
 		$avatarep_config_link .= '<div style="float: right; color: rgba(136, 17, 3, 1); background: url(../images/icons/exclamation.png) no-repeat 0px 18px; padding: 21px; text-decoration: none;">Plugin disabled</div>';
 	}
+	if(function_exists('styleUsernames_info') && $mybb->settings['avatarep_format'])
+	{
+		$avatarep_config_link .= '<div style="float: right; color: rgba(136, 17, 3, 1); background: url(../images/icons/exclamation.png) no-repeat 0px 18px; padding: 21px; text-decoration: none;">You have Style Usernames Plugin (Disable Formatted names option in avatar options, or Uninstall Style Usernames from your forums to not get errors.)</div>';
+	}	
 	return array(
         "name"			=> $db->escape_string($lang->avatarep_name),
     	"description"	=> $db->escape_string($lang->avatarep_descrip) . $avatarep_config_link,
