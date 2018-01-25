@@ -103,14 +103,14 @@ function avatarep_activate() {
     $lang->load("avatarep", false, true);
 
     // Crear el grupo de opciones
-    $query = $db->simple_select("settinggroups", "COUNT(*) as rows");
-    $rows = $db->fetch_field($query, "rows");
+    $query = $db->simple_select("settinggroups", "COUNT(*) as numrows");
+    $numrows = $db->fetch_field($query, "numrows");
 
     $avatarep_groupconfig = array(
         'name' => 'avatarep',
         'title' => $db->escape_string($lang->avatarep_title),
         'description' => $db->escape_string($lang->avatarep_title_descrip),
-        'disporder' => $rows+1,
+        'disporder' => $numrows+1,
         'isdefault' => 0
     );
 
@@ -279,7 +279,7 @@ function avatarep_activate() {
         'gid' => 0
     );
     
-    foreach($avatarep_config as $array => $content)
+    foreach($avatarep_config as $array_config => $content)
     {
         $db->insert_query("settings", $content);
     }
