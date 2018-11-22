@@ -1,12 +1,8 @@
 <?php
 /**
 *@ Autor: Whiteneo
-* https://www.youtube.com/watch?v=2zRv7DWpnbI 
-* https://www.youtube.com/watch?v=FhDRmJXFU1o 
-* https://www.youtube.com/watch?v=yO1Ed8o48i8 
-* https://www.youtube.com/watch?v=NFeF8vGu5CQ
-*@ Fecha: 2013-12-12
-*@ Version: 2.9.x
+*@ Fecha: 2018-08-24
+*@ Version: 3.0.x
 *@ Contacto: neogeoman@gmail.com
 */
 
@@ -45,6 +41,7 @@ if(defined("THIS_SCRIPT"))
 	else if(THIS_SCRIPT == 'private.php')
 	{
 		$plugins->add_hook("private_message", "avatarep_private_fname",15);
+		$plugins->add_hook("private_tracking_end", "avatarep_private_tracking_fname",15);
 	}
 	else if(THIS_SCRIPT == 'portal.php')
 	{
@@ -75,7 +72,7 @@ function avatarep_info()
 	{
 		$avatarep_config_link = '<div style="float: right;"><a href="index.php?module=config&amp;action=change&amp;search=avatarep" style="color:#035488; background: url(../images/icons/brick.png) no-repeat 0px 18px; padding: 18px; text-decoration: none;"> '.$db->escape_string($lang->avatarep_config).'</a></div>';
 	}
-	else if($mybb->settings['avatarep_active'] == 0)
+	else if(isset($mybb->settings['avatarep_active']) && $mybb->settings['avatarep_active'] == 0)
 	{
 		$avatarep_config_link .= '<div style="float: right; color: rgba(136, 17, 3, 1); background: url(../images/icons/exclamation.png) no-repeat 0px 18px; padding: 21px; text-decoration: none;">Plugin disabled</div>';
 	}
@@ -89,7 +86,7 @@ function avatarep_info()
 		"website"		=> "https://community.mybb.com/mods.php?action=view&pid=74",
 		"author"		=> "Whiteneo",
 		"authorsite"	=> "https://soportemybb.es",
-		"version"		=> "2.9.8",
+		"version"		=> "3.0",
 		"codename" 		=> "last_poster_avatar",
 		"compatibility" => "18*"
 	);
@@ -154,7 +151,7 @@ function avatarep_activate() {
         'title' =>  $db->escape_string($lang->avatarep_thread_lastposter_mark),
         'description' => $db->escape_string($lang->avatarep_thread_lastposter_mark_descrip),
         'optionscode' => 'yesno',
-        'value' => '1',
+        'value' => '0',
         'disporder' => 40,
         'gid' => $group['gid']
     );
@@ -384,57 +381,60 @@ function avatarep_activate() {
 		);
 	$db->insert_query("templates", $templatearray);
 	// Añadir el css para la tipsy
-	$avatarep_css = '.modal_avatar{display: none;width: auto;height: auto;position: absolute;z-index: 99999;}
-.modal_avatar_hover{width: 220px;height: auto;position: absolute;z-index: 99999;text-align: left;}
-.avatarep_tavatar {padding: 0px 5px;}
-.avatarep_tavatar img {height: 80px;width: 80px;padding: 5px;border-radius: 50%;}
-.avatarep_tavatar_hov {padding: 0px 5px;}
-.avatarep_tavatar_hov img {height: 40px;width: 40px;padding: 3px;border-radius: 50%;}
-.avatarep_usern{float: right;right: 10px;position: absolute;margin-top: -60px;font-size: 15px;background: #f5fdff;padding: 10px;opacity: 0.5;color: #424242;border-radius:2px;}
-.avatarep_usern_hov{float: right;right: 15px;position: absolute;margin-top: -50px;font-size: 13px;background: #f5fdff;padding: 10px;opacity: 0.8;border-radius: 2px;}
-.avatarep_online_ext1,.avatarep_online_ext{background: #008000;box-shadow: 1px 1px 2px 1px rgba(14, 252, 14, 0.8);border-radius: 50%;height: 90px;width: 90px;margin-left: 10px;opacity: 0.9;}
-.avatarep_offline_ext1,.avatarep_offline_ext{background: #FFA500;box-shadow: 1px 1px 2px 1px rgba(252, 165, 14, 0.8);border-radius: 50%;height: 90px;width: 90px;margin-left: 10px;opacity: 0.9;}
-.avatarep_online_ext2{background: #008000;box-shadow: 1px 1px 2px 1px rgba(14, 252, 14, 0.8);border-radius: 50%;height: 45px;width: 45px;margin-left: 10px;opacity: 0.9;}
-.avatarep_offline_ext2{background: #FFA500;box-shadow: 1px 1px 2px 1px rgba(252, 165, 14, 0.8);border-radius: 50%;height: 45px;width: 45px;margin-left: 10px;opacity: 0.9;}
-.avatarep_divisor{margin-top: -60px;}
-.avatarep_divisor_hov{margin-top: -50px;}
-.avatarep_profile{vertical-align: top;padding-left: 9px;width:340px;color:#424242;}
-.avatarep_profile a{color: #051517;}
-.avatarep_profile a:hover{color: #e09c09;}
-.avatarep_uprofile{line-height:1.5;margin-top: 40px;padding: 10px;}
-.avatarep_uprofile_hov{line-height: 1.5;margin-top: 16px;padding: 11px;}
-.avatarep_uname{font-size:15px;color:#025f7e;}
-.avatarep_memprofile{font-size:11px;font-weight:bold;}
-.avatarep_memprofile a{display: inline-block;padding: 0px 10px 15px 10px;}
-.avatarep_data{font-size: 11px;}
-.avatarep_data_item{display:block;}
-.avatarep_status{display:block;}
-.avatarep_img_contributor{padding: 2px;border: 1px solid #D8DFEA;width: 20px;height: 20px;border-radius: 50%;opacity: 0.9;	margin: 2px 5px 0px 2px;float: left;}
-.avatarep_img{padding: 3px;border: 1px solid #D8DFEA;width: 30px;height: 30px;border-radius: 50%;opacity: 0.9;margin: 0px 5px 0px 2px;}
-.avatarep_fd{float:left;margin: auto;padding: 0px 20px 0px 0px;width:30px;height:40px}
+	$avatarep_css = '.modal_avatar{display: none;width: auto;height: auto;position: absolute;z-index: 99999}
+.modal_avatar_hover{width: 220px;height: auto;position: absolute;z-index: 99999;text-align: left}
+.avatarep_tavatar {padding: 0px 5px}
+.avatarep_tavatar img {height: 80px;width: 80px;padding: 5px;border-radius: 50%}
+.avatarep_tavatar_hov {padding: 0px 5px}
+.avatarep_tavatar_hov img {height: 40px;width: 40px;padding: 3px;border-radius: 50%}
+.avatarep_usern{float: right;right: 10px;position: absolute;margin-top: -60px;font-size: 15px;background: #f5fdff;padding: 10px;opacity: 0.5;color: #424242;border-radius:2px}
+.avatarep_usern_hov{float: right;right: 15px;position: absolute;margin-top: -50px;font-size: 13px;background: #f5fdff;padding: 10px;opacity: 0.8;border-radius: 2px}
+.avatarep_online_ext1,.avatarep_online_ext{background: #008000;box-shadow: 1px 1px 2px 1px rgba(14, 252, 14, 0.8);border-radius: 50%;height: 90px;width: 90px;margin-left: 10px;opacity: 0.9}
+.avatarep_offline_ext1,.avatarep_offline_ext{background: #FFA500;box-shadow: 1px 1px 2px 1px rgba(252, 165, 14, 0.8);border-radius: 50%;height: 90px;width: 90px;margin-left: 10px;opacity: 0.9}
+.avatarep_online_ext2{background: #008000;box-shadow: 1px 1px 2px 1px rgba(14, 252, 14, 0.8);border-radius: 50%;height: 45px;width: 45px;margin-left: 10px;opacity: 0.9}
+.avatarep_offline_ext2{background: #FFA500;box-shadow: 1px 1px 2px 1px rgba(252, 165, 14, 0.8);border-radius: 50%;height: 45px;width: 45px;margin-left: 10px;opacity: 0.9}
+.avatarep_divisor{margin-top: -60px}
+.avatarep_divisor_hov{margin-top: -50px}
+.avatarep_profile{vertical-align: top;padding-left: 9px;width:340px;color:#424242}
+.avatarep_profile a{color: #051517}
+.avatarep_profile a:hover{color: #e09c09}
+.avatarep_uprofile{line-height:1.5;margin-top: 40px;padding: 10px}
+.avatarep_uprofile_hov{line-height: 1.5;margin-top: 16px;padding: 11px}
+.avatarep_uname{font-size:15px;color:#025f7e}
+.avatarep_memprofile{font-size:11px;font-weight:bold}
+.avatarep_memprofile a{display: inline-block;padding: 0px 10px 15px 10px}
+.avatarep_data{font-size: 11px}
+.avatarep_data_item{display:block}
+.avatarep_status{display:block}
+.avatarep_img_contributor{padding: 2px;border: 1px solid #D8DFEA;width: 20px;height: 20px;border-radius: 50%;opacity: 0.9;	margin: 2px 5px 0px 2px;float: left}
+.avatarep_img, .avatarep_bg{padding: 3px;border: 1px solid #D8DFEA;width: 40px;height: 40px;border-radius: 50%;opacity: 0.9;margin: auto;float: left}
+.avatarep_fd{width: 40px;height: 40px;display: inline;position: relative}
 .avatarep_fda,.avatarep_fdl,.avatarep_fdan,.avatarep_fda_mine,.avatarep_fdl_mine{float:left}
 .avatarep_fda,.avatarep_fda_mine{margin-right:15px}
-.avatarep_fdl_img{width: 20px;height: 20px;border-radius: 50px;position: absolute;margin-left: -35px;margin-top: 25px;border: 1px solid #424242;padding: 2px;}
+.avatarep_fdl_img{width: 20px;height: 20px;border-radius: 50px;position: absolute;margin-left: -35px;margin-top: 25px;border: 1px solid #424242;padding: 2px}
 @media screen and (max-width: 450px){
-.avatarep_memprofile a{display: block;padding: 2px;}
-.avatarep_online, .avatarep_offline{height: 35px;width: 35px;}	
-.avatarep_tavatar img {height: 30px;width: 30px;padding: 2px;}	
-.avatarep_divisor{margin-top: -28px;}
-.avatarep_uname{font-size:12px;}
-.avatarep_uprofile{margin-top: 0px;padding: 5px;}
-.avatarep_usern{float: right;right: 3px;position: absolute;margin-top: -30px;font-size: 12px;background: #f5fdff;padding: 5px;opacity: 0.5;color: #424242;border-radius:2px;}
-.avatarep_img_contributor{padding: 2px;border: 1px solid #D8DFEA;width: 19px;height: 19px;border-radius: 50%;opacity: 0.9;	margin: 2px 5px 0px 2px;float: left;}
-.avatarep_img{padding: 2px;border: 1px solid #D8DFEA;width: 19px;height: 19px;border-radius: 50%;opacity: 0.9;margin: 0px 5px 0px 2px;}
+.avatarep_memprofile a{display: block;padding: 2px}
+.avatarep_online, .avatarep_offline{height: 35px;width: 35px}
+.avatarep_online, .avatarep_offline{height: 35px;width: 35px}
+.avatarep_online_ext1,.avatarep_online_ext,.avatarep_offline_ext1,.avatarep_offline_ext{height: 32px;width: 32px}
+.avatarep_online_ext2,.avatarep_offline_ext2{height: 16px;width: 16px}
+.avatarep_tavatar img {height: 30px;width: 30px;padding: 2px}	
+.avatarep_divisor{margin-top: -28px}
+.avatarep_uname{font-size:12px}
+.avatarep_uprofile{margin-top: 0px;padding: 5px}
+.avatarep_usern{float: right;right: 3px;position: absolute;margin-top: -30px;font-size: 12px;background: #f5fdff;padding: 5px;opacity: 0.5;color: #424242;border-radius:2px}
+.avatarep_img_contributor{padding: 2px;border: 1px solid #D8DFEA;width: 19px;height: 19px;border-radius: 50%;opacity: 0.9;	margin: 2px 5px 0px 2px;float: left}
+.avatarep_img, .avatarep_bg{padding: 2px;border: 1px solid #D8DFEA;width: 19px;height: 19px;border-radius: 50%;opacity: 0.9;margin: auto;float: left}
 .avatarep_fd{float:left;margin: auto;padding: 0px 10px 0px 0px;width:20px;height:20px}
 .avatarep_fda,.avatarep_fdl,.avatarep_fdan,.avatarep_fda_mine,.avatarep_fdl_mine{float:left}
 .avatarep_fda,.avatarep_fda_mine{margin-right:15px}
-.avatarep_fdl_img{width: 20px;height: 20px;border-radius: 50px;position: absolute;margin-left: -35px;margin-top: 25px;border: 1px solid #424242;padding: 2px;}
+.avatarep_fdl_img{width: 20px;height: 20px;border-radius: 50px;position: absolute;margin-left: -35px;margin-top: 25px;border: 1px solid #424242;padding: 2px}
 }';
 
 	$stylesheet = array(
 		"name"			=> "avatarep.css",
 		"tid"			=> 1,
-		"attachedto"	=> 0,		
+		"attachedto"	=> "",
 		"stylesheet"	=> $db->escape_string($avatarep_css),
 		"cachefile"		=> "avatarep.css",
 		"lastmodified"	=> TIME_NOW
@@ -508,7 +508,7 @@ function avatarep_deactivate() {
     find_replace_templatesets("search_results_threads_thread", '#'.preg_quote('<avatarep_uid_[{$thread[\'lastposteruid\']}]>').'#', '',0);
     find_replace_templatesets("search_results_posts_post", '#'.preg_quote('<avatarep_uid_[{$post[\'uid\']}]>').'#', '',0);
     find_replace_templatesets("private_messagebit", '#'.preg_quote('<avatarep_uid_[{$tofromuid}]>').'#', '',0);
-    find_replace_templatesets("private_tracking_readmessage", '#'.preg_quote('<avatarep_uid_[{$readmessage[\'toid\']}]').'#', '',0);
+    find_replace_templatesets("private_tracking_readmessage", '#'.preg_quote('<avatarep_uid_[{$readmessage[\'toid\']}]>').'#', '',0);
     find_replace_templatesets("private_tracking_unreadmessage", '#'.preg_quote('<avatarep_uid_[{$unreadmessage[\'toid\']}]>').'#', '',0);
 	find_replace_templatesets("portal_latestthreads_thread", '#'.preg_quote('<avatarep_uid_[{$thread[\'lastposteruid\']}]>').'#', '',0);
 	find_replace_templatesets("showthread", '#'.preg_quote('{$avatarep_thread}').'#', '',0);	
@@ -541,26 +541,40 @@ function avatarep_format_avatar($user)
 				$avatar = $user['avatar'];
 			}
 			else if($user['avatartype'] == "" && $user['avatar']){
-				$avatar = $mybb->settings['bburl'] . "/images/default_avatar.png";
+				$avatar = false;
 			}	  
 			else{
-				$avatar = $mybb->settings['bburl'] . "/images/default_avatar.png";
+				$avatar = false;
 			}	
 		}
 		if($mybb->settings['avatarep_onerror'] == 1)
 			$onerror = " onerror=\"this.src=\'images/default_avatar.png\'\"";
 		else
 			$onerror = "";
-		return array(
-			'avatar' => $avatar,
-			'avatarep' => '<img src="' . $avatar . '" class="avatarep_img" alt="'.htmlspecialchars_uni($user['userusername']).'"'.$onerror.' />',
-			'username' => htmlspecialchars_uni($user['userusername']),
-			'profilelink' => get_profile_link($user['uid']),
-			'uid' => (int)$user['uid'],
-			'usergroup' => (int)$user['usergroup'],
-			'displaygroup' => (int)$user['displaygroup']
-		);
-
+		if($avatar == false)
+		{
+			return array(
+				'avatar' => "images/default_avatar.png",
+				'avatarep' => '<img class="avatarep_bg" alt="'.htmlspecialchars_uni($user['userusername']).' />',
+				'username' => htmlspecialchars_uni($user['userusername']),
+				'profilelink' => get_profile_link($user['uid']),
+				'uid' => (int)$user['uid'],
+				'usergroup' => (int)$user['usergroup'],
+				'displaygroup' => (int)$user['displaygroup']
+			);			
+		}
+		else
+		{
+			return array(
+				'avatar' => $avatar,
+				'avatarep' => '<img src="' . $avatar . '" class="avatarep_img" alt="'.htmlspecialchars_uni($user['userusername']).'"'.$onerror.' />',
+				'username' => htmlspecialchars_uni($user['userusername']),
+				'profilelink' => get_profile_link($user['uid']),
+				'uid' => (int)$user['uid'],
+				'usergroup' => (int)$user['usergroup'],
+				'displaygroup' => (int)$user['displaygroup']
+			);
+		}
 	return format_avatar($user);
 }		
 // Avatar en foros
@@ -600,7 +614,7 @@ function forumlist_avatar_fname(&$forum)
 
 function forumlist_avatar(&$content)
 {
-	global $cache, $db, $fcache, $mybb, $lang, $avatar_events;
+	global $cache, $db, $mybb, $lang, $avatar_events;
 
     // Cargamos idioma
     $lang->load("avatarep", false, true);
@@ -621,6 +635,7 @@ function forumlist_avatar(&$content)
 		case "usercp.php":if($mybb->settings['avatarep_usercp'] == 1)$show_avatars = true;break;
 		default: $show_avatars=false;
 	}
+
 	if($show_avatars == true)
 	{
 		$avatars= array();
@@ -643,6 +658,7 @@ function forumlist_avatar(&$content)
 				$users[] = (int)$val;
 			}
 			$sql = implode(',', array_unique($users));
+			if(!empty($sql))
 			$query = $db->simple_select('users', 'uid, username, username AS userusername, avatar, avatartype, usergroup, displaygroup', "uid IN ({$sql})");
 			$find = $replace = array();				
 			while($user = $db->fetch_array($query))
@@ -655,10 +671,10 @@ function forumlist_avatar(&$content)
 				if(!empty($user['avatar']))
 					$user['avatar'] = "<img src=\"{$user['avatar']}\" alt=\"{$user['username']}\" class=\"avatarep_img\"{$onerror} />";
 				else
-					$user['avatar'] = "<img src=\"images/default_avatar.png\" alt=\"{$user['username']}\" class=\"avatarep_img\" />";
+					$user['avatar'] = "<img data-name=\"{$user['username']}\" class=\"avatarep_bg\" />";
 				$uid = (int)$user['uid'];
 
-				$user['avatarep_title'] = $lang->sprintf($lang->avatarep_user_alt_forums, htmlspecialchars_uni($user['username']));
+				$user['avatarep_title'] = $lang->sprintf($lang->avatarep_user_alt, htmlspecialchars_uni($user['username']));
 				if($mybb->settings['avatarep_menu'] == 1){
 					if(function_exists("google_seo_url_profile"))
 					{
@@ -688,7 +704,7 @@ function forumlist_avatar(&$content)
 				if($mybb->settings['avatarep_guests'] == 1 && $user['uid'] === NULL)
 				{
 					$user['avatarep_alt'] = $lang->sprintf($lang->avatarep_user_alt, htmlspecialchars_uni($user['username']));	
-					$user['avatar'] = '<img class="avatarep_img" src="images/default_avatar.png" alt="'.$user['avatarep_alt'].'" />';
+					$user['avatar'] = '<img class="avatarep_bg" data-name="'.$user['username'].'" alt="'.$user['avatarep_alt'].'" />';
 				}
 				if($mybb->settings['avatarep_format'] == 1)
 				{
@@ -712,7 +728,7 @@ function forumlist_avatar(&$content)
 					if($mybb->settings['avatarep_guests'] == 1)
 					{
 						$find[] = "<avatarep_uid_[0]>";			
-						$replace[] = "<div class=\"avatarep_fd\"><img class=\"avatarep_img\" src=\"images/default_avatar.png\" alt=\"Guest\" /></div>";				
+						$replace[] = "<div class=\"avatarep_fd\"><img class=\"avatarep_bg\" data-name=\"".$user['username']."\" alt=\"Guest\" /></div>";				
 					}				
 				}
 			}
@@ -736,9 +752,7 @@ function forumlist_avatar_thread()
 	if($mybb->settings['avatarep_temas_mark'] == 1)
 	{
 		$mybb->user['username'] = htmlspecialchars_uni($mybb->user['username']);
-		if(empty($mybb->user['avatar']))
-			$mybb->user['avatar'] = "images/default_avatar.png";
-		else
+		if(!empty($mybb->user['avatar']))
 			$mybb->user['avatar'] = htmlspecialchars_uni($mybb->user['avatar']);
 		if($mybb->settings['avatarep_onerror'] == 1)
 			$onerror = " onerror=\"this.src=\'images/default_avatar.png\'\"";
@@ -746,7 +760,10 @@ function forumlist_avatar_thread()
 			$onerror = "";		
 		if($thread['lastposteruid'] == $mybb->user['uid'] || $thread['uid'] == $mybb->user['uid'])
 		{
-			$thread['avatarep'] = '<div class="avatarep_fdl_mine"><img src="' . $mybb->user['avatar'] . '" alt="' . $mybb->user['username'] . '" class="avatarep_fdl_img"'.$onerror.' /></div>';			
+			if(!empty($mybb->user['avatar']))
+				$thread['avatarep'] = '<div class="avatarep_fdl_mine"><img src="' . $mybb->user['avatar'] . '" alt="' . $mybb->user['username'] . '" class="avatarep_fdl_img"'.$onerror.' /></div>';
+			else		
+				$thread['avatarep'] = '<div class="avatarep_fdl_mine"><img data-name="' . $mybb->user['username'] . '" alt="' . $mybb->user['username'] . '" class="avatarep_bg avatarep_fdl_img" /></div>';				
 		}
 		else if($thread['lastposteruid'] != $mybb->user['uid'] && $thread['uid'] != $mybb->user['uid'] && $mybb->user['uid'])
 		{
@@ -758,7 +775,11 @@ function forumlist_avatar_thread()
 			$is_avatar = $db->num_rows($query);
 			if($is_avatar >= 1)
 			{
-				$thread['avatarep'] = '<div class="avatarep_fdl_mine"><img src="' . $mybb->user['avatar'] . '" alt="' . $mybb->user['username'] . '" class="avatarep_fdl_img"'.$onerror.' /></div>';			
+				if(!empty($mybb->user['avatar']))
+					$thread['avatarep'] = '<div class="avatarep_fdl_mine"><img src="' . $mybb->user['avatar'] . '" alt="' . $mybb->user['username'] . '" class="avatarep_fdl_img"'.$onerror.' /></div>';
+				else
+					$thread['avatarep'] = '<div class="avatarep_fdl_mine"><img data-name="' . $mybb->user['username'] . '" alt="' . $mybb->user['username'] . '" class="avatarep_bg avatarep_fdl_img" /></div>';
+					
 			}
 		}
 		else
@@ -908,7 +929,7 @@ function avatarep_announcement()
 
 function avatarep_private_fname()
 {
-	global $mybb, $cache, $message, $tofromusername;
+	global $mybb, $cache, $message, $tofromusername, $tofromuid;
 	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_private'] == 0)
     {
         return false;
@@ -944,6 +965,83 @@ function avatarep_private_fname()
 	$tofromusername = build_profile_link($tofromusername, $tofromuid);
 }
 
+function avatarep_private_tracking_fname()
+{
+	global $mybb, $lang, $db, $readmessages, $unreadmessages;
+	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_private'] == 0)
+    {
+        return false;
+    }
+	$lang->load('avatarep',false,true);
+	if(isset($readmessages))
+	{
+		$users = array();
+		foreach(array($readmessages) as $content)
+		{
+			if(!$content) continue;
+			preg_match_all('#<avatarep_uid_\[([0-9]+)\]#', $content, $matches);
+			if(is_array($matches[1]) && !empty($matches[1]))
+			{
+				foreach($matches[1] as $user)
+				{
+					if(!intval($user)) continue;
+					$users[] = intval($user);
+				}
+			}
+		}
+		if(!empty($users))
+		{
+			$sql = implode(',', $users);
+			if(!empty($sql))
+			$query = $db->simple_select('users', 'uid, username, username AS userusername, avatar, usergroup, displaygroup', "uid IN ({$sql})");
+			$find = $replace = array();		
+			while($user = $db->fetch_array($query))
+			{	
+				if($mybb->settings['avatarep_format'] == 1)
+				{
+					$find[] = ">".$user['userusername']."<";				
+					$replace[] = " style=\"display:block\">".format_name($user['userusername'],$user['usergroup'],$user['displaygroup'])."<";
+				}
+			}
+			if(isset($readmessages)) $readmessages = str_replace($find, $replace, $readmessages);
+		}		
+	}
+
+	if(isset($unreadmessages))
+	{
+		$users = array();
+		foreach(array($unreadmessages) as $content)
+		{
+			if(!$content) continue;
+			preg_match_all('#<avatarep_uid_\[([0-9]+)\]#', $content, $matches);
+			if(is_array($matches[1]) && !empty($matches[1]))
+			{
+				foreach($matches[1] as $user)
+				{
+					if(!intval($user)) continue;
+					$users[] = intval($user);
+				}
+			}
+		}
+		if(!empty($users))
+		{
+			$sql = implode(',', $users);
+			if(!empty($sql))
+			$query = $db->simple_select('users', 'uid, username, username AS userusername, avatar, usergroup, displaygroup', "uid IN ({$sql})");
+			$find = $replace = array();		
+			while($user = $db->fetch_array($query))
+			{	
+				if($mybb->settings['avatarep_format'] == 1)
+				{
+					$find[] = ">".$user['userusername']."<";				
+					$replace[] = " style=\"display:block\">".format_name($user['userusername'],$user['usergroup'],$user['displaygroup'])."<";
+				}
+			}
+			if(isset($unreadmessages)) $unreadmessages = str_replace($find, $replace, $unreadmessages);
+		}		
+	}	
+}
+
 function avatarep_usercp_fname()
 {
 	global $db, $lang, $mybb, $latest_threads, $latest_subscribed;
@@ -971,6 +1069,7 @@ function avatarep_usercp_fname()
 		if(!empty($users))
 		{
 			$sql = implode(',', $users);
+			if(!empty($sql))
 			$query = $db->simple_select('users', 'uid, username, username AS userusername, avatar, usergroup, displaygroup', "uid IN ({$sql})");
 			$find = $replace = array();		
 			while($user = $db->fetch_array($query))
@@ -1004,6 +1103,7 @@ function avatarep_usercp_fname()
 		if(!empty($users))
 		{
 			$sql = implode(',', $users);
+			if(!empty($sql))			
 			$query = $db->simple_select('users', 'uid, username, username AS userusername, avatar, usergroup, displaygroup', "uid IN ({$sql})");
 			$find = $replace = array();		
 			while($user = $db->fetch_array($query))
@@ -1062,6 +1162,7 @@ function avatarep_portal_fname()
 	if(!empty($users))
 	{
 		$sql = implode(',', $users);
+		if(!empty($sql))
 		$query = $db->simple_select('users', 'uid, username, username AS userusername, avatar, usergroup, displaygroup', "uid IN ({$sql})");
 		$find = $replace = array();		
 		while($user = $db->fetch_array($query))
@@ -1102,6 +1203,7 @@ function avatarep_portal_sb()
 	if(!empty($users))
 	{
 		$sql = implode(',', $users);
+		if(!empty($sql))		
 		$query = $db->simple_select('users', 'uid, username, username AS userusername, avatar, usergroup, displaygroup', "uid IN ({$sql})");
 		$find = $replace = array();		
 		while($user = $db->fetch_array($query))
@@ -1144,9 +1246,9 @@ function avatarep_threads()
 			$myuid = (int)$mybb->user['uid'];
 			$myuid = $db->escape_string($myuid);
 			if(empty($mybb->user['avatar']))
-				$mybb->user['avatar'] = "images/default_avatar.png";
+				$mybb->user['avatar'] = "data-name=\"" . $mybb->user['username'] . "\" class=\"avatarep_bg\"";
 			else
-				$mybb->user['avatar'] = htmlspecialchars_uni($mybb->user['avatar']);
+				$mybb->user['avatar'] = "src=\"".htmlspecialchars_uni($mybb->user['avatar'])."\" class=\"avatarep_img_contributor\"";
 			if($mybb->settings['avatarep_onerror'] == 1)
 				$onerror = " onerror=\"this.src=\'images/default_avatar.png\'\"";
 			else
@@ -1155,7 +1257,7 @@ function avatarep_threads()
 			$is_avatar = $db->num_rows($query);
 			if($is_avatar >= 1)
 			{
-				$avatarep_thread = '<img src="' . $mybb->user['avatar'] . '" alt="' . $mybb->user['username'] . '" class="avatarep_img_contributor"'.$onerror.' />';			
+				$avatarep_thread = '<img '. $mybb->user['avatar'] . ' alt="' . $mybb->user['username'] . '" '.$onerror.' />';			
 			}
 			else
 			{
@@ -1185,7 +1287,7 @@ function avatarep_threads()
 }
 
 function avatarep_style_guser(){
-   global $mybb, $cache, $db;
+   global $mybb, $cache;
 
    	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_format'] == 0)
     {
@@ -1199,24 +1301,24 @@ function avatarep_style_guser(){
 
 	if(isset($cache->cache['moderators']))
 	{
-		foreach ($cache->cache['moderators'] as $fid => $fdata)
+		foreach ($cache->cache['moderators'] as $fmid => $fmdata)
 		{
-			if (isset($fdata['usergroups']))
+			if (isset($fmdata['usergroups']))
 			{
-				foreach ($fdata['usergroups'] as $gid => $gdata)
+				foreach ($fmdata['usergroups'] as $gmid => $gmdata)
 				{
-					$cache->cache['moderators'][$fid]['usergroups'][$gid]['title'] = "#{$gdata['title']}{$gid}#";
-					$cache->cache['usergroups'][$gid]['title'] = $gdata['title'];
-					$cache->cache['groups'][] = $gid;
+					$cache->cache['moderators'][$fmid]['usergroups'][$gmid]['title'] = "#{$gmdata['title']}{$gmid}#";
+					$cache->cache['usergroups'][$gmid]['title'] = $gmdata['title'];
+					$cache->cache['groups'][] = $gmid;
 				}
 			}
-			if (isset($fdata['users']))
+			if (isset($fmdata['users']))
 			{
-				foreach ($fdata['users'] as $uid => $udata)
+				foreach ($fmdata['users'] as $umid => $umdata)
 				{
-					$cache->cache['moderators'][$fid]['users'][$uid]['username'] = "#{$udata['username']}{$uid}#";				
-					$cache->cache['users'][$uid] = $udata['username'];
-					$cache->cache['mods'][] = $uid;
+					$cache->cache['moderators'][$fmid]['users'][$umid]['username'] = "#{$umdata['username']}{$umid}#";				
+					$cache->cache['users'][$umid] = $udmata['username'];
+					$cache->cache['mods'][] = $umid;
 				}
 			}
 		}		
@@ -1249,36 +1351,40 @@ function avatarep_style_output(&$content){
 	
     if (isset($cache->cache['users']))
     {	
-        $result = $db->simple_select('users', 'uid, username, usergroup, displaygroup', 'uid IN (' . implode(',', array_keys($cache->cache['users'])) . ')');
-        while ($avatarep = $db->fetch_array($result))
-        {
-			$username = format_name($avatarep['username'], $avatarep['usergroup'], $avatarep['displaygroup']);
-			$format = "#{$avatarep['username']}{$avatarep['uid']}#";
-			if(is_array($cache->cache['groups']) && !empty($cache->cache['mods']))
+		$sql_in = implode(',', array_keys($cache->cache['users']));
+		if(!empty($sql_in))
+		{	
+			$result = $db->simple_select('users', 'uid, username, usergroup, displaygroup', 'uid IN (' . $sql_in . ')');
+			while ($avatarep = $db->fetch_array($result))
 			{
-				$compare = explode(",", $cache->cache['mods']);
-				if(in_array($avatarep['uid'], $compare))
-                {
-                    $old_username = str_replace('{username}', $format, $cache->cache['usergroups'][$avatarep['usergroup']]['namestyle']);
-                    if ($old_username != '')
-                    {
-                        $content = str_replace($old_username, $format, $content);
-                    }
-                }
-				
+				$username = format_name($avatarep['username'], $avatarep['usergroup'], $avatarep['displaygroup']);
+				$format = "#{$avatarep['username']}{$avatarep['uid']}#";
+				if(is_array($cache->cache['groups']) && !empty($cache->cache['mods']))
+				{
+					$compare = explode(",", $cache->cache['mods']);
+					if(in_array($avatarep['uid'], $compare))
+					{
+						$old_username = str_replace('{username}', $format, $cache->cache['usergroups'][$avatarep['usergroup']]['namestyle']);
+						if ($old_username != '')
+						{
+							$content = str_replace($old_username, $format, $content);
+						}
+					}
+					
+				}
+		
+				$content = str_replace($format, $username, $content);
 			}
-	
-            $content = str_replace($format, $username, $content);			
 			unset($cache->cache['users'][$avatarep['uid']]);
 		}
 
-		if (isset($fdata['users']))
+		if (isset($fmdata['users']))
 		{
-			foreach ($fdata['users'] as $uid => $udata)
+			foreach ($fmdata['users'] as $umid => $umdata)
 			{
-				$cache->cache['moderators'][$fid]['users'][$uid]['username'] = "#{$udata['username']}{$uid}#";				
-				$cache->cache['users'][$uid] = $udata['username'];
-				$cache->cache['mods'][] = $uid;
+				$cache->cache['moderators'][$fmid]['users'][$umid]['username'] = "#{$umdata['username']}{$umid}#";				
+				$cache->cache['users'][$umid] = $umdata['username'];
+				$cache->cache['mods'][] = $umid;
 			}
 		}
 	}
@@ -1295,14 +1401,14 @@ function avatarep_style_output(&$content){
     
     if (isset($cache->cache['groups']))
     {
-        foreach ($cache->cache['usergroups'] as $gid => $gdata)
+        foreach ($cache->cache['usergroups'] as $gmid => $gmdata)
         {
-            if (!in_array($gid, $cache->cache['groups']))
+            if (!in_array($gmid, $cache->cache['groups']))
             {
                 continue;
             }
-            $title = format_name($gdata['title'], $gid);
-            $format = "#{$gdata['title']}{$gid}#";
+            $title = format_name($gmdata['title'], $gmid);
+            $format = "#{$gmdata['title']}{$gmid}#";
             $content = str_replace($format, $title, $content);
         }
     }	
@@ -1332,10 +1438,7 @@ function avatarep_popup()
     {
         return false;
     }
-	if($mybb->settings['avatarep_menu_events'] == 2)
-	{
-		$avatarep_script = "<script type=\"text/javascript\" src=\"{$mybb->asset_url}/jscripts/avatarep.js?ver=292\"></script>";
-	}
+	$avatarep_script = "<script type=\"text/javascript\" src=\"{$mybb->asset_url}/jscripts/avatarep.js?ver=299\"></script>";
     if($mybb->input['action'] == "avatarep_popup"){
 
 	$lang->load("member", false, true);
@@ -1348,11 +1451,13 @@ function avatarep_popup()
 		{
 			eval("\$avatarep_popup = \"".$templates->get("avatarep_popup_error_hover", 1, 0)."\";");
 			echo json_encode($avatarep_popup);
+			exit;
 		}
 		else
 		{		
 			eval("\$avatarep_popup = \"".$templates->get("avatarep_popup_error", 1, 0)."\";");
 			echo $avatarep_popup;
+			exit;			
 		}
     }
 	else{
@@ -1383,13 +1488,16 @@ function avatarep_popup()
 		$memprofile = get_user($uid);
 		$lang->avatarep_user_alt = $lang->sprintf($lang->avatarep_user_alt, htmlspecialchars_uni($memprofile['username']));
 		$lang->avatarep_user_no_avatar = htmlspecialchars_uni($lang->avatarep_user_no_avatar);
+		$avatar = htmlspecialchars_uni($memprofile['avatar']);
+		if(empty($avatar))
+			$avatar = "images/default_avatar.png";
 		if($memprofile['uid'] > 0 && $memprofile['avatar'] == "" || empty($memprofile['avatar'])) 
 		{
-			$avatarep = '<img src="images/default_avatar.png" alt="'.$lang->avatarep_user_no_avatar.'" />';
+			$avatarep = '<img src="'.$avatar.'" class="avatarep_img" alt="'.$lang->avatarep_user_no_avatar.'" />';
 		}
 		else if($memprofile['uid'] == 0 && empty($memprofile['avatar']) && $mybb->settings['avatarep_guests'] == 1) 
 		{
-			$avatarep = '<img src="images/default_avatar.png" alt="'.$lang->avatarep_user_no_avatar.'" />';
+			$avatarep = '<img src="'.$avatar.'" class="avatarep_img" alt="'.$lang->avatarep_user_no_avatar.'" />';
 		}		
 		else
 		{
@@ -1428,14 +1536,14 @@ function avatarep_popup()
 		{
 			eval("\$avatarep_popup = \"".$templates->get("avatarep_popup_hover", 1, 0)."\";");
 			echo json_encode($avatarep_popup);
+			exit;
 		}
 		else
 		{
 			eval("\$avatarep_popup = \"".$templates->get("avatarep_popup", 1, 0)."\";");
 			echo $avatarep_popup;
+			exit;
 		}	
 		}
-		exit;
 	}
 }
-?>
