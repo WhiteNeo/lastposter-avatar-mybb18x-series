@@ -60,6 +60,9 @@ if(defined("THIS_SCRIPT"))
 	$plugins->add_hook('pre_output_page', 'forumlist_avatar',15);
 }
 
+global $theme, $mybb;
+define('DEF_AV', str_replace('{theme}', $theme['imgdir'], $mybb->settings['useravatar']));
+
 // Informacion del plugin
 function avatarep_info()
 {
@@ -548,13 +551,13 @@ function avatarep_format_avatar($user)
 			}	
 		}
 		if($mybb->settings['avatarep_onerror'] == 1)
-			$onerror = " onerror=\"this.src=\'images/default_avatar.png\'\"";
+			$onerror = " onerror=\"this.src='".DEF_AV."'\"";
 		else
 			$onerror = "";
 		if($avatar == false)
 		{
 			return array(
-				'avatar' => "images/default_avatar.png",
+				'avatar' => DEF_AV,
 				'avatarep' => '<img class="avatarep_bg" alt="'.htmlspecialchars_uni($user['userusername']).' />',
 				'username' => htmlspecialchars_uni($user['userusername']),
 				'profilelink' => get_profile_link($user['uid']),
@@ -664,7 +667,7 @@ function forumlist_avatar(&$content)
 			while($user = $db->fetch_array($query))
 			{	
 				if($mybb->settings['avatarep_onerror'] == 1)
-					$onerror = " onerror=\"this.src=\'images/default_avatar.png\'\"";
+					$onerror = " onerror=\"this.src='".DEF_AV."'\"";
 				else
 					$onerror = "";		
 				$avatar = avatarep_format_avatar($user);
@@ -755,7 +758,7 @@ function forumlist_avatar_thread()
 		if(!empty($mybb->user['avatar']))
 			$mybb->user['avatar'] = htmlspecialchars_uni($mybb->user['avatar']);
 		if($mybb->settings['avatarep_onerror'] == 1)
-			$onerror = " onerror=\"this.src=\'images/default_avatar.png\'\"";
+			$onerror = " onerror=\"this.src='".DEF_AV."'\"";
 		else
 			$onerror = "";		
 		if($thread['lastposteruid'] == $mybb->user['uid'] || $thread['uid'] == $mybb->user['uid'])
@@ -1250,7 +1253,7 @@ function avatarep_threads()
 			else
 				$mybb->user['avatar'] = "src=\"".htmlspecialchars_uni($mybb->user['avatar'])."\" class=\"avatarep_img_contributor\"";
 			if($mybb->settings['avatarep_onerror'] == 1)
-				$onerror = " onerror=\"this.src=\'images/default_avatar.png\'\"";
+				$onerror = " onerror=\"this.src='".DEF_AV."'\"";
 			else
 				$onerror = "";			
 			$query = $db->simple_select("posts","uid","tid={$tid} AND uid= {$myuid}",array("limit"=>1));
@@ -1266,7 +1269,7 @@ function avatarep_threads()
 				$avatarep['avatar'] = str_replace($replace, $search, $avatarep['avatar']);
 				$avatar_thread = $avatarep['avatar'];
 				if(empty($avatar_thread))
-					$avatar_thread = "images/default_avatar.png";
+					$avatar_thread = DEF_AV;
 				else
 					$avatar_thread = htmlspecialchars_uni($avatar_thread);
 				$post['avatarep_title'] = $lang->sprintf($lang->avatarep_user_alt_thread_contributor, $avatarep['username']);
@@ -1276,7 +1279,7 @@ function avatarep_threads()
 		else
 		{
 			if($mybb->settings['avatarep_onerror'] == 1)
-				$onerror = " onerror=\"this.src=\'images/default_avatar.png\'\"";
+				$onerror = " onerror=\"this.src='".DEF_AV."'\"";
 			else
 				$onerror = "";			
 			$search = "/uploads";
@@ -1490,7 +1493,7 @@ function avatarep_popup()
 		$lang->avatarep_user_no_avatar = htmlspecialchars_uni($lang->avatarep_user_no_avatar);
 		$avatar = htmlspecialchars_uni($memprofile['avatar']);
 		if(empty($avatar))
-			$avatar = "images/default_avatar.png";
+			$avatar = DEF_AV;
 		if($memprofile['uid'] > 0 && $memprofile['avatar'] == "" || empty($memprofile['avatar'])) 
 		{
 			$avatarep = '<img src="'.$avatar.'" class="avatarep_img" alt="'.$lang->avatarep_user_no_avatar.'" />';
@@ -1502,7 +1505,7 @@ function avatarep_popup()
 		else
 		{
 			if($mybb->settings['avatarep_onerror'] == 1)
-				$onerror = " onerror=\"this.src=\'images/default_avatar.png\'\"";
+				$onerror = " onerror=\"this.src='".DEF_AV."'\"";
 			else
 				$onerror = "";			
 			$avatarep =  htmlspecialchars_uni($memprofile['avatar']);
