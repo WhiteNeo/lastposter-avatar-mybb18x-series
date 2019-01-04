@@ -1,10 +1,10 @@
 /**
 *@ Autor: Dark Neo
 *@ Fecha: 2017-22-12
-*@ Version: 2.9.8
+*@ Version: 2.9.9
 *@ Contacto: neogeoman@gmail.com
 */
-$(document).on("ready", function(){
+$(function(){
 	var NavaT = 0;						
 	var myTimer;
 	if (typeof lpaname === 'undefined')
