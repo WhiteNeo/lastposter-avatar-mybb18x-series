@@ -29,7 +29,7 @@ if(defined("THIS_SCRIPT"))
 	}
 	else if(THIS_SCRIPT == 'showthread.php')
 	{
-		if($settings['sidebox5'] == 0 || $settings['sidebox5'] == 1)
+		if(isset($settings['sidebox5']) && ($settings['sidebox5'] == 0 || $settings['sidebox5'] == 1))
 		$plugins->add_hook('showthread_end', 'avatarep_portal_sb');		
 		$plugins->add_hook('showthread_end', 'avatarep_threads');
 	}
@@ -531,7 +531,14 @@ function avatarep_format_avatar($user)
 		$dimensions = "30px";
 		$avatar = format_avatar($user['avatar'], $dimensions, $size);
 		$avatar = htmlspecialchars_uni($avatar['image']);
-
+		
+		// usergroup & displaygroup may not be available here, lets reload the user
+		if(!isset($user['usergroup']) || !isset($user['displaygroup'])) {
+			$getuser = get_user((int)$user['uid']);
+			$user['usergroup'] = $getuser['usergroup'];
+			$user['displaygroup'] = $getuser['displaygroup'];
+		}
+		
 		if(THIS_SCRIPT == "showthread.php"){
 			if($user['avatartype'] == "upload"){
 				$avatar = $mybb->settings['bburl'] . "/" . $user['avatar'];
