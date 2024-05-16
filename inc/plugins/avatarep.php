@@ -17,7 +17,7 @@ if(defined("THIS_SCRIPT"))
 	// Añadir hooks
 	if(THIS_SCRIPT == 'index.php' || THIS_SCRIPT == 'forumdisplay.php')
 	{
-		if($settings['sidebox5'] == 0 || $settings['sidebox5'] == 1)
+		if(isset($settings['sidebox5']) && ($settings['sidebox5'] == 0 || $settings['sidebox5'] == 1))
 		{
 			$plugins->add_hook('index_end', 'avatarep_portal_sb');	
 			$plugins->add_hook('forumdisplay_end', 'avatarep_portal_sb');		
@@ -60,8 +60,8 @@ if(defined("THIS_SCRIPT"))
 	$plugins->add_hook('pre_output_page', 'forumlist_avatar',15);
 }
 
-global $theme, $mybb;
-define('DEF_AV', str_replace('{theme}', $theme['imgdir'], $mybb->settings['useravatar']));
+//global $theme, $mybb;
+//define('DEF_AV', str_replace('{theme}', $theme['imgdir'], $mybb->settings['useravatar'])); << $theme is not available here, lets load it at global end.
 
 // Informacion del plugin
 function avatarep_info()
@@ -1290,7 +1290,8 @@ function avatarep_threads()
 }
 
 function avatarep_style_guser(){
-   global $mybb, $cache;
+   global $mybb, $theme, $cache;
+   define('DEF_AV', str_replace('{theme}', $theme['imgdir'], $mybb->settings['useravatar']));
 
    	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_format'] == 0)
     {
@@ -1442,7 +1443,7 @@ function avatarep_popup()
         return false;
     }
 	$avatarep_script = "<script type=\"text/javascript\" src=\"{$mybb->asset_url}/jscripts/avatarep.js?ver=299\"></script>";
-    if($mybb->input['action'] == "avatarep_popup"){
+    if(isset($mybb->input['action']) && $mybb->input['action'] == "avatarep_popup"){
 
 	$lang->load("member", false, true);
 	$lang->load("avatarep", false, true);
