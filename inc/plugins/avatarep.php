@@ -17,7 +17,7 @@ if(defined("THIS_SCRIPT"))
 	// Añadir hooks
 	if(THIS_SCRIPT == 'index.php' || THIS_SCRIPT == 'forumdisplay.php')
 	{
-		if($settings['sidebox5'] == 0 || $settings['sidebox5'] == 1)
+		if(isset($settings['sidebox5']) && ($settings['sidebox5'] == 0 || $settings['sidebox5'] == 1))
 		{
 			$plugins->add_hook('index_end', 'avatarep_portal_sb');	
 			$plugins->add_hook('forumdisplay_end', 'avatarep_portal_sb');		
@@ -29,7 +29,7 @@ if(defined("THIS_SCRIPT"))
 	}
 	else if(THIS_SCRIPT == 'showthread.php')
 	{
-		if($settings['sidebox5'] == 0 || $settings['sidebox5'] == 1)
+		if(isset($settings['sidebox5']) && ($settings['sidebox5'] == 0 || $settings['sidebox5'] == 1))
 		$plugins->add_hook('showthread_end', 'avatarep_portal_sb');		
 		$plugins->add_hook('showthread_end', 'avatarep_threads');
 	}
@@ -54,14 +54,14 @@ if(defined("THIS_SCRIPT"))
 	{
 		$plugins->add_hook("usercp_end", "avatarep_usercp_fname",15);
 	}
-	$plugins->add_hook('global_start', 'avatarep_popup');
+	$plugins->add_hook('global_intermediate', 'avatarep_popup');
 	$plugins->add_hook('global_end', 'avatarep_style_guser',10);
 	$plugins->add_hook('pre_output_page', 'avatarep_style_output',10);
 	$plugins->add_hook('pre_output_page', 'forumlist_avatar',15);
 }
 
-global $theme, $mybb;
-define('DEF_AV', str_replace('{theme}', $theme['imgdir'], $mybb->settings['useravatar']));
+//global $theme, $mybb;
+//define('DEF_AV', str_replace('{theme}', $theme['imgdir'], $mybb->settings['useravatar'])); //<< $theme is not available here, lets load it at global intermediate.
 
 // Informacion del plugin
 function avatarep_info()
@@ -531,7 +531,14 @@ function avatarep_format_avatar($user)
 		$dimensions = "30px";
 		$avatar = format_avatar($user['avatar'], $dimensions, $size);
 		$avatar = htmlspecialchars_uni($avatar['image']);
-
+		
+		// usergroup & displaygroup may not be available here, lets reload the user
+		if(!isset($user['usergroup']) || !isset($user['displaygroup'])) {
+			$getuser = get_user((int)$user['uid']);
+			$user['usergroup'] = $getuser['usergroup'];
+			$user['displaygroup'] = $getuser['displaygroup'];
+		}
+		
 		if(THIS_SCRIPT == "showthread.php"){
 			if($user['avatartype'] == "upload"){
 				$avatar = $mybb->settings['bburl'] . "/" . $user['avatar'];
@@ -843,7 +850,7 @@ function forumlist_avatar_search()
 
 	if($mybb->settings['avatarep_format'] == 1  && $mybb->settings['avatarep_temas'] == 1)
 	{
-		if($post['uid']>0)
+		if(isset($post['uid']) && $post['uid']>0)
 		{
 			$post['username'] = htmlspecialchars_uni($post['username']);
 			$cache->cache['users'][$post['uid']] = $post['username'];		
@@ -858,7 +865,7 @@ function forumlist_avatar_search()
 			$cache->cache['guests'][] = $post['username'];		
 			$post['username'] = "#{$post['username']}#";			
 		}
-		if($thread['uid']>0)
+		if(isset($thread['uid']) && $thread['uid']>0)
 		{
 			$thread['username'] = htmlspecialchars_uni($thread['username']);
 			$cache->cache['users'][$thread['uid']] = $thread['username'];		
@@ -873,7 +880,7 @@ function forumlist_avatar_search()
 			$cache->cache['guests'][] = $thread['username'];		
 			$thread['username'] = "#{$thread['username']}#";			
 		}
-		if($thread['lastposteruid']>0)
+		if(isset($thread['lastposteruid']) && $thread['lastposteruid']>0)
 		{	
 			$thread['lastposter'] = htmlspecialchars_uni($thread['lastposter']);
 			$cache->cache['users'][$thread['lastposteruid']] = $thread['lastposter'];		
@@ -1290,7 +1297,8 @@ function avatarep_threads()
 }
 
 function avatarep_style_guser(){
-   global $mybb, $cache;
+   global $mybb, $theme, $cache;
+   define('DEF_AV', str_replace('{theme}', $theme['imgdir'], $mybb->settings['useravatar']));
 
    	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_format'] == 0)
     {
@@ -1435,14 +1443,16 @@ function avatarep_hover_extends($id, $name)
 
 function avatarep_popup()
 {
-    global $lang, $mybb, $templates, $avatarep_popup, $db, $avatarep_script;
+    global $lang, $mybb, $templates, $avatarep_popup, $db, $avatarep_script, $theme;
+
+	define('DEF_AV', str_replace('{theme}', $theme['imgdir'], $mybb->settings['useravatar']));
 
 	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_menu'] == 0)
     {
         return false;
     }
 	$avatarep_script = "<script type=\"text/javascript\" src=\"{$mybb->asset_url}/jscripts/avatarep.js?ver=299\"></script>";
-    if($mybb->input['action'] == "avatarep_popup"){
+    if(isset($mybb->input['action']) && $mybb->input['action'] == "avatarep_popup"){
 
 	$lang->load("member", false, true);
 	$lang->load("avatarep", false, true);
