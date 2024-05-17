@@ -1298,7 +1298,10 @@ function avatarep_threads()
 
 function avatarep_style_guser(){
    global $mybb, $theme, $cache;
-   define('DEF_AV', str_replace('{theme}', $theme['imgdir'], $mybb->settings['useravatar']));
+   
+   if (!defined('DEF_AV')) {
+	   define('DEF_AV', str_replace('{theme}', $theme['imgdir'], $mybb->settings['useravatar']));
+   }
 
    	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_format'] == 0)
     {
