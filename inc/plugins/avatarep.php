@@ -850,7 +850,7 @@ function forumlist_avatar_search()
 
 	if($mybb->settings['avatarep_format'] == 1  && $mybb->settings['avatarep_temas'] == 1)
 	{
-		if($post['uid']>0)
+		if(isset($post['uid']) && $post['uid']>0)
 		{
 			$post['username'] = htmlspecialchars_uni($post['username']);
 			$cache->cache['users'][$post['uid']] = $post['username'];		
@@ -865,7 +865,7 @@ function forumlist_avatar_search()
 			$cache->cache['guests'][] = $post['username'];		
 			$post['username'] = "#{$post['username']}#";			
 		}
-		if($thread['uid']>0)
+		if(isset($thread['uid']) && $thread['uid']>0)
 		{
 			$thread['username'] = htmlspecialchars_uni($thread['username']);
 			$cache->cache['users'][$thread['uid']] = $thread['username'];		
@@ -880,7 +880,7 @@ function forumlist_avatar_search()
 			$cache->cache['guests'][] = $thread['username'];		
 			$thread['username'] = "#{$thread['username']}#";			
 		}
-		if($thread['lastposteruid']>0)
+		if(isset($thread['lastposteruid']) && $thread['lastposteruid']>0)
 		{	
 			$thread['lastposter'] = htmlspecialchars_uni($thread['lastposter']);
 			$cache->cache['users'][$thread['lastposteruid']] = $thread['lastposter'];		
