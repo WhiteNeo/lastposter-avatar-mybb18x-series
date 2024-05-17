@@ -54,14 +54,14 @@ if(defined("THIS_SCRIPT"))
 	{
 		$plugins->add_hook("usercp_end", "avatarep_usercp_fname",15);
 	}
-	$plugins->add_hook('global_start', 'avatarep_popup');
+	$plugins->add_hook('global_intermediate', 'avatarep_popup');
 	$plugins->add_hook('global_end', 'avatarep_style_guser',10);
 	$plugins->add_hook('pre_output_page', 'avatarep_style_output',10);
 	$plugins->add_hook('pre_output_page', 'forumlist_avatar',15);
 }
 
 //global $theme, $mybb;
-//define('DEF_AV', str_replace('{theme}', $theme['imgdir'], $mybb->settings['useravatar'])); << $theme is not available here, lets load it at global end.
+//define('DEF_AV', str_replace('{theme}', $theme['imgdir'], $mybb->settings['useravatar'])); //<< $theme is not available here, lets load it at global intermediate.
 
 // Informacion del plugin
 function avatarep_info()
@@ -1443,7 +1443,9 @@ function avatarep_hover_extends($id, $name)
 
 function avatarep_popup()
 {
-    global $lang, $mybb, $templates, $avatarep_popup, $db, $avatarep_script;
+    global $lang, $mybb, $templates, $avatarep_popup, $db, $avatarep_script, $theme;
+
+	define('DEF_AV', str_replace('{theme}', $theme['imgdir'], $mybb->settings['useravatar']));
 
 	if($mybb->settings['avatarep_active'] == 0 || $mybb->settings['avatarep_active'] == 1 && $mybb->settings['avatarep_menu'] == 0)
     {
